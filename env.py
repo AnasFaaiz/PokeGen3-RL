@@ -22,18 +22,18 @@ class PokemonBattleEnv(gym.Env):
         self.sock.sendall(b"GET_STATE\n")
         raw = self.sock_file.readline()
         parts = [int(x) for x in raw.strip().split(",")]
-        player_hp, player_max, enemy_hp, enemy_max, battle_over = parts
+        player_hp, player_max, enemy_hp, enemy_max, battle_over, player_lost = parts
         obs = np.array([
             player_hp / max(player_max, 1),
             enemy_hp / max(enemy_max, 1)
         ], dtype=np.float32)
-        return obs, player_hp, enemy_hp, bool(battle_over)
+        return obs, player_hp, enemy_hp, bool(battle_over), bool(player_lost)
 
     def reset(self, seed=None, options=None):
         super().reset(seed=seed)
         while True:
-            obs, p_hp, e_hp, _ = self._get_state()
-            if e_hp > 0:
+            obs, p_hp, e_hp, _, _ = self._get_state()
+            if e_hp > 0 and p_hp > 0:
                 break
             time.sleep(0.5)
 
@@ -50,12 +50,15 @@ class PokemonBattleEnv(gym.Env):
         time.sleep(self.action_wait)
 
         # 3. NOW poll for the resulting state
-        obs, p_hp, e_hp, battle_over = self._get_state()
+        obs, p_hp, e_hp, battle_over, player_lost = self._get_state()
 
         # 4. Compute reward from the change
         reward = (self.prev_enemy_hp - e_hp) - (self.prev_player_hp - p_hp)
         if battle_over:
-            reward += 100 if e_hp <= 0 else -100
+            if player_lost:
+                reward -= 100
+            else:
+                reward += 100
 
         self.prev_player_hp = p_hp
         self.prev_enemy_hp = e_hp

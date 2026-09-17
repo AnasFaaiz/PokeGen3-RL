@@ -18,6 +18,9 @@ local walkTimer = 0
 local lastSelectState = false
 local toggleCooldown = 0
 
+local PARTY_BASE = 0x02024542
+local PARTY_STRIDE = 0x64
+
 local WALK_SEQUENCE = {
 	C.GBA_KEY.UP,
 	C.GBA_KEY.RIGHT,
@@ -36,11 +39,32 @@ function getState()
 	local playerMaxHP = emu:read16(ADDR_PLAYER_MAX_HP)
 	local enemyHP = emu:read16(ADDR_ENEMY_HP)
 	local enemyMaxHP = emu:read16(ADDR_ENEMY_MAX_HP)
+
 	local battleOver = 0
-	if enemyHP <= 0 or playerHP <= 0 then
+	local playerLost = 0
+	if enemyHP <= 0 then
 		battleOver = 1
+	elseif playerHP <= 0 and isPartyWiped() then
+		battleOver = 1
+		playerLost = 1
 	end
-	return string.format("%d,%d,%d,%d,%d", playerHP, playerMaxHP, enemyHP, enemyMaxHP, battleOver)
+
+	return string.format("%d,%d,%d,%d,%d,%d", playerHP, playerMaxHP, enemyHP, enemyMaxHP, battleOver, playerLost)
+end
+
+function dumpwide2()
+	local BASE = 0x02024542
+	local RANGE_AFTER = 0x300
+
+	console:log(string.format("=== Wide dump from 0x%08X ===", BASE))
+	for offset = 0, RANGE_AFTER, 2 do
+		local addr = BASE + offset
+		local val = emu:read16(addr)
+		if val > 0 and val < 300 then
+			console:log(string.format("0x%08X (offset + %d): %d", addr, offset, val))
+		end
+	end
+	console:log("=== End dump ===")
 end
 
 function checkToggleKey()
@@ -58,6 +82,16 @@ function checkToggleKey()
 		toggleCooldown = 20
 	end
 	lastSelectState = selectHeld
+end
+
+function isPartyWiped()
+	for i = 0, 5 do
+		local hp = emu:read16(PARTY_BASE + (i * PARTY_STRIDE))
+		if hp > 0 then
+			return false
+		end
+	end
+	return true
 end
 
 function processWalk()
