@@ -10,7 +10,7 @@ CSV_FILE = "battle_data.csv"
 def alert_loss():
     print("[ALERT] Battle lost!")
     try:
-        subprocess.run(["paplay", "/usr/share/sounds/freedesktop/stereo/complete.oga"])
+        subprocess.run(["paplay", "/usr/share/sounds/freedesktop/stereo/message.oga"])
     except FileNotFoundError:
         os.system('echo -e "\\a"')
 
