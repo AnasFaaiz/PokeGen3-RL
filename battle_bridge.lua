@@ -60,6 +60,11 @@ function getState()
 	local p_level = emu:read8(ADDR_PLAYER_HP + 2)
 	local e_level = emu:read8(ADDR_ENEMY_HP + 2)
 
+	local pStatus1 = emu:read32(0x020240D0)
+	local eStatus1 = emu:read32(0x02024128)
+	local pStatus2 = emu:read32(0x020240D4)
+	local eStatus2 = emu:read32(0x0202412C)
+
 	local p_atk_buff = emu:read8(ADDR_PLAYER_HP - 15)
 	local p_def_buff = emu:read8(ADDR_PLAYER_HP - 14)
 	local p_spd_buff = emu:read8(ADDR_PLAYER_HP - 13)
@@ -79,7 +84,7 @@ function getState()
 	end
 
 	return string.format(
-		"%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d",
+		"%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d",
 		playerHP,
 		playerMaxHP,
 		enemyHP,
@@ -100,6 +105,10 @@ function getState()
 		e_type2,
 		p_level,
 		e_level,
+		pStatus1,
+		eStatus1,
+		pStatus2,
+		eStatus2,
 		p_atk_buff,
 		p_def_buff,
 		p_spd_buff,
@@ -309,6 +318,14 @@ function processAction()
 			pendingAction = nil
 		end
 	end
+end
+
+function checkStatus()
+	local pStatus1 = emu:read32(0x020240D0)
+	local eStatus1 = emu:read32(0x02024128)
+
+	console:log(string.format("Player Status1: %d (0x%X)", pStatus1, pStatus1))
+	console:log(string.format("Enemy Status1 : %d (0x%X)", eStatus1, eStatus1))
 end
 
 function dumpMoveRegion()

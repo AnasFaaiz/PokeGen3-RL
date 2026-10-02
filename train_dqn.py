@@ -5,7 +5,7 @@ import os
 env = PokemonBattleEnv()
 
 # Changed to v2 to prevent crashing against the old 6-input model
-model_name = "pokemon_dqn_v2" 
+model_name = "pokemon_dqn_v3" 
 
 if os.path.exists(f"{model_name}.zip"):
     print("Loading existing model to continue training...")
@@ -25,7 +25,7 @@ else:
     )
 
 # 200 timesteps is perfect for a quick sanity check to ensure no crashes!
-model.learn(total_timesteps=500, tb_log_name="run_v2", reset_num_timesteps=False)
+model.learn(total_timesteps=500, tb_log_name="run_v3", reset_num_timesteps=False)
 print(f"Total episodes completed: {env.episode}")
 model.save(model_name)
 env.close()
