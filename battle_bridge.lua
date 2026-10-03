@@ -53,7 +53,6 @@ function getState()
 
 	local p_type1 = emu:read8(ADDR_PLAYER_HP - 7)
 	local p_type2 = emu:read8(ADDR_PLAYER_HP - 6)
-
 	local e_type1 = emu:read8(ADDR_ENEMY_HP - 7)
 	local e_type2 = emu:read8(ADDR_ENEMY_HP - 6)
 
@@ -68,10 +67,22 @@ function getState()
 	local p_atk_buff = emu:read8(ADDR_PLAYER_HP - 15)
 	local p_def_buff = emu:read8(ADDR_PLAYER_HP - 14)
 	local p_spd_buff = emu:read8(ADDR_PLAYER_HP - 13)
-
 	local e_atk_buff = emu:read8(ADDR_ENEMY_HP - 15)
 	local e_def_buff = emu:read8(ADDR_ENEMY_HP - 14)
 	local e_spd_buff = emu:read8(ADDR_ENEMY_HP - 13)
+
+	local party1_hp = emu:read16(PARTY_BASE + (0 * PARTY_STRIDE))
+	local party1_maxhp = emu:read16(PARTY_BASE + (0 * PARTY_STRIDE) + 2)
+	local party2_hp = emu:read16(PARTY_BASE + (1 * PARTY_STRIDE))
+	local party2_maxhp = emu:read16(PARTY_BASE + (1 * PARTY_STRIDE) + 2)
+	local party3_hp = emu:read16(PARTY_BASE + (2 * PARTY_STRIDE))
+	local party3_maxhp = emu:read16(PARTY_BASE + (2 * PARTY_STRIDE) + 2)
+	local party4_hp = emu:read16(PARTY_BASE + (3 * PARTY_STRIDE))
+	local party4_maxhp = emu:read16(PARTY_BASE + (3 * PARTY_STRIDE) + 2)
+	local party5_hp = emu:read16(PARTY_BASE + (4 * PARTY_STRIDE))
+	local party5_maxhp = emu:read16(PARTY_BASE + (4 * PARTY_STRIDE) + 2)
+	local party6_hp = emu:read16(PARTY_BASE + (5 * PARTY_STRIDE))
+	local party6_maxhp = emu:read16(PARTY_BASE + (5 * PARTY_STRIDE) + 2)
 
 	local battleOver = 0
 	local playerLost = 0
@@ -84,7 +95,7 @@ function getState()
 	end
 
 	return string.format(
-		"%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d",
+		"%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d",
 		playerHP,
 		playerMaxHP,
 		enemyHP,
@@ -114,7 +125,19 @@ function getState()
 		p_spd_buff,
 		e_atk_buff,
 		e_def_buff,
-		e_spd_buff
+		e_spd_buff,
+		party1_hp,
+		party1_maxhp,
+		party2_hp,
+		party2_maxhp,
+		party3_hp,
+		party3_maxhp,
+		party4_hp,
+		party4_maxhp,
+		party5_hp,
+		party5_maxhp,
+		party6_hp,
+		party6_maxhp
 	)
 end
 
@@ -326,6 +349,11 @@ function checkStatus()
 
 	console:log(string.format("Player Status1: %d (0x%X)", pStatus1, pStatus1))
 	console:log(string.format("Enemy Status1 : %d (0x%X)", eStatus1, eStatus1))
+end
+
+function checkParty2MaxHP()
+	local addr = PARTY_BASE + (1 * PARTY_STRIDE) + 2
+	console:log("Party slot 2 maxHP (computed offset): " .. emu:read16(addr))
 end
 
 function dumpMoveRegion()

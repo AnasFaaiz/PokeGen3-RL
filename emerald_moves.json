@@ -5,7 +5,9 @@
         "type_id": 0,
         "power": 40,
         "accuracy": 100,
-        "pp": 35
+        "pp": 35,
+        "damage_class": "physical",
+        "damage_class_id": 1
     },
     "2": {
         "name": "Karate Chop",
@@ -13,7 +15,9 @@
         "type_id": 1,
         "power": 50,
         "accuracy": 100,
-        "pp": 25
+        "pp": 25,
+        "damage_class": "physical",
+        "damage_class_id": 1
     },
     "3": {
         "name": "Double Slap",
@@ -21,7 +25,9 @@
         "type_id": 0,
         "power": 15,
         "accuracy": 85,
-        "pp": 10
+        "pp": 10,
+        "damage_class": "physical",
+        "damage_class_id": 1
     },
     "4": {
         "name": "Comet Punch",
@@ -29,7 +35,9 @@
         "type_id": 0,
         "power": 18,
         "accuracy": 85,
-        "pp": 15
+        "pp": 15,
+        "damage_class": "physical",
+        "damage_class_id": 1
     },
     "5": {
         "name": "Mega Punch",
@@ -37,7 +45,9 @@
         "type_id": 0,
         "power": 80,
         "accuracy": 85,
-        "pp": 20
+        "pp": 20,
+        "damage_class": "physical",
+        "damage_class_id": 1
     },
     "6": {
         "name": "Pay Day",
@@ -45,7 +55,9 @@
         "type_id": 0,
         "power": 40,
         "accuracy": 100,
-        "pp": 20
+        "pp": 20,
+        "damage_class": "physical",
+        "damage_class_id": 1
     },
     "7": {
         "name": "Fire Punch",
@@ -53,7 +65,9 @@
         "type_id": 9,
         "power": 75,
         "accuracy": 100,
-        "pp": 15
+        "pp": 15,
+        "damage_class": "physical",
+        "damage_class_id": 1
     },
     "8": {
         "name": "Ice Punch",
@@ -61,7 +75,9 @@
         "type_id": 14,
         "power": 75,
         "accuracy": 100,
-        "pp": 15
+        "pp": 15,
+        "damage_class": "physical",
+        "damage_class_id": 1
     },
     "9": {
         "name": "Thunder Punch",
@@ -69,7 +85,9 @@
         "type_id": 12,
         "power": 75,
         "accuracy": 100,
-        "pp": 15
+        "pp": 15,
+        "damage_class": "physical",
+        "damage_class_id": 1
     },
     "10": {
         "name": "Scratch",
@@ -77,7 +95,9 @@
         "type_id": 0,
         "power": 40,
         "accuracy": 100,
-        "pp": 35
+        "pp": 35,
+        "damage_class": "physical",
+        "damage_class_id": 1
     },
     "11": {
         "name": "Vice Grip",
@@ -85,7 +105,9 @@
         "type_id": 0,
         "power": 55,
         "accuracy": 100,
-        "pp": 30
+        "pp": 30,
+        "damage_class": "physical",
+        "damage_class_id": 1
     },
     "12": {
         "name": "Guillotine",
@@ -93,7 +115,9 @@
         "type_id": 0,
         "power": 0,
         "accuracy": 30,
-        "pp": 5
+        "pp": 5,
+        "damage_class": "physical",
+        "damage_class_id": 1
     },
     "13": {
         "name": "Razor Wind",
@@ -101,7 +125,9 @@
         "type_id": 0,
         "power": 80,
         "accuracy": 100,
-        "pp": 10
+        "pp": 10,
+        "damage_class": "special",
+        "damage_class_id": 2
     },
     "14": {
         "name": "Swords Dance",
@@ -109,7 +135,9 @@
         "type_id": 0,
         "power": 0,
         "accuracy": 100,
-        "pp": 20
+        "pp": 20,
+        "damage_class": "status",
+        "damage_class_id": 0
     },
     "15": {
         "name": "Cut",
@@ -117,7 +145,9 @@
         "type_id": 0,
         "power": 50,
         "accuracy": 95,
-        "pp": 30
+        "pp": 30,
+        "damage_class": "physical",
+        "damage_class_id": 1
     },
     "16": {
         "name": "Gust",
@@ -125,7 +155,9 @@
         "type_id": 2,
         "power": 40,
         "accuracy": 100,
-        "pp": 35
+        "pp": 35,
+        "damage_class": "special",
+        "damage_class_id": 2
     },
     "17": {
         "name": "Wing Attack",
@@ -133,7 +165,9 @@
         "type_id": 2,
         "power": 60,
         "accuracy": 100,
-        "pp": 35
+        "pp": 35,
+        "damage_class": "physical",
+        "damage_class_id": 1
     },
     "18": {
         "name": "Whirlwind",
@@ -141,7 +175,9 @@
         "type_id": 0,
         "power": 0,
         "accuracy": 100,
-        "pp": 20
+        "pp": 20,
+        "damage_class": "status",
+        "damage_class_id": 0
     },
     "19": {
         "name": "Fly",
@@ -149,7 +185,9 @@
         "type_id": 2,
         "power": 90,
         "accuracy": 95,
-        "pp": 15
+        "pp": 15,
+        "damage_class": "physical",
+        "damage_class_id": 1
     },
     "20": {
         "name": "Bind",
@@ -157,7 +195,9 @@
         "type_id": 0,
         "power": 15,
         "accuracy": 85,
-        "pp": 20
+        "pp": 20,
+        "damage_class": "physical",
+        "damage_class_id": 1
     },
     "21": {
         "name": "Slam",
@@ -165,7 +205,9 @@
         "type_id": 0,
         "power": 80,
         "accuracy": 75,
-        "pp": 20
+        "pp": 20,
+        "damage_class": "physical",
+        "damage_class_id": 1
     },
     "22": {
         "name": "Vine Whip",
@@ -173,7 +215,9 @@
         "type_id": 11,
         "power": 45,
         "accuracy": 100,
-        "pp": 25
+        "pp": 25,
+        "damage_class": "physical",
+        "damage_class_id": 1
     },
     "23": {
         "name": "Stomp",
@@ -181,7 +225,9 @@
         "type_id": 0,
         "power": 65,
         "accuracy": 100,
-        "pp": 20
+        "pp": 20,
+        "damage_class": "physical",
+        "damage_class_id": 1
     },
     "24": {
         "name": "Double Kick",
@@ -189,7 +235,9 @@
         "type_id": 1,
         "power": 30,
         "accuracy": 100,
-        "pp": 30
+        "pp": 30,
+        "damage_class": "physical",
+        "damage_class_id": 1
     },
     "25": {
         "name": "Mega Kick",
@@ -197,7 +245,9 @@
         "type_id": 0,
         "power": 120,
         "accuracy": 75,
-        "pp": 5
+        "pp": 5,
+        "damage_class": "physical",
+        "damage_class_id": 1
     },
     "26": {
         "name": "Jump Kick",
@@ -205,7 +255,9 @@
         "type_id": 1,
         "power": 100,
         "accuracy": 95,
-        "pp": 10
+        "pp": 10,
+        "damage_class": "physical",
+        "damage_class_id": 1
     },
     "27": {
         "name": "Rolling Kick",
@@ -213,7 +265,9 @@
         "type_id": 1,
         "power": 60,
         "accuracy": 85,
-        "pp": 15
+        "pp": 15,
+        "damage_class": "physical",
+        "damage_class_id": 1
     },
     "28": {
         "name": "Sand Attack",
@@ -221,7 +275,9 @@
         "type_id": 4,
         "power": 0,
         "accuracy": 100,
-        "pp": 15
+        "pp": 15,
+        "damage_class": "status",
+        "damage_class_id": 0
     },
     "29": {
         "name": "Headbutt",
@@ -229,7 +285,9 @@
         "type_id": 0,
         "power": 70,
         "accuracy": 100,
-        "pp": 15
+        "pp": 15,
+        "damage_class": "physical",
+        "damage_class_id": 1
     },
     "30": {
         "name": "Horn Attack",
@@ -237,7 +295,9 @@
         "type_id": 0,
         "power": 65,
         "accuracy": 100,
-        "pp": 25
+        "pp": 25,
+        "damage_class": "physical",
+        "damage_class_id": 1
     },
     "31": {
         "name": "Fury Attack",
@@ -245,7 +305,9 @@
         "type_id": 0,
         "power": 15,
         "accuracy": 85,
-        "pp": 20
+        "pp": 20,
+        "damage_class": "physical",
+        "damage_class_id": 1
     },
     "32": {
         "name": "Horn Drill",
@@ -253,7 +315,9 @@
         "type_id": 0,
         "power": 0,
         "accuracy": 30,
-        "pp": 5
+        "pp": 5,
+        "damage_class": "physical",
+        "damage_class_id": 1
     },
     "33": {
         "name": "Tackle",
@@ -261,7 +325,9 @@
         "type_id": 0,
         "power": 40,
         "accuracy": 100,
-        "pp": 35
+        "pp": 35,
+        "damage_class": "physical",
+        "damage_class_id": 1
     },
     "34": {
         "name": "Body Slam",
@@ -269,7 +335,9 @@
         "type_id": 0,
         "power": 85,
         "accuracy": 100,
-        "pp": 15
+        "pp": 15,
+        "damage_class": "physical",
+        "damage_class_id": 1
     },
     "35": {
         "name": "Wrap",
@@ -277,7 +345,9 @@
         "type_id": 0,
         "power": 15,
         "accuracy": 90,
-        "pp": 20
+        "pp": 20,
+        "damage_class": "physical",
+        "damage_class_id": 1
     },
     "36": {
         "name": "Take Down",
@@ -285,7 +355,9 @@
         "type_id": 0,
         "power": 90,
         "accuracy": 85,
-        "pp": 20
+        "pp": 20,
+        "damage_class": "physical",
+        "damage_class_id": 1
     },
     "37": {
         "name": "Thrash",
@@ -293,7 +365,9 @@
         "type_id": 0,
         "power": 120,
         "accuracy": 100,
-        "pp": 10
+        "pp": 10,
+        "damage_class": "physical",
+        "damage_class_id": 1
     },
     "38": {
         "name": "Double Edge",
@@ -301,7 +375,9 @@
         "type_id": 0,
         "power": 120,
         "accuracy": 100,
-        "pp": 15
+        "pp": 15,
+        "damage_class": "physical",
+        "damage_class_id": 1
     },
     "39": {
         "name": "Tail Whip",
@@ -309,7 +385,9 @@
         "type_id": 0,
         "power": 0,
         "accuracy": 100,
-        "pp": 30
+        "pp": 30,
+        "damage_class": "status",
+        "damage_class_id": 0
     },
     "40": {
         "name": "Poison Sting",
@@ -317,7 +395,9 @@
         "type_id": 3,
         "power": 15,
         "accuracy": 100,
-        "pp": 35
+        "pp": 35,
+        "damage_class": "physical",
+        "damage_class_id": 1
     },
     "41": {
         "name": "Twineedle",
@@ -325,7 +405,9 @@
         "type_id": 6,
         "power": 25,
         "accuracy": 100,
-        "pp": 20
+        "pp": 20,
+        "damage_class": "physical",
+        "damage_class_id": 1
     },
     "42": {
         "name": "Pin Missile",
@@ -333,7 +415,9 @@
         "type_id": 6,
         "power": 25,
         "accuracy": 95,
-        "pp": 20
+        "pp": 20,
+        "damage_class": "physical",
+        "damage_class_id": 1
     },
     "43": {
         "name": "Leer",
@@ -341,7 +425,9 @@
         "type_id": 0,
         "power": 0,
         "accuracy": 100,
-        "pp": 30
+        "pp": 30,
+        "damage_class": "status",
+        "damage_class_id": 0
     },
     "44": {
         "name": "Bite",
@@ -349,7 +435,9 @@
         "type_id": 16,
         "power": 60,
         "accuracy": 100,
-        "pp": 25
+        "pp": 25,
+        "damage_class": "physical",
+        "damage_class_id": 1
     },
     "45": {
         "name": "Growl",
@@ -357,7 +445,9 @@
         "type_id": 0,
         "power": 0,
         "accuracy": 100,
-        "pp": 40
+        "pp": 40,
+        "damage_class": "status",
+        "damage_class_id": 0
     },
     "46": {
         "name": "Roar",
@@ -365,7 +455,9 @@
         "type_id": 0,
         "power": 0,
         "accuracy": 100,
-        "pp": 20
+        "pp": 20,
+        "damage_class": "status",
+        "damage_class_id": 0
     },
     "47": {
         "name": "Sing",
@@ -373,7 +465,9 @@
         "type_id": 0,
         "power": 0,
         "accuracy": 55,
-        "pp": 15
+        "pp": 15,
+        "damage_class": "status",
+        "damage_class_id": 0
     },
     "48": {
         "name": "Supersonic",
@@ -381,7 +475,9 @@
         "type_id": 0,
         "power": 0,
         "accuracy": 55,
-        "pp": 20
+        "pp": 20,
+        "damage_class": "status",
+        "damage_class_id": 0
     },
     "49": {
         "name": "Sonic Boom",
@@ -389,7 +485,9 @@
         "type_id": 0,
         "power": 0,
         "accuracy": 90,
-        "pp": 20
+        "pp": 20,
+        "damage_class": "special",
+        "damage_class_id": 2
     },
     "50": {
         "name": "Disable",
@@ -397,7 +495,9 @@
         "type_id": 0,
         "power": 0,
         "accuracy": 100,
-        "pp": 20
+        "pp": 20,
+        "damage_class": "status",
+        "damage_class_id": 0
     },
     "51": {
         "name": "Acid",
@@ -405,7 +505,9 @@
         "type_id": 3,
         "power": 40,
         "accuracy": 100,
-        "pp": 30
+        "pp": 30,
+        "damage_class": "special",
+        "damage_class_id": 2
     },
     "52": {
         "name": "Ember",
@@ -413,7 +515,9 @@
         "type_id": 9,
         "power": 40,
         "accuracy": 100,
-        "pp": 25
+        "pp": 25,
+        "damage_class": "special",
+        "damage_class_id": 2
     },
     "53": {
         "name": "Flamethrower",
@@ -421,7 +525,9 @@
         "type_id": 9,
         "power": 90,
         "accuracy": 100,
-        "pp": 15
+        "pp": 15,
+        "damage_class": "special",
+        "damage_class_id": 2
     },
     "54": {
         "name": "Mist",
@@ -429,7 +535,9 @@
         "type_id": 14,
         "power": 0,
         "accuracy": 100,
-        "pp": 30
+        "pp": 30,
+        "damage_class": "status",
+        "damage_class_id": 0
     },
     "55": {
         "name": "Water Gun",
@@ -437,7 +545,9 @@
         "type_id": 10,
         "power": 40,
         "accuracy": 100,
-        "pp": 25
+        "pp": 25,
+        "damage_class": "special",
+        "damage_class_id": 2
     },
     "56": {
         "name": "Hydro Pump",
@@ -445,7 +555,9 @@
         "type_id": 10,
         "power": 110,
         "accuracy": 80,
-        "pp": 5
+        "pp": 5,
+        "damage_class": "special",
+        "damage_class_id": 2
     },
     "57": {
         "name": "Surf",
@@ -453,7 +565,9 @@
         "type_id": 10,
         "power": 90,
         "accuracy": 100,
-        "pp": 15
+        "pp": 15,
+        "damage_class": "special",
+        "damage_class_id": 2
     },
     "58": {
         "name": "Ice Beam",
@@ -461,7 +575,9 @@
         "type_id": 14,
         "power": 90,
         "accuracy": 100,
-        "pp": 10
+        "pp": 10,
+        "damage_class": "special",
+        "damage_class_id": 2
     },
     "59": {
         "name": "Blizzard",
@@ -469,7 +585,9 @@
         "type_id": 14,
         "power": 110,
         "accuracy": 70,
-        "pp": 5
+        "pp": 5,
+        "damage_class": "special",
+        "damage_class_id": 2
     },
     "60": {
         "name": "Psybeam",
@@ -477,7 +595,9 @@
         "type_id": 13,
         "power": 65,
         "accuracy": 100,
-        "pp": 20
+        "pp": 20,
+        "damage_class": "special",
+        "damage_class_id": 2
     },
     "61": {
         "name": "Bubble Beam",
@@ -485,7 +605,9 @@
         "type_id": 10,
         "power": 65,
         "accuracy": 100,
-        "pp": 20
+        "pp": 20,
+        "damage_class": "special",
+        "damage_class_id": 2
     },
     "62": {
         "name": "Aurora Beam",
@@ -493,7 +615,9 @@
         "type_id": 14,
         "power": 65,
         "accuracy": 100,
-        "pp": 20
+        "pp": 20,
+        "damage_class": "special",
+        "damage_class_id": 2
     },
     "63": {
         "name": "Hyper Beam",
@@ -501,7 +625,9 @@
         "type_id": 0,
         "power": 150,
         "accuracy": 90,
-        "pp": 5
+        "pp": 5,
+        "damage_class": "special",
+        "damage_class_id": 2
     },
     "64": {
         "name": "Peck",
@@ -509,7 +635,9 @@
         "type_id": 2,
         "power": 35,
         "accuracy": 100,
-        "pp": 35
+        "pp": 35,
+        "damage_class": "physical",
+        "damage_class_id": 1
     },
     "65": {
         "name": "Drill Peck",
@@ -517,7 +645,9 @@
         "type_id": 2,
         "power": 80,
         "accuracy": 100,
-        "pp": 20
+        "pp": 20,
+        "damage_class": "physical",
+        "damage_class_id": 1
     },
     "66": {
         "name": "Submission",
@@ -525,7 +655,9 @@
         "type_id": 1,
         "power": 80,
         "accuracy": 80,
-        "pp": 20
+        "pp": 20,
+        "damage_class": "physical",
+        "damage_class_id": 1
     },
     "67": {
         "name": "Low Kick",
@@ -533,7 +665,9 @@
         "type_id": 1,
         "power": 0,
         "accuracy": 100,
-        "pp": 20
+        "pp": 20,
+        "damage_class": "physical",
+        "damage_class_id": 1
     },
     "68": {
         "name": "Counter",
@@ -541,7 +675,9 @@
         "type_id": 1,
         "power": 0,
         "accuracy": 100,
-        "pp": 20
+        "pp": 20,
+        "damage_class": "physical",
+        "damage_class_id": 1
     },
     "69": {
         "name": "Seismic Toss",
@@ -549,7 +685,9 @@
         "type_id": 1,
         "power": 0,
         "accuracy": 100,
-        "pp": 20
+        "pp": 20,
+        "damage_class": "physical",
+        "damage_class_id": 1
     },
     "70": {
         "name": "Strength",
@@ -557,7 +695,9 @@
         "type_id": 0,
         "power": 80,
         "accuracy": 100,
-        "pp": 15
+        "pp": 15,
+        "damage_class": "physical",
+        "damage_class_id": 1
     },
     "71": {
         "name": "Absorb",
@@ -565,7 +705,9 @@
         "type_id": 11,
         "power": 20,
         "accuracy": 100,
-        "pp": 25
+        "pp": 25,
+        "damage_class": "special",
+        "damage_class_id": 2
     },
     "72": {
         "name": "Mega Drain",
@@ -573,7 +715,9 @@
         "type_id": 11,
         "power": 40,
         "accuracy": 100,
-        "pp": 15
+        "pp": 15,
+        "damage_class": "special",
+        "damage_class_id": 2
     },
     "73": {
         "name": "Leech Seed",
@@ -581,7 +725,9 @@
         "type_id": 11,
         "power": 0,
         "accuracy": 90,
-        "pp": 10
+        "pp": 10,
+        "damage_class": "status",
+        "damage_class_id": 0
     },
     "74": {
         "name": "Growth",
@@ -589,7 +735,9 @@
         "type_id": 0,
         "power": 0,
         "accuracy": 100,
-        "pp": 20
+        "pp": 20,
+        "damage_class": "status",
+        "damage_class_id": 0
     },
     "75": {
         "name": "Razor Leaf",
@@ -597,7 +745,9 @@
         "type_id": 11,
         "power": 55,
         "accuracy": 95,
-        "pp": 25
+        "pp": 25,
+        "damage_class": "physical",
+        "damage_class_id": 1
     },
     "76": {
         "name": "Solar Beam",
@@ -605,7 +755,9 @@
         "type_id": 11,
         "power": 120,
         "accuracy": 100,
-        "pp": 10
+        "pp": 10,
+        "damage_class": "special",
+        "damage_class_id": 2
     },
     "77": {
         "name": "Poison Powder",
@@ -613,7 +765,9 @@
         "type_id": 3,
         "power": 0,
         "accuracy": 75,
-        "pp": 35
+        "pp": 35,
+        "damage_class": "status",
+        "damage_class_id": 0
     },
     "78": {
         "name": "Stun Spore",
@@ -621,7 +775,9 @@
         "type_id": 11,
         "power": 0,
         "accuracy": 75,
-        "pp": 30
+        "pp": 30,
+        "damage_class": "status",
+        "damage_class_id": 0
     },
     "79": {
         "name": "Sleep Powder",
@@ -629,7 +785,9 @@
         "type_id": 11,
         "power": 0,
         "accuracy": 75,
-        "pp": 15
+        "pp": 15,
+        "damage_class": "status",
+        "damage_class_id": 0
     },
     "80": {
         "name": "Petal Dance",
@@ -637,7 +795,9 @@
         "type_id": 11,
         "power": 120,
         "accuracy": 100,
-        "pp": 10
+        "pp": 10,
+        "damage_class": "special",
+        "damage_class_id": 2
     },
     "81": {
         "name": "String Shot",
@@ -645,7 +805,9 @@
         "type_id": 6,
         "power": 0,
         "accuracy": 95,
-        "pp": 40
+        "pp": 40,
+        "damage_class": "status",
+        "damage_class_id": 0
     },
     "82": {
         "name": "Dragon Rage",
@@ -653,7 +815,9 @@
         "type_id": 15,
         "power": 0,
         "accuracy": 100,
-        "pp": 10
+        "pp": 10,
+        "damage_class": "special",
+        "damage_class_id": 2
     },
     "83": {
         "name": "Fire Spin",
@@ -661,7 +825,9 @@
         "type_id": 9,
         "power": 35,
         "accuracy": 85,
-        "pp": 15
+        "pp": 15,
+        "damage_class": "special",
+        "damage_class_id": 2
     },
     "84": {
         "name": "Thunder Shock",
@@ -669,7 +835,9 @@
         "type_id": 12,
         "power": 40,
         "accuracy": 100,
-        "pp": 30
+        "pp": 30,
+        "damage_class": "special",
+        "damage_class_id": 2
     },
     "85": {
         "name": "Thunderbolt",
@@ -677,7 +845,9 @@
         "type_id": 12,
         "power": 90,
         "accuracy": 100,
-        "pp": 15
+        "pp": 15,
+        "damage_class": "special",
+        "damage_class_id": 2
     },
     "86": {
         "name": "Thunder Wave",
@@ -685,7 +855,9 @@
         "type_id": 12,
         "power": 0,
         "accuracy": 90,
-        "pp": 20
+        "pp": 20,
+        "damage_class": "status",
+        "damage_class_id": 0
     },
     "87": {
         "name": "Thunder",
@@ -693,7 +865,9 @@
         "type_id": 12,
         "power": 110,
         "accuracy": 70,
-        "pp": 10
+        "pp": 10,
+        "damage_class": "special",
+        "damage_class_id": 2
     },
     "88": {
         "name": "Rock Throw",
@@ -701,7 +875,9 @@
         "type_id": 5,
         "power": 50,
         "accuracy": 90,
-        "pp": 15
+        "pp": 15,
+        "damage_class": "physical",
+        "damage_class_id": 1
     },
     "89": {
         "name": "Earthquake",
@@ -709,7 +885,9 @@
         "type_id": 4,
         "power": 100,
         "accuracy": 100,
-        "pp": 10
+        "pp": 10,
+        "damage_class": "physical",
+        "damage_class_id": 1
     },
     "90": {
         "name": "Fissure",
@@ -717,7 +895,9 @@
         "type_id": 4,
         "power": 0,
         "accuracy": 30,
-        "pp": 5
+        "pp": 5,
+        "damage_class": "physical",
+        "damage_class_id": 1
     },
     "91": {
         "name": "Dig",
@@ -725,7 +905,9 @@
         "type_id": 4,
         "power": 80,
         "accuracy": 100,
-        "pp": 10
+        "pp": 10,
+        "damage_class": "physical",
+        "damage_class_id": 1
     },
     "92": {
         "name": "Toxic",
@@ -733,7 +915,9 @@
         "type_id": 3,
         "power": 0,
         "accuracy": 90,
-        "pp": 10
+        "pp": 10,
+        "damage_class": "status",
+        "damage_class_id": 0
     },
     "93": {
         "name": "Confusion",
@@ -741,7 +925,9 @@
         "type_id": 13,
         "power": 50,
         "accuracy": 100,
-        "pp": 25
+        "pp": 25,
+        "damage_class": "special",
+        "damage_class_id": 2
     },
     "94": {
         "name": "Psychic",
@@ -749,7 +935,9 @@
         "type_id": 13,
         "power": 90,
         "accuracy": 100,
-        "pp": 10
+        "pp": 10,
+        "damage_class": "special",
+        "damage_class_id": 2
     },
     "95": {
         "name": "Hypnosis",
@@ -757,7 +945,9 @@
         "type_id": 13,
         "power": 0,
         "accuracy": 60,
-        "pp": 20
+        "pp": 20,
+        "damage_class": "status",
+        "damage_class_id": 0
     },
     "96": {
         "name": "Meditate",
@@ -765,7 +955,9 @@
         "type_id": 13,
         "power": 0,
         "accuracy": 100,
-        "pp": 40
+        "pp": 40,
+        "damage_class": "status",
+        "damage_class_id": 0
     },
     "97": {
         "name": "Agility",
@@ -773,7 +965,9 @@
         "type_id": 13,
         "power": 0,
         "accuracy": 100,
-        "pp": 30
+        "pp": 30,
+        "damage_class": "status",
+        "damage_class_id": 0
     },
     "98": {
         "name": "Quick Attack",
@@ -781,7 +975,9 @@
         "type_id": 0,
         "power": 40,
         "accuracy": 100,
-        "pp": 30
+        "pp": 30,
+        "damage_class": "physical",
+        "damage_class_id": 1
     },
     "99": {
         "name": "Rage",
@@ -789,7 +985,9 @@
         "type_id": 0,
         "power": 20,
         "accuracy": 100,
-        "pp": 20
+        "pp": 20,
+        "damage_class": "physical",
+        "damage_class_id": 1
     },
     "100": {
         "name": "Teleport",
@@ -797,7 +995,9 @@
         "type_id": 13,
         "power": 0,
         "accuracy": 100,
-        "pp": 20
+        "pp": 20,
+        "damage_class": "status",
+        "damage_class_id": 0
     },
     "101": {
         "name": "Night Shade",
@@ -805,7 +1005,9 @@
         "type_id": 7,
         "power": 0,
         "accuracy": 100,
-        "pp": 15
+        "pp": 15,
+        "damage_class": "special",
+        "damage_class_id": 2
     },
     "102": {
         "name": "Mimic",
@@ -813,7 +1015,9 @@
         "type_id": 0,
         "power": 0,
         "accuracy": 100,
-        "pp": 10
+        "pp": 10,
+        "damage_class": "status",
+        "damage_class_id": 0
     },
     "103": {
         "name": "Screech",
@@ -821,7 +1025,9 @@
         "type_id": 0,
         "power": 0,
         "accuracy": 85,
-        "pp": 40
+        "pp": 40,
+        "damage_class": "status",
+        "damage_class_id": 0
     },
     "104": {
         "name": "Double Team",
@@ -829,7 +1035,9 @@
         "type_id": 0,
         "power": 0,
         "accuracy": 100,
-        "pp": 15
+        "pp": 15,
+        "damage_class": "status",
+        "damage_class_id": 0
     },
     "105": {
         "name": "Recover",
@@ -837,7 +1045,9 @@
         "type_id": 0,
         "power": 0,
         "accuracy": 100,
-        "pp": 5
+        "pp": 5,
+        "damage_class": "status",
+        "damage_class_id": 0
     },
     "106": {
         "name": "Harden",
@@ -845,7 +1055,9 @@
         "type_id": 0,
         "power": 0,
         "accuracy": 100,
-        "pp": 30
+        "pp": 30,
+        "damage_class": "status",
+        "damage_class_id": 0
     },
     "107": {
         "name": "Minimize",
@@ -853,7 +1065,9 @@
         "type_id": 0,
         "power": 0,
         "accuracy": 100,
-        "pp": 10
+        "pp": 10,
+        "damage_class": "status",
+        "damage_class_id": 0
     },
     "108": {
         "name": "Smokescreen",
@@ -861,7 +1075,9 @@
         "type_id": 0,
         "power": 0,
         "accuracy": 100,
-        "pp": 20
+        "pp": 20,
+        "damage_class": "status",
+        "damage_class_id": 0
     },
     "109": {
         "name": "Confuse Ray",
@@ -869,7 +1085,9 @@
         "type_id": 7,
         "power": 0,
         "accuracy": 100,
-        "pp": 10
+        "pp": 10,
+        "damage_class": "status",
+        "damage_class_id": 0
     },
     "110": {
         "name": "Withdraw",
@@ -877,7 +1095,9 @@
         "type_id": 10,
         "power": 0,
         "accuracy": 100,
-        "pp": 40
+        "pp": 40,
+        "damage_class": "status",
+        "damage_class_id": 0
     },
     "111": {
         "name": "Defense Curl",
@@ -885,7 +1105,9 @@
         "type_id": 0,
         "power": 0,
         "accuracy": 100,
-        "pp": 40
+        "pp": 40,
+        "damage_class": "status",
+        "damage_class_id": 0
     },
     "112": {
         "name": "Barrier",
@@ -893,7 +1115,9 @@
         "type_id": 13,
         "power": 0,
         "accuracy": 100,
-        "pp": 20
+        "pp": 20,
+        "damage_class": "status",
+        "damage_class_id": 0
     },
     "113": {
         "name": "Light Screen",
@@ -901,7 +1125,9 @@
         "type_id": 13,
         "power": 0,
         "accuracy": 100,
-        "pp": 30
+        "pp": 30,
+        "damage_class": "status",
+        "damage_class_id": 0
     },
     "114": {
         "name": "Haze",
@@ -909,7 +1135,9 @@
         "type_id": 14,
         "power": 0,
         "accuracy": 100,
-        "pp": 30
+        "pp": 30,
+        "damage_class": "status",
+        "damage_class_id": 0
     },
     "115": {
         "name": "Reflect",
@@ -917,7 +1145,9 @@
         "type_id": 13,
         "power": 0,
         "accuracy": 100,
-        "pp": 20
+        "pp": 20,
+        "damage_class": "status",
+        "damage_class_id": 0
     },
     "116": {
         "name": "Focus Energy",
@@ -925,7 +1155,9 @@
         "type_id": 0,
         "power": 0,
         "accuracy": 100,
-        "pp": 30
+        "pp": 30,
+        "damage_class": "status",
+        "damage_class_id": 0
     },
     "117": {
         "name": "Bide",
@@ -933,7 +1165,9 @@
         "type_id": 0,
         "power": 0,
         "accuracy": 100,
-        "pp": 10
+        "pp": 10,
+        "damage_class": "physical",
+        "damage_class_id": 1
     },
     "118": {
         "name": "Metronome",
@@ -941,7 +1175,9 @@
         "type_id": 0,
         "power": 0,
         "accuracy": 100,
-        "pp": 10
+        "pp": 10,
+        "damage_class": "status",
+        "damage_class_id": 0
     },
     "119": {
         "name": "Mirror Move",
@@ -949,7 +1185,9 @@
         "type_id": 2,
         "power": 0,
         "accuracy": 100,
-        "pp": 20
+        "pp": 20,
+        "damage_class": "status",
+        "damage_class_id": 0
     },
     "120": {
         "name": "Self Destruct",
@@ -957,7 +1195,9 @@
         "type_id": 0,
         "power": 200,
         "accuracy": 100,
-        "pp": 5
+        "pp": 5,
+        "damage_class": "physical",
+        "damage_class_id": 1
     },
     "121": {
         "name": "Egg Bomb",
@@ -965,7 +1205,9 @@
         "type_id": 0,
         "power": 100,
         "accuracy": 75,
-        "pp": 10
+        "pp": 10,
+        "damage_class": "physical",
+        "damage_class_id": 1
     },
     "122": {
         "name": "Lick",
@@ -973,7 +1215,9 @@
         "type_id": 7,
         "power": 30,
         "accuracy": 100,
-        "pp": 30
+        "pp": 30,
+        "damage_class": "physical",
+        "damage_class_id": 1
     },
     "123": {
         "name": "Smog",
@@ -981,7 +1225,9 @@
         "type_id": 3,
         "power": 30,
         "accuracy": 70,
-        "pp": 20
+        "pp": 20,
+        "damage_class": "special",
+        "damage_class_id": 2
     },
     "124": {
         "name": "Sludge",
@@ -989,7 +1235,9 @@
         "type_id": 3,
         "power": 65,
         "accuracy": 100,
-        "pp": 20
+        "pp": 20,
+        "damage_class": "special",
+        "damage_class_id": 2
     },
     "125": {
         "name": "Bone Club",
@@ -997,7 +1245,9 @@
         "type_id": 4,
         "power": 65,
         "accuracy": 85,
-        "pp": 20
+        "pp": 20,
+        "damage_class": "physical",
+        "damage_class_id": 1
     },
     "126": {
         "name": "Fire Blast",
@@ -1005,7 +1255,9 @@
         "type_id": 9,
         "power": 110,
         "accuracy": 85,
-        "pp": 5
+        "pp": 5,
+        "damage_class": "special",
+        "damage_class_id": 2
     },
     "127": {
         "name": "Waterfall",
@@ -1013,7 +1265,9 @@
         "type_id": 10,
         "power": 80,
         "accuracy": 100,
-        "pp": 15
+        "pp": 15,
+        "damage_class": "physical",
+        "damage_class_id": 1
     },
     "128": {
         "name": "Clamp",
@@ -1021,7 +1275,9 @@
         "type_id": 10,
         "power": 35,
         "accuracy": 85,
-        "pp": 15
+        "pp": 15,
+        "damage_class": "physical",
+        "damage_class_id": 1
     },
     "129": {
         "name": "Swift",
@@ -1029,7 +1285,9 @@
         "type_id": 0,
         "power": 60,
         "accuracy": 100,
-        "pp": 20
+        "pp": 20,
+        "damage_class": "special",
+        "damage_class_id": 2
     },
     "130": {
         "name": "Skull Bash",
@@ -1037,7 +1295,9 @@
         "type_id": 0,
         "power": 130,
         "accuracy": 100,
-        "pp": 10
+        "pp": 10,
+        "damage_class": "physical",
+        "damage_class_id": 1
     },
     "131": {
         "name": "Spike Cannon",
@@ -1045,7 +1305,9 @@
         "type_id": 0,
         "power": 20,
         "accuracy": 100,
-        "pp": 15
+        "pp": 15,
+        "damage_class": "physical",
+        "damage_class_id": 1
     },
     "132": {
         "name": "Constrict",
@@ -1053,7 +1315,9 @@
         "type_id": 0,
         "power": 10,
         "accuracy": 100,
-        "pp": 35
+        "pp": 35,
+        "damage_class": "physical",
+        "damage_class_id": 1
     },
     "133": {
         "name": "Amnesia",
@@ -1061,7 +1325,9 @@
         "type_id": 13,
         "power": 0,
         "accuracy": 100,
-        "pp": 20
+        "pp": 20,
+        "damage_class": "status",
+        "damage_class_id": 0
     },
     "134": {
         "name": "Kinesis",
@@ -1069,7 +1335,9 @@
         "type_id": 13,
         "power": 0,
         "accuracy": 80,
-        "pp": 15
+        "pp": 15,
+        "damage_class": "status",
+        "damage_class_id": 0
     },
     "135": {
         "name": "Soft Boiled",
@@ -1077,7 +1345,9 @@
         "type_id": 0,
         "power": 0,
         "accuracy": 100,
-        "pp": 5
+        "pp": 5,
+        "damage_class": "status",
+        "damage_class_id": 0
     },
     "136": {
         "name": "High Jump Kick",
@@ -1085,7 +1355,9 @@
         "type_id": 1,
         "power": 130,
         "accuracy": 90,
-        "pp": 10
+        "pp": 10,
+        "damage_class": "physical",
+        "damage_class_id": 1
     },
     "137": {
         "name": "Glare",
@@ -1093,7 +1365,9 @@
         "type_id": 0,
         "power": 0,
         "accuracy": 100,
-        "pp": 30
+        "pp": 30,
+        "damage_class": "status",
+        "damage_class_id": 0
     },
     "138": {
         "name": "Dream Eater",
@@ -1101,7 +1375,9 @@
         "type_id": 13,
         "power": 100,
         "accuracy": 100,
-        "pp": 15
+        "pp": 15,
+        "damage_class": "special",
+        "damage_class_id": 2
     },
     "139": {
         "name": "Poison Gas",
@@ -1109,7 +1385,9 @@
         "type_id": 3,
         "power": 0,
         "accuracy": 90,
-        "pp": 40
+        "pp": 40,
+        "damage_class": "status",
+        "damage_class_id": 0
     },
     "140": {
         "name": "Barrage",
@@ -1117,7 +1395,9 @@
         "type_id": 0,
         "power": 15,
         "accuracy": 85,
-        "pp": 20
+        "pp": 20,
+        "damage_class": "physical",
+        "damage_class_id": 1
     },
     "141": {
         "name": "Leech Life",
@@ -1125,7 +1405,9 @@
         "type_id": 6,
         "power": 80,
         "accuracy": 100,
-        "pp": 10
+        "pp": 10,
+        "damage_class": "physical",
+        "damage_class_id": 1
     },
     "142": {
         "name": "Lovely Kiss",
@@ -1133,7 +1415,9 @@
         "type_id": 0,
         "power": 0,
         "accuracy": 75,
-        "pp": 10
+        "pp": 10,
+        "damage_class": "status",
+        "damage_class_id": 0
     },
     "143": {
         "name": "Sky Attack",
@@ -1141,7 +1425,9 @@
         "type_id": 2,
         "power": 140,
         "accuracy": 90,
-        "pp": 5
+        "pp": 5,
+        "damage_class": "physical",
+        "damage_class_id": 1
     },
     "144": {
         "name": "Transform",
@@ -1149,7 +1435,9 @@
         "type_id": 0,
         "power": 0,
         "accuracy": 100,
-        "pp": 10
+        "pp": 10,
+        "damage_class": "status",
+        "damage_class_id": 0
     },
     "145": {
         "name": "Bubble",
@@ -1157,7 +1445,9 @@
         "type_id": 10,
         "power": 40,
         "accuracy": 100,
-        "pp": 30
+        "pp": 30,
+        "damage_class": "special",
+        "damage_class_id": 2
     },
     "146": {
         "name": "Dizzy Punch",
@@ -1165,7 +1455,9 @@
         "type_id": 0,
         "power": 70,
         "accuracy": 100,
-        "pp": 10
+        "pp": 10,
+        "damage_class": "physical",
+        "damage_class_id": 1
     },
     "147": {
         "name": "Spore",
@@ -1173,7 +1465,9 @@
         "type_id": 11,
         "power": 0,
         "accuracy": 100,
-        "pp": 15
+        "pp": 15,
+        "damage_class": "status",
+        "damage_class_id": 0
     },
     "148": {
         "name": "Flash",
@@ -1181,7 +1475,9 @@
         "type_id": 0,
         "power": 0,
         "accuracy": 100,
-        "pp": 20
+        "pp": 20,
+        "damage_class": "status",
+        "damage_class_id": 0
     },
     "149": {
         "name": "Psywave",
@@ -1189,7 +1485,9 @@
         "type_id": 13,
         "power": 0,
         "accuracy": 100,
-        "pp": 15
+        "pp": 15,
+        "damage_class": "special",
+        "damage_class_id": 2
     },
     "150": {
         "name": "Splash",
@@ -1197,7 +1495,9 @@
         "type_id": 0,
         "power": 0,
         "accuracy": 100,
-        "pp": 40
+        "pp": 40,
+        "damage_class": "status",
+        "damage_class_id": 0
     },
     "151": {
         "name": "Acid Armor",
@@ -1205,7 +1505,9 @@
         "type_id": 3,
         "power": 0,
         "accuracy": 100,
-        "pp": 20
+        "pp": 20,
+        "damage_class": "status",
+        "damage_class_id": 0
     },
     "152": {
         "name": "Crabhammer",
@@ -1213,7 +1515,9 @@
         "type_id": 10,
         "power": 100,
         "accuracy": 90,
-        "pp": 10
+        "pp": 10,
+        "damage_class": "physical",
+        "damage_class_id": 1
     },
     "153": {
         "name": "Explosion",
@@ -1221,7 +1525,9 @@
         "type_id": 0,
         "power": 250,
         "accuracy": 100,
-        "pp": 5
+        "pp": 5,
+        "damage_class": "physical",
+        "damage_class_id": 1
     },
     "154": {
         "name": "Fury Swipes",
@@ -1229,7 +1535,9 @@
         "type_id": 0,
         "power": 18,
         "accuracy": 80,
-        "pp": 15
+        "pp": 15,
+        "damage_class": "physical",
+        "damage_class_id": 1
     },
     "155": {
         "name": "Bonemerang",
@@ -1237,7 +1545,9 @@
         "type_id": 4,
         "power": 50,
         "accuracy": 90,
-        "pp": 10
+        "pp": 10,
+        "damage_class": "physical",
+        "damage_class_id": 1
     },
     "156": {
         "name": "Rest",
@@ -1245,7 +1555,9 @@
         "type_id": 13,
         "power": 0,
         "accuracy": 100,
-        "pp": 5
+        "pp": 5,
+        "damage_class": "status",
+        "damage_class_id": 0
     },
     "157": {
         "name": "Rock Slide",
@@ -1253,7 +1565,9 @@
         "type_id": 5,
         "power": 75,
         "accuracy": 90,
-        "pp": 10
+        "pp": 10,
+        "damage_class": "physical",
+        "damage_class_id": 1
     },
     "158": {
         "name": "Hyper Fang",
@@ -1261,7 +1575,9 @@
         "type_id": 0,
         "power": 80,
         "accuracy": 90,
-        "pp": 15
+        "pp": 15,
+        "damage_class": "physical",
+        "damage_class_id": 1
     },
     "159": {
         "name": "Sharpen",
@@ -1269,7 +1585,9 @@
         "type_id": 0,
         "power": 0,
         "accuracy": 100,
-        "pp": 30
+        "pp": 30,
+        "damage_class": "status",
+        "damage_class_id": 0
     },
     "160": {
         "name": "Conversion",
@@ -1277,7 +1595,9 @@
         "type_id": 0,
         "power": 0,
         "accuracy": 100,
-        "pp": 30
+        "pp": 30,
+        "damage_class": "status",
+        "damage_class_id": 0
     },
     "161": {
         "name": "Tri Attack",
@@ -1285,7 +1605,9 @@
         "type_id": 0,
         "power": 80,
         "accuracy": 100,
-        "pp": 10
+        "pp": 10,
+        "damage_class": "special",
+        "damage_class_id": 2
     },
     "162": {
         "name": "Super Fang",
@@ -1293,7 +1615,9 @@
         "type_id": 0,
         "power": 0,
         "accuracy": 90,
-        "pp": 10
+        "pp": 10,
+        "damage_class": "physical",
+        "damage_class_id": 1
     },
     "163": {
         "name": "Slash",
@@ -1301,7 +1625,9 @@
         "type_id": 0,
         "power": 70,
         "accuracy": 100,
-        "pp": 20
+        "pp": 20,
+        "damage_class": "physical",
+        "damage_class_id": 1
     },
     "164": {
         "name": "Substitute",
@@ -1309,7 +1635,9 @@
         "type_id": 0,
         "power": 0,
         "accuracy": 100,
-        "pp": 10
+        "pp": 10,
+        "damage_class": "status",
+        "damage_class_id": 0
     },
     "165": {
         "name": "Struggle",
@@ -1317,7 +1645,9 @@
         "type_id": 0,
         "power": 50,
         "accuracy": 100,
-        "pp": 1
+        "pp": 1,
+        "damage_class": "physical",
+        "damage_class_id": 1
     },
     "166": {
         "name": "Sketch",
@@ -1325,7 +1655,9 @@
         "type_id": 0,
         "power": 0,
         "accuracy": 100,
-        "pp": 1
+        "pp": 1,
+        "damage_class": "status",
+        "damage_class_id": 0
     },
     "167": {
         "name": "Triple Kick",
@@ -1333,7 +1665,9 @@
         "type_id": 1,
         "power": 10,
         "accuracy": 90,
-        "pp": 10
+        "pp": 10,
+        "damage_class": "physical",
+        "damage_class_id": 1
     },
     "168": {
         "name": "Thief",
@@ -1341,7 +1675,9 @@
         "type_id": 16,
         "power": 60,
         "accuracy": 100,
-        "pp": 25
+        "pp": 25,
+        "damage_class": "physical",
+        "damage_class_id": 1
     },
     "169": {
         "name": "Spider Web",
@@ -1349,7 +1685,9 @@
         "type_id": 6,
         "power": 0,
         "accuracy": 100,
-        "pp": 10
+        "pp": 10,
+        "damage_class": "status",
+        "damage_class_id": 0
     },
     "170": {
         "name": "Mind Reader",
@@ -1357,7 +1695,9 @@
         "type_id": 0,
         "power": 0,
         "accuracy": 100,
-        "pp": 5
+        "pp": 5,
+        "damage_class": "status",
+        "damage_class_id": 0
     },
     "171": {
         "name": "Nightmare",
@@ -1365,7 +1705,9 @@
         "type_id": 7,
         "power": 0,
         "accuracy": 100,
-        "pp": 15
+        "pp": 15,
+        "damage_class": "status",
+        "damage_class_id": 0
     },
     "172": {
         "name": "Flame Wheel",
@@ -1373,7 +1715,9 @@
         "type_id": 9,
         "power": 60,
         "accuracy": 100,
-        "pp": 25
+        "pp": 25,
+        "damage_class": "physical",
+        "damage_class_id": 1
     },
     "173": {
         "name": "Snore",
@@ -1381,7 +1725,9 @@
         "type_id": 0,
         "power": 50,
         "accuracy": 100,
-        "pp": 15
+        "pp": 15,
+        "damage_class": "special",
+        "damage_class_id": 2
     },
     "174": {
         "name": "Curse",
@@ -1389,7 +1735,9 @@
         "type_id": 7,
         "power": 0,
         "accuracy": 100,
-        "pp": 10
+        "pp": 10,
+        "damage_class": "status",
+        "damage_class_id": 0
     },
     "175": {
         "name": "Flail",
@@ -1397,7 +1745,9 @@
         "type_id": 0,
         "power": 0,
         "accuracy": 100,
-        "pp": 15
+        "pp": 15,
+        "damage_class": "physical",
+        "damage_class_id": 1
     },
     "176": {
         "name": "Conversion 2",
@@ -1405,7 +1755,9 @@
         "type_id": 0,
         "power": 0,
         "accuracy": 100,
-        "pp": 30
+        "pp": 30,
+        "damage_class": "status",
+        "damage_class_id": 0
     },
     "177": {
         "name": "Aeroblast",
@@ -1413,7 +1765,9 @@
         "type_id": 2,
         "power": 100,
         "accuracy": 95,
-        "pp": 5
+        "pp": 5,
+        "damage_class": "special",
+        "damage_class_id": 2
     },
     "178": {
         "name": "Cotton Spore",
@@ -1421,7 +1775,9 @@
         "type_id": 11,
         "power": 0,
         "accuracy": 100,
-        "pp": 40
+        "pp": 40,
+        "damage_class": "status",
+        "damage_class_id": 0
     },
     "179": {
         "name": "Reversal",
@@ -1429,7 +1785,9 @@
         "type_id": 1,
         "power": 0,
         "accuracy": 100,
-        "pp": 15
+        "pp": 15,
+        "damage_class": "physical",
+        "damage_class_id": 1
     },
     "180": {
         "name": "Spite",
@@ -1437,7 +1795,9 @@
         "type_id": 7,
         "power": 0,
         "accuracy": 100,
-        "pp": 10
+        "pp": 10,
+        "damage_class": "status",
+        "damage_class_id": 0
     },
     "181": {
         "name": "Powder Snow",
@@ -1445,7 +1805,9 @@
         "type_id": 14,
         "power": 40,
         "accuracy": 100,
-        "pp": 25
+        "pp": 25,
+        "damage_class": "special",
+        "damage_class_id": 2
     },
     "182": {
         "name": "Protect",
@@ -1453,7 +1815,9 @@
         "type_id": 0,
         "power": 0,
         "accuracy": 100,
-        "pp": 10
+        "pp": 10,
+        "damage_class": "status",
+        "damage_class_id": 0
     },
     "183": {
         "name": "Mach Punch",
@@ -1461,7 +1825,9 @@
         "type_id": 1,
         "power": 40,
         "accuracy": 100,
-        "pp": 30
+        "pp": 30,
+        "damage_class": "physical",
+        "damage_class_id": 1
     },
     "184": {
         "name": "Scary Face",
@@ -1469,7 +1835,9 @@
         "type_id": 0,
         "power": 0,
         "accuracy": 100,
-        "pp": 10
+        "pp": 10,
+        "damage_class": "status",
+        "damage_class_id": 0
     },
     "185": {
         "name": "Feint Attack",
@@ -1477,7 +1845,9 @@
         "type_id": 16,
         "power": 60,
         "accuracy": 100,
-        "pp": 20
+        "pp": 20,
+        "damage_class": "physical",
+        "damage_class_id": 1
     },
     "186": {
         "name": "Sweet Kiss",
@@ -1485,7 +1855,9 @@
         "type_id": 17,
         "power": 0,
         "accuracy": 75,
-        "pp": 10
+        "pp": 10,
+        "damage_class": "status",
+        "damage_class_id": 0
     },
     "187": {
         "name": "Belly Drum",
@@ -1493,7 +1865,9 @@
         "type_id": 0,
         "power": 0,
         "accuracy": 100,
-        "pp": 10
+        "pp": 10,
+        "damage_class": "status",
+        "damage_class_id": 0
     },
     "188": {
         "name": "Sludge Bomb",
@@ -1501,7 +1875,9 @@
         "type_id": 3,
         "power": 90,
         "accuracy": 100,
-        "pp": 10
+        "pp": 10,
+        "damage_class": "special",
+        "damage_class_id": 2
     },
     "189": {
         "name": "Mud Slap",
@@ -1509,7 +1885,9 @@
         "type_id": 4,
         "power": 20,
         "accuracy": 100,
-        "pp": 10
+        "pp": 10,
+        "damage_class": "special",
+        "damage_class_id": 2
     },
     "190": {
         "name": "Octazooka",
@@ -1517,7 +1895,9 @@
         "type_id": 10,
         "power": 65,
         "accuracy": 85,
-        "pp": 10
+        "pp": 10,
+        "damage_class": "special",
+        "damage_class_id": 2
     },
     "191": {
         "name": "Spikes",
@@ -1525,7 +1905,9 @@
         "type_id": 4,
         "power": 0,
         "accuracy": 100,
-        "pp": 20
+        "pp": 20,
+        "damage_class": "status",
+        "damage_class_id": 0
     },
     "192": {
         "name": "Zap Cannon",
@@ -1533,7 +1915,9 @@
         "type_id": 12,
         "power": 120,
         "accuracy": 50,
-        "pp": 5
+        "pp": 5,
+        "damage_class": "special",
+        "damage_class_id": 2
     },
     "193": {
         "name": "Foresight",
@@ -1541,7 +1925,9 @@
         "type_id": 0,
         "power": 0,
         "accuracy": 100,
-        "pp": 40
+        "pp": 40,
+        "damage_class": "status",
+        "damage_class_id": 0
     },
     "194": {
         "name": "Destiny Bond",
@@ -1549,7 +1935,9 @@
         "type_id": 7,
         "power": 0,
         "accuracy": 100,
-        "pp": 5
+        "pp": 5,
+        "damage_class": "status",
+        "damage_class_id": 0
     },
     "195": {
         "name": "Perish Song",
@@ -1557,7 +1945,9 @@
         "type_id": 0,
         "power": 0,
         "accuracy": 100,
-        "pp": 5
+        "pp": 5,
+        "damage_class": "status",
+        "damage_class_id": 0
     },
     "196": {
         "name": "Icy Wind",
@@ -1565,7 +1955,9 @@
         "type_id": 14,
         "power": 55,
         "accuracy": 95,
-        "pp": 15
+        "pp": 15,
+        "damage_class": "special",
+        "damage_class_id": 2
     },
     "197": {
         "name": "Detect",
@@ -1573,7 +1965,9 @@
         "type_id": 1,
         "power": 0,
         "accuracy": 100,
-        "pp": 5
+        "pp": 5,
+        "damage_class": "status",
+        "damage_class_id": 0
     },
     "198": {
         "name": "Bone Rush",
@@ -1581,7 +1975,9 @@
         "type_id": 4,
         "power": 25,
         "accuracy": 90,
-        "pp": 10
+        "pp": 10,
+        "damage_class": "physical",
+        "damage_class_id": 1
     },
     "199": {
         "name": "Lock On",
@@ -1589,7 +1985,9 @@
         "type_id": 0,
         "power": 0,
         "accuracy": 100,
-        "pp": 5
+        "pp": 5,
+        "damage_class": "status",
+        "damage_class_id": 0
     },
     "200": {
         "name": "Outrage",
@@ -1597,7 +1995,9 @@
         "type_id": 15,
         "power": 120,
         "accuracy": 100,
-        "pp": 10
+        "pp": 10,
+        "damage_class": "physical",
+        "damage_class_id": 1
     },
     "201": {
         "name": "Sandstorm",
@@ -1605,7 +2005,9 @@
         "type_id": 5,
         "power": 0,
         "accuracy": 100,
-        "pp": 10
+        "pp": 10,
+        "damage_class": "status",
+        "damage_class_id": 0
     },
     "202": {
         "name": "Giga Drain",
@@ -1613,7 +2015,9 @@
         "type_id": 11,
         "power": 75,
         "accuracy": 100,
-        "pp": 10
+        "pp": 10,
+        "damage_class": "special",
+        "damage_class_id": 2
     },
     "203": {
         "name": "Endure",
@@ -1621,7 +2025,9 @@
         "type_id": 0,
         "power": 0,
         "accuracy": 100,
-        "pp": 10
+        "pp": 10,
+        "damage_class": "status",
+        "damage_class_id": 0
     },
     "204": {
         "name": "Charm",
@@ -1629,7 +2035,9 @@
         "type_id": 17,
         "power": 0,
         "accuracy": 100,
-        "pp": 20
+        "pp": 20,
+        "damage_class": "status",
+        "damage_class_id": 0
     },
     "205": {
         "name": "Rollout",
@@ -1637,7 +2045,9 @@
         "type_id": 5,
         "power": 30,
         "accuracy": 90,
-        "pp": 20
+        "pp": 20,
+        "damage_class": "physical",
+        "damage_class_id": 1
     },
     "206": {
         "name": "False Swipe",
@@ -1645,7 +2055,9 @@
         "type_id": 0,
         "power": 40,
         "accuracy": 100,
-        "pp": 40
+        "pp": 40,
+        "damage_class": "physical",
+        "damage_class_id": 1
     },
     "207": {
         "name": "Swagger",
@@ -1653,7 +2065,9 @@
         "type_id": 0,
         "power": 0,
         "accuracy": 85,
-        "pp": 15
+        "pp": 15,
+        "damage_class": "status",
+        "damage_class_id": 0
     },
     "208": {
         "name": "Milk Drink",
@@ -1661,7 +2075,9 @@
         "type_id": 0,
         "power": 0,
         "accuracy": 100,
-        "pp": 5
+        "pp": 5,
+        "damage_class": "status",
+        "damage_class_id": 0
     },
     "209": {
         "name": "Spark",
@@ -1669,7 +2085,9 @@
         "type_id": 12,
         "power": 65,
         "accuracy": 100,
-        "pp": 20
+        "pp": 20,
+        "damage_class": "physical",
+        "damage_class_id": 1
     },
     "210": {
         "name": "Fury Cutter",
@@ -1677,7 +2095,9 @@
         "type_id": 6,
         "power": 40,
         "accuracy": 95,
-        "pp": 20
+        "pp": 20,
+        "damage_class": "physical",
+        "damage_class_id": 1
     },
     "211": {
         "name": "Steel Wing",
@@ -1685,7 +2105,9 @@
         "type_id": 8,
         "power": 70,
         "accuracy": 90,
-        "pp": 25
+        "pp": 25,
+        "damage_class": "physical",
+        "damage_class_id": 1
     },
     "212": {
         "name": "Mean Look",
@@ -1693,7 +2115,9 @@
         "type_id": 0,
         "power": 0,
         "accuracy": 100,
-        "pp": 5
+        "pp": 5,
+        "damage_class": "status",
+        "damage_class_id": 0
     },
     "213": {
         "name": "Attract",
@@ -1701,7 +2125,9 @@
         "type_id": 0,
         "power": 0,
         "accuracy": 100,
-        "pp": 15
+        "pp": 15,
+        "damage_class": "status",
+        "damage_class_id": 0
     },
     "214": {
         "name": "Sleep Talk",
@@ -1709,7 +2135,9 @@
         "type_id": 0,
         "power": 0,
         "accuracy": 100,
-        "pp": 10
+        "pp": 10,
+        "damage_class": "status",
+        "damage_class_id": 0
     },
     "215": {
         "name": "Heal Bell",
@@ -1717,7 +2145,9 @@
         "type_id": 0,
         "power": 0,
         "accuracy": 100,
-        "pp": 5
+        "pp": 5,
+        "damage_class": "status",
+        "damage_class_id": 0
     },
     "216": {
         "name": "Return",
@@ -1725,7 +2155,9 @@
         "type_id": 0,
         "power": 0,
         "accuracy": 100,
-        "pp": 20
+        "pp": 20,
+        "damage_class": "physical",
+        "damage_class_id": 1
     },
     "217": {
         "name": "Present",
@@ -1733,7 +2165,9 @@
         "type_id": 0,
         "power": 0,
         "accuracy": 90,
-        "pp": 15
+        "pp": 15,
+        "damage_class": "physical",
+        "damage_class_id": 1
     },
     "218": {
         "name": "Frustration",
@@ -1741,7 +2175,9 @@
         "type_id": 0,
         "power": 0,
         "accuracy": 100,
-        "pp": 20
+        "pp": 20,
+        "damage_class": "physical",
+        "damage_class_id": 1
     },
     "219": {
         "name": "Safeguard",
@@ -1749,7 +2185,9 @@
         "type_id": 0,
         "power": 0,
         "accuracy": 100,
-        "pp": 25
+        "pp": 25,
+        "damage_class": "status",
+        "damage_class_id": 0
     },
     "220": {
         "name": "Pain Split",
@@ -1757,7 +2195,9 @@
         "type_id": 0,
         "power": 0,
         "accuracy": 100,
-        "pp": 20
+        "pp": 20,
+        "damage_class": "status",
+        "damage_class_id": 0
     },
     "221": {
         "name": "Sacred Fire",
@@ -1765,7 +2205,9 @@
         "type_id": 9,
         "power": 100,
         "accuracy": 95,
-        "pp": 5
+        "pp": 5,
+        "damage_class": "physical",
+        "damage_class_id": 1
     },
     "222": {
         "name": "Magnitude",
@@ -1773,7 +2215,9 @@
         "type_id": 4,
         "power": 0,
         "accuracy": 100,
-        "pp": 30
+        "pp": 30,
+        "damage_class": "physical",
+        "damage_class_id": 1
     },
     "223": {
         "name": "Dynamic Punch",
@@ -1781,7 +2225,9 @@
         "type_id": 1,
         "power": 100,
         "accuracy": 50,
-        "pp": 5
+        "pp": 5,
+        "damage_class": "physical",
+        "damage_class_id": 1
     },
     "224": {
         "name": "Megahorn",
@@ -1789,7 +2235,9 @@
         "type_id": 6,
         "power": 120,
         "accuracy": 85,
-        "pp": 10
+        "pp": 10,
+        "damage_class": "physical",
+        "damage_class_id": 1
     },
     "225": {
         "name": "Dragon Breath",
@@ -1797,7 +2245,9 @@
         "type_id": 15,
         "power": 60,
         "accuracy": 100,
-        "pp": 20
+        "pp": 20,
+        "damage_class": "special",
+        "damage_class_id": 2
     },
     "226": {
         "name": "Baton Pass",
@@ -1805,7 +2255,9 @@
         "type_id": 0,
         "power": 0,
         "accuracy": 100,
-        "pp": 40
+        "pp": 40,
+        "damage_class": "status",
+        "damage_class_id": 0
     },
     "227": {
         "name": "Encore",
@@ -1813,7 +2265,9 @@
         "type_id": 0,
         "power": 0,
         "accuracy": 100,
-        "pp": 5
+        "pp": 5,
+        "damage_class": "status",
+        "damage_class_id": 0
     },
     "228": {
         "name": "Pursuit",
@@ -1821,7 +2275,9 @@
         "type_id": 16,
         "power": 40,
         "accuracy": 100,
-        "pp": 20
+        "pp": 20,
+        "damage_class": "physical",
+        "damage_class_id": 1
     },
     "229": {
         "name": "Rapid Spin",
@@ -1829,7 +2285,9 @@
         "type_id": 0,
         "power": 50,
         "accuracy": 100,
-        "pp": 40
+        "pp": 40,
+        "damage_class": "physical",
+        "damage_class_id": 1
     },
     "230": {
         "name": "Sweet Scent",
@@ -1837,7 +2295,9 @@
         "type_id": 0,
         "power": 0,
         "accuracy": 100,
-        "pp": 20
+        "pp": 20,
+        "damage_class": "status",
+        "damage_class_id": 0
     },
     "231": {
         "name": "Iron Tail",
@@ -1845,7 +2305,9 @@
         "type_id": 8,
         "power": 100,
         "accuracy": 75,
-        "pp": 15
+        "pp": 15,
+        "damage_class": "physical",
+        "damage_class_id": 1
     },
     "232": {
         "name": "Metal Claw",
@@ -1853,7 +2315,9 @@
         "type_id": 8,
         "power": 50,
         "accuracy": 95,
-        "pp": 35
+        "pp": 35,
+        "damage_class": "physical",
+        "damage_class_id": 1
     },
     "233": {
         "name": "Vital Throw",
@@ -1861,7 +2325,9 @@
         "type_id": 1,
         "power": 70,
         "accuracy": 100,
-        "pp": 10
+        "pp": 10,
+        "damage_class": "physical",
+        "damage_class_id": 1
     },
     "234": {
         "name": "Morning Sun",
@@ -1869,7 +2335,9 @@
         "type_id": 0,
         "power": 0,
         "accuracy": 100,
-        "pp": 5
+        "pp": 5,
+        "damage_class": "status",
+        "damage_class_id": 0
     },
     "235": {
         "name": "Synthesis",
@@ -1877,7 +2345,9 @@
         "type_id": 11,
         "power": 0,
         "accuracy": 100,
-        "pp": 5
+        "pp": 5,
+        "damage_class": "status",
+        "damage_class_id": 0
     },
     "236": {
         "name": "Moonlight",
@@ -1885,7 +2355,9 @@
         "type_id": 17,
         "power": 0,
         "accuracy": 100,
-        "pp": 5
+        "pp": 5,
+        "damage_class": "status",
+        "damage_class_id": 0
     },
     "237": {
         "name": "Hidden Power",
@@ -1893,7 +2365,9 @@
         "type_id": 0,
         "power": 60,
         "accuracy": 100,
-        "pp": 15
+        "pp": 15,
+        "damage_class": "special",
+        "damage_class_id": 2
     },
     "238": {
         "name": "Cross Chop",
@@ -1901,7 +2375,9 @@
         "type_id": 1,
         "power": 100,
         "accuracy": 80,
-        "pp": 5
+        "pp": 5,
+        "damage_class": "physical",
+        "damage_class_id": 1
     },
     "239": {
         "name": "Twister",
@@ -1909,7 +2385,9 @@
         "type_id": 15,
         "power": 40,
         "accuracy": 100,
-        "pp": 20
+        "pp": 20,
+        "damage_class": "special",
+        "damage_class_id": 2
     },
     "240": {
         "name": "Rain Dance",
@@ -1917,7 +2395,9 @@
         "type_id": 10,
         "power": 0,
         "accuracy": 100,
-        "pp": 5
+        "pp": 5,
+        "damage_class": "status",
+        "damage_class_id": 0
     },
     "241": {
         "name": "Sunny Day",
@@ -1925,7 +2405,9 @@
         "type_id": 9,
         "power": 0,
         "accuracy": 100,
-        "pp": 5
+        "pp": 5,
+        "damage_class": "status",
+        "damage_class_id": 0
     },
     "242": {
         "name": "Crunch",
@@ -1933,7 +2415,9 @@
         "type_id": 16,
         "power": 80,
         "accuracy": 100,
-        "pp": 15
+        "pp": 15,
+        "damage_class": "physical",
+        "damage_class_id": 1
     },
     "243": {
         "name": "Mirror Coat",
@@ -1941,7 +2425,9 @@
         "type_id": 13,
         "power": 0,
         "accuracy": 100,
-        "pp": 20
+        "pp": 20,
+        "damage_class": "special",
+        "damage_class_id": 2
     },
     "244": {
         "name": "Psych Up",
@@ -1949,7 +2435,9 @@
         "type_id": 0,
         "power": 0,
         "accuracy": 100,
-        "pp": 10
+        "pp": 10,
+        "damage_class": "status",
+        "damage_class_id": 0
     },
     "245": {
         "name": "Extreme Speed",
@@ -1957,7 +2445,9 @@
         "type_id": 0,
         "power": 80,
         "accuracy": 100,
-        "pp": 5
+        "pp": 5,
+        "damage_class": "physical",
+        "damage_class_id": 1
     },
     "246": {
         "name": "Ancient Power",
@@ -1965,7 +2455,9 @@
         "type_id": 5,
         "power": 60,
         "accuracy": 100,
-        "pp": 5
+        "pp": 5,
+        "damage_class": "special",
+        "damage_class_id": 2
     },
     "247": {
         "name": "Shadow Ball",
@@ -1973,7 +2465,9 @@
         "type_id": 7,
         "power": 80,
         "accuracy": 100,
-        "pp": 15
+        "pp": 15,
+        "damage_class": "special",
+        "damage_class_id": 2
     },
     "248": {
         "name": "Future Sight",
@@ -1981,7 +2475,9 @@
         "type_id": 13,
         "power": 120,
         "accuracy": 100,
-        "pp": 10
+        "pp": 10,
+        "damage_class": "special",
+        "damage_class_id": 2
     },
     "249": {
         "name": "Rock Smash",
@@ -1989,7 +2485,9 @@
         "type_id": 1,
         "power": 40,
         "accuracy": 100,
-        "pp": 15
+        "pp": 15,
+        "damage_class": "physical",
+        "damage_class_id": 1
     },
     "250": {
         "name": "Whirlpool",
@@ -1997,7 +2495,9 @@
         "type_id": 10,
         "power": 35,
         "accuracy": 85,
-        "pp": 15
+        "pp": 15,
+        "damage_class": "special",
+        "damage_class_id": 2
     },
     "251": {
         "name": "Beat Up",
@@ -2005,7 +2505,9 @@
         "type_id": 16,
         "power": 0,
         "accuracy": 100,
-        "pp": 10
+        "pp": 10,
+        "damage_class": "physical",
+        "damage_class_id": 1
     },
     "252": {
         "name": "Fake Out",
@@ -2013,7 +2515,9 @@
         "type_id": 0,
         "power": 40,
         "accuracy": 100,
-        "pp": 10
+        "pp": 10,
+        "damage_class": "physical",
+        "damage_class_id": 1
     },
     "253": {
         "name": "Uproar",
@@ -2021,7 +2525,9 @@
         "type_id": 0,
         "power": 90,
         "accuracy": 100,
-        "pp": 10
+        "pp": 10,
+        "damage_class": "special",
+        "damage_class_id": 2
     },
     "254": {
         "name": "Stockpile",
@@ -2029,7 +2535,9 @@
         "type_id": 0,
         "power": 0,
         "accuracy": 100,
-        "pp": 20
+        "pp": 20,
+        "damage_class": "status",
+        "damage_class_id": 0
     },
     "255": {
         "name": "Spit Up",
@@ -2037,7 +2545,9 @@
         "type_id": 0,
         "power": 0,
         "accuracy": 100,
-        "pp": 10
+        "pp": 10,
+        "damage_class": "special",
+        "damage_class_id": 2
     },
     "256": {
         "name": "Swallow",
@@ -2045,7 +2555,9 @@
         "type_id": 0,
         "power": 0,
         "accuracy": 100,
-        "pp": 10
+        "pp": 10,
+        "damage_class": "status",
+        "damage_class_id": 0
     },
     "257": {
         "name": "Heat Wave",
@@ -2053,7 +2565,9 @@
         "type_id": 9,
         "power": 95,
         "accuracy": 90,
-        "pp": 10
+        "pp": 10,
+        "damage_class": "special",
+        "damage_class_id": 2
     },
     "258": {
         "name": "Hail",
@@ -2061,7 +2575,9 @@
         "type_id": 14,
         "power": 0,
         "accuracy": 100,
-        "pp": 10
+        "pp": 10,
+        "damage_class": "status",
+        "damage_class_id": 0
     },
     "259": {
         "name": "Torment",
@@ -2069,7 +2585,9 @@
         "type_id": 16,
         "power": 0,
         "accuracy": 100,
-        "pp": 15
+        "pp": 15,
+        "damage_class": "status",
+        "damage_class_id": 0
     },
     "260": {
         "name": "Flatter",
@@ -2077,7 +2595,9 @@
         "type_id": 16,
         "power": 0,
         "accuracy": 100,
-        "pp": 15
+        "pp": 15,
+        "damage_class": "status",
+        "damage_class_id": 0
     },
     "261": {
         "name": "Will O Wisp",
@@ -2085,7 +2605,9 @@
         "type_id": 9,
         "power": 0,
         "accuracy": 85,
-        "pp": 15
+        "pp": 15,
+        "damage_class": "status",
+        "damage_class_id": 0
     },
     "262": {
         "name": "Memento",
@@ -2093,7 +2615,9 @@
         "type_id": 16,
         "power": 0,
         "accuracy": 100,
-        "pp": 10
+        "pp": 10,
+        "damage_class": "status",
+        "damage_class_id": 0
     },
     "263": {
         "name": "Facade",
@@ -2101,7 +2625,9 @@
         "type_id": 0,
         "power": 70,
         "accuracy": 100,
-        "pp": 20
+        "pp": 20,
+        "damage_class": "physical",
+        "damage_class_id": 1
     },
     "264": {
         "name": "Focus Punch",
@@ -2109,7 +2635,9 @@
         "type_id": 1,
         "power": 150,
         "accuracy": 100,
-        "pp": 20
+        "pp": 20,
+        "damage_class": "physical",
+        "damage_class_id": 1
     },
     "265": {
         "name": "Smelling Salts",
@@ -2117,7 +2645,9 @@
         "type_id": 0,
         "power": 70,
         "accuracy": 100,
-        "pp": 10
+        "pp": 10,
+        "damage_class": "physical",
+        "damage_class_id": 1
     },
     "266": {
         "name": "Follow Me",
@@ -2125,7 +2655,9 @@
         "type_id": 0,
         "power": 0,
         "accuracy": 100,
-        "pp": 20
+        "pp": 20,
+        "damage_class": "status",
+        "damage_class_id": 0
     },
     "267": {
         "name": "Nature Power",
@@ -2133,7 +2665,9 @@
         "type_id": 0,
         "power": 0,
         "accuracy": 100,
-        "pp": 20
+        "pp": 20,
+        "damage_class": "status",
+        "damage_class_id": 0
     },
     "268": {
         "name": "Charge",
@@ -2141,7 +2675,9 @@
         "type_id": 12,
         "power": 0,
         "accuracy": 100,
-        "pp": 20
+        "pp": 20,
+        "damage_class": "status",
+        "damage_class_id": 0
     },
     "269": {
         "name": "Taunt",
@@ -2149,7 +2685,9 @@
         "type_id": 16,
         "power": 0,
         "accuracy": 100,
-        "pp": 20
+        "pp": 20,
+        "damage_class": "status",
+        "damage_class_id": 0
     },
     "270": {
         "name": "Helping Hand",
@@ -2157,7 +2695,9 @@
         "type_id": 0,
         "power": 0,
         "accuracy": 100,
-        "pp": 20
+        "pp": 20,
+        "damage_class": "status",
+        "damage_class_id": 0
     },
     "271": {
         "name": "Trick",
@@ -2165,7 +2705,9 @@
         "type_id": 13,
         "power": 0,
         "accuracy": 100,
-        "pp": 10
+        "pp": 10,
+        "damage_class": "status",
+        "damage_class_id": 0
     },
     "272": {
         "name": "Role Play",
@@ -2173,7 +2715,9 @@
         "type_id": 13,
         "power": 0,
         "accuracy": 100,
-        "pp": 10
+        "pp": 10,
+        "damage_class": "status",
+        "damage_class_id": 0
     },
     "273": {
         "name": "Wish",
@@ -2181,7 +2725,9 @@
         "type_id": 0,
         "power": 0,
         "accuracy": 100,
-        "pp": 10
+        "pp": 10,
+        "damage_class": "status",
+        "damage_class_id": 0
     },
     "274": {
         "name": "Assist",
@@ -2189,7 +2735,9 @@
         "type_id": 0,
         "power": 0,
         "accuracy": 100,
-        "pp": 20
+        "pp": 20,
+        "damage_class": "status",
+        "damage_class_id": 0
     },
     "275": {
         "name": "Ingrain",
@@ -2197,7 +2745,9 @@
         "type_id": 11,
         "power": 0,
         "accuracy": 100,
-        "pp": 20
+        "pp": 20,
+        "damage_class": "status",
+        "damage_class_id": 0
     },
     "276": {
         "name": "Superpower",
@@ -2205,7 +2755,9 @@
         "type_id": 1,
         "power": 120,
         "accuracy": 100,
-        "pp": 5
+        "pp": 5,
+        "damage_class": "physical",
+        "damage_class_id": 1
     },
     "277": {
         "name": "Magic Coat",
@@ -2213,7 +2765,9 @@
         "type_id": 13,
         "power": 0,
         "accuracy": 100,
-        "pp": 15
+        "pp": 15,
+        "damage_class": "status",
+        "damage_class_id": 0
     },
     "278": {
         "name": "Recycle",
@@ -2221,7 +2775,9 @@
         "type_id": 0,
         "power": 0,
         "accuracy": 100,
-        "pp": 10
+        "pp": 10,
+        "damage_class": "status",
+        "damage_class_id": 0
     },
     "279": {
         "name": "Revenge",
@@ -2229,7 +2785,9 @@
         "type_id": 1,
         "power": 60,
         "accuracy": 100,
-        "pp": 10
+        "pp": 10,
+        "damage_class": "physical",
+        "damage_class_id": 1
     },
     "280": {
         "name": "Brick Break",
@@ -2237,7 +2795,9 @@
         "type_id": 1,
         "power": 75,
         "accuracy": 100,
-        "pp": 15
+        "pp": 15,
+        "damage_class": "physical",
+        "damage_class_id": 1
     },
     "281": {
         "name": "Yawn",
@@ -2245,7 +2805,9 @@
         "type_id": 0,
         "power": 0,
         "accuracy": 100,
-        "pp": 10
+        "pp": 10,
+        "damage_class": "status",
+        "damage_class_id": 0
     },
     "282": {
         "name": "Knock Off",
@@ -2253,7 +2815,9 @@
         "type_id": 16,
         "power": 65,
         "accuracy": 100,
-        "pp": 20
+        "pp": 20,
+        "damage_class": "physical",
+        "damage_class_id": 1
     },
     "283": {
         "name": "Endeavor",
@@ -2261,7 +2825,9 @@
         "type_id": 0,
         "power": 0,
         "accuracy": 100,
-        "pp": 5
+        "pp": 5,
+        "damage_class": "physical",
+        "damage_class_id": 1
     },
     "284": {
         "name": "Eruption",
@@ -2269,7 +2835,9 @@
         "type_id": 9,
         "power": 150,
         "accuracy": 100,
-        "pp": 5
+        "pp": 5,
+        "damage_class": "special",
+        "damage_class_id": 2
     },
     "285": {
         "name": "Skill Swap",
@@ -2277,7 +2845,9 @@
         "type_id": 13,
         "power": 0,
         "accuracy": 100,
-        "pp": 10
+        "pp": 10,
+        "damage_class": "status",
+        "damage_class_id": 0
     },
     "286": {
         "name": "Imprison",
@@ -2285,7 +2855,9 @@
         "type_id": 13,
         "power": 0,
         "accuracy": 100,
-        "pp": 10
+        "pp": 10,
+        "damage_class": "status",
+        "damage_class_id": 0
     },
     "287": {
         "name": "Refresh",
@@ -2293,7 +2865,9 @@
         "type_id": 0,
         "power": 0,
         "accuracy": 100,
-        "pp": 20
+        "pp": 20,
+        "damage_class": "status",
+        "damage_class_id": 0
     },
     "288": {
         "name": "Grudge",
@@ -2301,7 +2875,9 @@
         "type_id": 7,
         "power": 0,
         "accuracy": 100,
-        "pp": 5
+        "pp": 5,
+        "damage_class": "status",
+        "damage_class_id": 0
     },
     "289": {
         "name": "Snatch",
@@ -2309,7 +2885,9 @@
         "type_id": 16,
         "power": 0,
         "accuracy": 100,
-        "pp": 10
+        "pp": 10,
+        "damage_class": "status",
+        "damage_class_id": 0
     },
     "290": {
         "name": "Secret Power",
@@ -2317,7 +2895,9 @@
         "type_id": 0,
         "power": 70,
         "accuracy": 100,
-        "pp": 20
+        "pp": 20,
+        "damage_class": "physical",
+        "damage_class_id": 1
     },
     "291": {
         "name": "Dive",
@@ -2325,7 +2905,9 @@
         "type_id": 10,
         "power": 80,
         "accuracy": 100,
-        "pp": 10
+        "pp": 10,
+        "damage_class": "physical",
+        "damage_class_id": 1
     },
     "292": {
         "name": "Arm Thrust",
@@ -2333,7 +2915,9 @@
         "type_id": 1,
         "power": 15,
         "accuracy": 100,
-        "pp": 20
+        "pp": 20,
+        "damage_class": "physical",
+        "damage_class_id": 1
     },
     "293": {
         "name": "Camouflage",
@@ -2341,7 +2925,9 @@
         "type_id": 0,
         "power": 0,
         "accuracy": 100,
-        "pp": 20
+        "pp": 20,
+        "damage_class": "status",
+        "damage_class_id": 0
     },
     "294": {
         "name": "Tail Glow",
@@ -2349,7 +2935,9 @@
         "type_id": 6,
         "power": 0,
         "accuracy": 100,
-        "pp": 20
+        "pp": 20,
+        "damage_class": "status",
+        "damage_class_id": 0
     },
     "295": {
         "name": "Luster Purge",
@@ -2357,7 +2945,9 @@
         "type_id": 13,
         "power": 95,
         "accuracy": 100,
-        "pp": 5
+        "pp": 5,
+        "damage_class": "special",
+        "damage_class_id": 2
     },
     "296": {
         "name": "Mist Ball",
@@ -2365,7 +2955,9 @@
         "type_id": 13,
         "power": 95,
         "accuracy": 100,
-        "pp": 5
+        "pp": 5,
+        "damage_class": "special",
+        "damage_class_id": 2
     },
     "297": {
         "name": "Feather Dance",
@@ -2373,7 +2965,9 @@
         "type_id": 2,
         "power": 0,
         "accuracy": 100,
-        "pp": 15
+        "pp": 15,
+        "damage_class": "status",
+        "damage_class_id": 0
     },
     "298": {
         "name": "Teeter Dance",
@@ -2381,7 +2975,9 @@
         "type_id": 0,
         "power": 0,
         "accuracy": 100,
-        "pp": 20
+        "pp": 20,
+        "damage_class": "status",
+        "damage_class_id": 0
     },
     "299": {
         "name": "Blaze Kick",
@@ -2389,7 +2985,9 @@
         "type_id": 9,
         "power": 85,
         "accuracy": 90,
-        "pp": 10
+        "pp": 10,
+        "damage_class": "physical",
+        "damage_class_id": 1
     },
     "300": {
         "name": "Mud Sport",
@@ -2397,7 +2995,9 @@
         "type_id": 4,
         "power": 0,
         "accuracy": 100,
-        "pp": 15
+        "pp": 15,
+        "damage_class": "status",
+        "damage_class_id": 0
     },
     "301": {
         "name": "Ice Ball",
@@ -2405,7 +3005,9 @@
         "type_id": 14,
         "power": 30,
         "accuracy": 90,
-        "pp": 20
+        "pp": 20,
+        "damage_class": "physical",
+        "damage_class_id": 1
     },
     "302": {
         "name": "Needle Arm",
@@ -2413,7 +3015,9 @@
         "type_id": 11,
         "power": 60,
         "accuracy": 100,
-        "pp": 15
+        "pp": 15,
+        "damage_class": "physical",
+        "damage_class_id": 1
     },
     "303": {
         "name": "Slack Off",
@@ -2421,7 +3025,9 @@
         "type_id": 0,
         "power": 0,
         "accuracy": 100,
-        "pp": 5
+        "pp": 5,
+        "damage_class": "status",
+        "damage_class_id": 0
     },
     "304": {
         "name": "Hyper Voice",
@@ -2429,7 +3035,9 @@
         "type_id": 0,
         "power": 90,
         "accuracy": 100,
-        "pp": 10
+        "pp": 10,
+        "damage_class": "special",
+        "damage_class_id": 2
     },
     "305": {
         "name": "Poison Fang",
@@ -2437,7 +3045,9 @@
         "type_id": 3,
         "power": 50,
         "accuracy": 100,
-        "pp": 15
+        "pp": 15,
+        "damage_class": "physical",
+        "damage_class_id": 1
     },
     "306": {
         "name": "Crush Claw",
@@ -2445,7 +3055,9 @@
         "type_id": 0,
         "power": 75,
         "accuracy": 95,
-        "pp": 10
+        "pp": 10,
+        "damage_class": "physical",
+        "damage_class_id": 1
     },
     "307": {
         "name": "Blast Burn",
@@ -2453,7 +3065,9 @@
         "type_id": 9,
         "power": 150,
         "accuracy": 90,
-        "pp": 5
+        "pp": 5,
+        "damage_class": "special",
+        "damage_class_id": 2
     },
     "308": {
         "name": "Hydro Cannon",
@@ -2461,7 +3075,9 @@
         "type_id": 10,
         "power": 150,
         "accuracy": 90,
-        "pp": 5
+        "pp": 5,
+        "damage_class": "special",
+        "damage_class_id": 2
     },
     "309": {
         "name": "Meteor Mash",
@@ -2469,7 +3085,9 @@
         "type_id": 8,
         "power": 90,
         "accuracy": 90,
-        "pp": 10
+        "pp": 10,
+        "damage_class": "physical",
+        "damage_class_id": 1
     },
     "310": {
         "name": "Astonish",
@@ -2477,7 +3095,9 @@
         "type_id": 7,
         "power": 30,
         "accuracy": 100,
-        "pp": 15
+        "pp": 15,
+        "damage_class": "physical",
+        "damage_class_id": 1
     },
     "311": {
         "name": "Weather Ball",
@@ -2485,7 +3105,9 @@
         "type_id": 0,
         "power": 50,
         "accuracy": 100,
-        "pp": 10
+        "pp": 10,
+        "damage_class": "special",
+        "damage_class_id": 2
     },
     "312": {
         "name": "Aromatherapy",
@@ -2493,7 +3115,9 @@
         "type_id": 11,
         "power": 0,
         "accuracy": 100,
-        "pp": 5
+        "pp": 5,
+        "damage_class": "status",
+        "damage_class_id": 0
     },
     "313": {
         "name": "Fake Tears",
@@ -2501,7 +3125,9 @@
         "type_id": 16,
         "power": 0,
         "accuracy": 100,
-        "pp": 20
+        "pp": 20,
+        "damage_class": "status",
+        "damage_class_id": 0
     },
     "314": {
         "name": "Air Cutter",
@@ -2509,7 +3135,9 @@
         "type_id": 2,
         "power": 60,
         "accuracy": 95,
-        "pp": 25
+        "pp": 25,
+        "damage_class": "special",
+        "damage_class_id": 2
     },
     "315": {
         "name": "Overheat",
@@ -2517,7 +3145,9 @@
         "type_id": 9,
         "power": 130,
         "accuracy": 90,
-        "pp": 5
+        "pp": 5,
+        "damage_class": "special",
+        "damage_class_id": 2
     },
     "316": {
         "name": "Odor Sleuth",
@@ -2525,7 +3155,9 @@
         "type_id": 0,
         "power": 0,
         "accuracy": 100,
-        "pp": 40
+        "pp": 40,
+        "damage_class": "status",
+        "damage_class_id": 0
     },
     "317": {
         "name": "Rock Tomb",
@@ -2533,7 +3165,9 @@
         "type_id": 5,
         "power": 60,
         "accuracy": 95,
-        "pp": 15
+        "pp": 15,
+        "damage_class": "physical",
+        "damage_class_id": 1
     },
     "318": {
         "name": "Silver Wind",
@@ -2541,7 +3175,9 @@
         "type_id": 6,
         "power": 60,
         "accuracy": 100,
-        "pp": 5
+        "pp": 5,
+        "damage_class": "special",
+        "damage_class_id": 2
     },
     "319": {
         "name": "Metal Sound",
@@ -2549,7 +3185,9 @@
         "type_id": 8,
         "power": 0,
         "accuracy": 85,
-        "pp": 40
+        "pp": 40,
+        "damage_class": "status",
+        "damage_class_id": 0
     },
     "320": {
         "name": "Grass Whistle",
@@ -2557,7 +3195,9 @@
         "type_id": 11,
         "power": 0,
         "accuracy": 55,
-        "pp": 15
+        "pp": 15,
+        "damage_class": "status",
+        "damage_class_id": 0
     },
     "321": {
         "name": "Tickle",
@@ -2565,7 +3205,9 @@
         "type_id": 0,
         "power": 0,
         "accuracy": 100,
-        "pp": 20
+        "pp": 20,
+        "damage_class": "status",
+        "damage_class_id": 0
     },
     "322": {
         "name": "Cosmic Power",
@@ -2573,7 +3215,9 @@
         "type_id": 13,
         "power": 0,
         "accuracy": 100,
-        "pp": 20
+        "pp": 20,
+        "damage_class": "status",
+        "damage_class_id": 0
     },
     "323": {
         "name": "Water Spout",
@@ -2581,7 +3225,9 @@
         "type_id": 10,
         "power": 150,
         "accuracy": 100,
-        "pp": 5
+        "pp": 5,
+        "damage_class": "special",
+        "damage_class_id": 2
     },
     "324": {
         "name": "Signal Beam",
@@ -2589,7 +3235,9 @@
         "type_id": 6,
         "power": 75,
         "accuracy": 100,
-        "pp": 15
+        "pp": 15,
+        "damage_class": "special",
+        "damage_class_id": 2
     },
     "325": {
         "name": "Shadow Punch",
@@ -2597,7 +3245,9 @@
         "type_id": 7,
         "power": 60,
         "accuracy": 100,
-        "pp": 20
+        "pp": 20,
+        "damage_class": "physical",
+        "damage_class_id": 1
     },
     "326": {
         "name": "Extrasensory",
@@ -2605,7 +3255,9 @@
         "type_id": 13,
         "power": 80,
         "accuracy": 100,
-        "pp": 20
+        "pp": 20,
+        "damage_class": "special",
+        "damage_class_id": 2
     },
     "327": {
         "name": "Sky Uppercut",
@@ -2613,7 +3265,9 @@
         "type_id": 1,
         "power": 85,
         "accuracy": 90,
-        "pp": 15
+        "pp": 15,
+        "damage_class": "physical",
+        "damage_class_id": 1
     },
     "328": {
         "name": "Sand Tomb",
@@ -2621,7 +3275,9 @@
         "type_id": 4,
         "power": 35,
         "accuracy": 85,
-        "pp": 15
+        "pp": 15,
+        "damage_class": "physical",
+        "damage_class_id": 1
     },
     "329": {
         "name": "Sheer Cold",
@@ -2629,7 +3285,9 @@
         "type_id": 14,
         "power": 0,
         "accuracy": 30,
-        "pp": 5
+        "pp": 5,
+        "damage_class": "special",
+        "damage_class_id": 2
     },
     "330": {
         "name": "Muddy Water",
@@ -2637,7 +3295,9 @@
         "type_id": 10,
         "power": 90,
         "accuracy": 85,
-        "pp": 10
+        "pp": 10,
+        "damage_class": "special",
+        "damage_class_id": 2
     },
     "331": {
         "name": "Bullet Seed",
@@ -2645,7 +3305,9 @@
         "type_id": 11,
         "power": 25,
         "accuracy": 100,
-        "pp": 30
+        "pp": 30,
+        "damage_class": "physical",
+        "damage_class_id": 1
     },
     "332": {
         "name": "Aerial Ace",
@@ -2653,7 +3315,9 @@
         "type_id": 2,
         "power": 60,
         "accuracy": 100,
-        "pp": 20
+        "pp": 20,
+        "damage_class": "physical",
+        "damage_class_id": 1
     },
     "333": {
         "name": "Icicle Spear",
@@ -2661,7 +3325,9 @@
         "type_id": 14,
         "power": 25,
         "accuracy": 100,
-        "pp": 30
+        "pp": 30,
+        "damage_class": "physical",
+        "damage_class_id": 1
     },
     "334": {
         "name": "Iron Defense",
@@ -2669,7 +3335,9 @@
         "type_id": 8,
         "power": 0,
         "accuracy": 100,
-        "pp": 15
+        "pp": 15,
+        "damage_class": "status",
+        "damage_class_id": 0
     },
     "335": {
         "name": "Block",
@@ -2677,7 +3345,9 @@
         "type_id": 0,
         "power": 0,
         "accuracy": 100,
-        "pp": 5
+        "pp": 5,
+        "damage_class": "status",
+        "damage_class_id": 0
     },
     "336": {
         "name": "Howl",
@@ -2685,7 +3355,9 @@
         "type_id": 0,
         "power": 0,
         "accuracy": 100,
-        "pp": 40
+        "pp": 40,
+        "damage_class": "status",
+        "damage_class_id": 0
     },
     "337": {
         "name": "Dragon Claw",
@@ -2693,7 +3365,9 @@
         "type_id": 15,
         "power": 80,
         "accuracy": 100,
-        "pp": 15
+        "pp": 15,
+        "damage_class": "physical",
+        "damage_class_id": 1
     },
     "338": {
         "name": "Frenzy Plant",
@@ -2701,7 +3375,9 @@
         "type_id": 11,
         "power": 150,
         "accuracy": 90,
-        "pp": 5
+        "pp": 5,
+        "damage_class": "special",
+        "damage_class_id": 2
     },
     "339": {
         "name": "Bulk Up",
@@ -2709,7 +3385,9 @@
         "type_id": 1,
         "power": 0,
         "accuracy": 100,
-        "pp": 20
+        "pp": 20,
+        "damage_class": "status",
+        "damage_class_id": 0
     },
     "340": {
         "name": "Bounce",
@@ -2717,7 +3395,9 @@
         "type_id": 2,
         "power": 85,
         "accuracy": 85,
-        "pp": 5
+        "pp": 5,
+        "damage_class": "physical",
+        "damage_class_id": 1
     },
     "341": {
         "name": "Mud Shot",
@@ -2725,7 +3405,9 @@
         "type_id": 4,
         "power": 55,
         "accuracy": 95,
-        "pp": 15
+        "pp": 15,
+        "damage_class": "special",
+        "damage_class_id": 2
     },
     "342": {
         "name": "Poison Tail",
@@ -2733,7 +3415,9 @@
         "type_id": 3,
         "power": 50,
         "accuracy": 100,
-        "pp": 25
+        "pp": 25,
+        "damage_class": "physical",
+        "damage_class_id": 1
     },
     "343": {
         "name": "Covet",
@@ -2741,7 +3425,9 @@
         "type_id": 0,
         "power": 60,
         "accuracy": 100,
-        "pp": 25
+        "pp": 25,
+        "damage_class": "physical",
+        "damage_class_id": 1
     },
     "344": {
         "name": "Volt Tackle",
@@ -2749,7 +3435,9 @@
         "type_id": 12,
         "power": 120,
         "accuracy": 100,
-        "pp": 15
+        "pp": 15,
+        "damage_class": "physical",
+        "damage_class_id": 1
     },
     "345": {
         "name": "Magical Leaf",
@@ -2757,7 +3445,9 @@
         "type_id": 11,
         "power": 60,
         "accuracy": 100,
-        "pp": 20
+        "pp": 20,
+        "damage_class": "special",
+        "damage_class_id": 2
     },
     "346": {
         "name": "Water Sport",
@@ -2765,7 +3455,9 @@
         "type_id": 10,
         "power": 0,
         "accuracy": 100,
-        "pp": 15
+        "pp": 15,
+        "damage_class": "status",
+        "damage_class_id": 0
     },
     "347": {
         "name": "Calm Mind",
@@ -2773,7 +3465,9 @@
         "type_id": 13,
         "power": 0,
         "accuracy": 100,
-        "pp": 20
+        "pp": 20,
+        "damage_class": "status",
+        "damage_class_id": 0
     },
     "348": {
         "name": "Leaf Blade",
@@ -2781,7 +3475,9 @@
         "type_id": 11,
         "power": 90,
         "accuracy": 100,
-        "pp": 15
+        "pp": 15,
+        "damage_class": "physical",
+        "damage_class_id": 1
     },
     "349": {
         "name": "Dragon Dance",
@@ -2789,7 +3485,9 @@
         "type_id": 15,
         "power": 0,
         "accuracy": 100,
-        "pp": 20
+        "pp": 20,
+        "damage_class": "status",
+        "damage_class_id": 0
     },
     "350": {
         "name": "Rock Blast",
@@ -2797,7 +3495,9 @@
         "type_id": 5,
         "power": 25,
         "accuracy": 90,
-        "pp": 10
+        "pp": 10,
+        "damage_class": "physical",
+        "damage_class_id": 1
     },
     "351": {
         "name": "Shock Wave",
@@ -2805,7 +3505,9 @@
         "type_id": 12,
         "power": 60,
         "accuracy": 100,
-        "pp": 20
+        "pp": 20,
+        "damage_class": "special",
+        "damage_class_id": 2
     },
     "352": {
         "name": "Water Pulse",
@@ -2813,7 +3515,9 @@
         "type_id": 10,
         "power": 60,
         "accuracy": 100,
-        "pp": 20
+        "pp": 20,
+        "damage_class": "special",
+        "damage_class_id": 2
     },
     "353": {
         "name": "Doom Desire",
@@ -2821,7 +3525,9 @@
         "type_id": 8,
         "power": 140,
         "accuracy": 100,
-        "pp": 5
+        "pp": 5,
+        "damage_class": "special",
+        "damage_class_id": 2
     },
     "354": {
         "name": "Psycho Boost",
@@ -2829,6 +3535,8 @@
         "type_id": 13,
         "power": 140,
         "accuracy": 90,
-        "pp": 5
+        "pp": 5,
+        "damage_class": "special",
+        "damage_class_id": 2
     }
 }
