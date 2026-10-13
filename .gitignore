@@ -1,3 +1,4 @@
 .venv/
 battle_data.csv
 battle_log.txt
+__pycache__/
