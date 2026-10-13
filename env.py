@@ -6,7 +6,6 @@ import gymnasium as gym
 from gymnasium import spaces
 from logger import init_csv, log_step, log_battle_end
 
-# --- Load move type lookup once, at import time ---
 with open("emerald_moves.json") as f:
     _raw_moves = json.load(f)
 MOVE_TYPES = {int(k): v["type_id"] for k, v in _raw_moves.items()}
@@ -14,13 +13,42 @@ MOVE_POWER = {int(k): v["power"] for k, v in _raw_moves.items()}
 MOVE_ACCURACY = {int(k): v["accuracy"] for k, v in _raw_moves.items()}
 MOVE_DAMAGE_CLASS = {int(k): v["damage_class_id"] for k, v in _raw_moves.items()}
 
-# --- Load type effectiveness chart once, at import time ---
+with open("species_id_to_name.json") as f:
+    SPECIES_ID_TO_NAME = {int(k): v for k, v in json.load(f).items()}
+with open("species_types.json") as f:
+    SPECIES_TYPES = json.load(f)
+
+TYPE_NAME_TO_ID = {
+    "NORMAL": 0, "FIGHTING": 1, "FLYING": 2, "POISON": 3, "GROUND": 4,
+    "ROCK": 5, "BUG": 6, "GHOST": 7, "STEEL": 8, "MYSTERY": 9,
+    "FIRE": 10, "WATER": 11, "GRASS": 12, "ELECTRIC": 13, "PSYCHIC": 14,
+    "ICE": 15, "DRAGON": 16, "DARK": 17,
+}
+
+def get_species_types(species_id):
+    name = SPECIES_ID_TO_NAME.get(species_id)
+    if name is None:
+        return 0, 0
+    t = SPECIES_TYPES.get(name, {"type1": "NORMAL", "type2": "NORMAL"})
+    return TYPE_NAME_TO_ID[t["type1"]], TYPE_NAME_TO_ID[t["type2"]]
+
+def _remap_pokeapi_type(t):
+    if t <= 8:
+        return t
+    if t == 17:
+        return 9
+    return t + 1
+
 with open("type_chart.json") as f:
     _raw_type_chart = json.load(f)
 TYPE_CHART = {
-    int(atk): {int(dfd): mult for dfd, mult in defenders.items()}
+    _remap_pokeapi_type(int(atk)): {
+        _remap_pokeapi_type(int(dfd)): mult for dfd, mult in defenders.items()
+    }
     for atk, defenders in _raw_type_chart.items()
 }
+TYPE_CHART.setdefault(7, {})[8] = 0.5
+TYPE_CHART.setdefault(17, {})[8] = 0.5
 
 def get_effectiveness(move_type, defender_type1, defender_type2):
     mult1 = TYPE_CHART.get(move_type, {}).get(defender_type1, 1.0)
@@ -29,6 +57,25 @@ def get_effectiveness(move_type, defender_type1, defender_type2):
     else:
         mult2 = 1.0
     return mult1 * mult2
+
+def best_move_effectiveness(moves, e_type1, e_type2):
+    best = 0.0
+    for m in moves:
+        if m == 0:
+            continue
+        mt = MOVE_TYPES.get(m, 17)
+        eff = get_effectiveness(mt, e_type1, e_type2)
+        if eff > best:
+            best = eff
+    return best
+
+def type_resistance(my_type1, my_type2, e_type1, e_type2):
+    worst = 0.0
+    for et in {e_type1, e_type2}:
+        eff = get_effectiveness(et, my_type1, my_type2)
+        if eff > worst:
+            worst = eff
+    return worst
 
 STATUS1_SLEEP_MASK = 0x07
 STATUS1_PARALYSIS = 0x40
@@ -43,8 +90,8 @@ class PokemonBattleEnv(gym.Env):
         self.sock_file = self.sock.makefile("r")
         self.action_wait = action_wait
 
-        self.action_space = spaces.Discrete(4)
-        self.observation_space = spaces.Box(low=0.0, high=1.0, shape=(52,), dtype=np.float32)
+        self.action_space = spaces.Discrete(10)
+        self.observation_space = spaces.Box(low=0.0, high=1.0, shape=(64,), dtype=np.float32)
 
         self.prev_player_hp = None
         self.prev_enemy_hp = None
@@ -52,6 +99,12 @@ class PokemonBattleEnv(gym.Env):
         init_csv()
         self.episode = 0
         self.step_count = 0
+
+        # running totals for the session, printed on close()
+        self.total_reward = 0.0
+        self.move_count = 0
+        self.switch_count = 0
+        self.illegal_count = 0
 
     def _get_state(self):
         self.sock.sendall(b"GET_STATE\n")
@@ -64,7 +117,13 @@ class PokemonBattleEnv(gym.Env):
          p_status1, e_status1, p_status2, e_status2,
          p_atk, p_def, p_spd, e_atk, e_def, e_spd,
          party1_hp, party1_maxhp, party2_hp, party2_maxhp, party3_hp, party3_maxhp,
-         party4_hp, party4_maxhp, party5_hp, party5_maxhp, party6_hp, party6_maxhp) = parts
+         party4_hp, party4_maxhp, party5_hp, party5_maxhp, party6_hp, party6_maxhp,
+         p1_species, p1_item, p1_m1, p1_m2, p1_m3, p1_m4,
+         p2_species, p2_item, p2_m1, p2_m2, p2_m3, p2_m4,
+         p3_species, p3_item, p3_m1, p3_m2, p3_m3, p3_m4,
+         p4_species, p4_item, p4_m1, p4_m2, p4_m3, p4_m4,
+         p5_species, p5_item, p5_m1, p5_m2, p5_m3, p5_m4,
+         p6_species, p6_item, p6_m1, p6_m2, p6_m3, p6_m4) = parts
 
         move1_type = MOVE_TYPES.get(move1, 17)
         move2_type = MOVE_TYPES.get(move2, 17)
@@ -98,6 +157,21 @@ class PokemonBattleEnv(gym.Env):
         party5_ratio = party5_hp / max(party5_maxhp, 1)
         party6_ratio = party6_hp / max(party6_maxhp, 1)
 
+        party_slots = [
+            (p1_species, [p1_m1, p1_m2, p1_m3, p1_m4]),
+            (p2_species, [p2_m1, p2_m2, p2_m3, p2_m4]),
+            (p3_species, [p3_m1, p3_m2, p3_m3, p3_m4]),
+            (p4_species, [p4_m1, p4_m2, p4_m3, p4_m4]),
+            (p5_species, [p5_m1, p5_m2, p5_m3, p5_m4]),
+            (p6_species, [p6_m1, p6_m2, p6_m3, p6_m4]),
+        ]
+        party_atk = []
+        party_def = []
+        for species, moves in party_slots:
+            t1, t2 = get_species_types(species)
+            party_atk.append(best_move_effectiveness(moves, e_type1, e_type2) / 4.0)
+            party_def.append(type_resistance(t1, t2, e_type1, e_type2) / 4.0)
+
         obs = np.array([
             player_hp / max(player_max, 1),
             enemy_hp / max(enemy_max, 1),
@@ -114,7 +188,9 @@ class PokemonBattleEnv(gym.Env):
             p_status2 / 4294967295.0, e_status2 / 4294967295.0,
             p_atk / 12.0, p_def / 12.0, p_spd / 12.0,
             e_atk / 12.0, e_def / 12.0, e_spd / 12.0,
-            party1_ratio, party2_ratio, party3_ratio, party4_ratio, party5_ratio, party6_ratio
+            party1_ratio, party2_ratio, party3_ratio, party4_ratio, party5_ratio, party6_ratio,
+            *party_atk,
+            *party_def,
         ], dtype=np.float32)
 
         return obs, player_hp, enemy_hp, bool(battle_over), bool(player_lost), [pp1, pp2, pp3, pp4], p_status1
@@ -140,21 +216,53 @@ class PokemonBattleEnv(gym.Env):
             print("[WARNING] step() called but doesn't look like an active battle — skipping")
             return obs, 0, True, False, {"player_lost": player_lost}
 
-        print(f"DEBUG | Action Chosen: {action} | Current PP List: {pp_list} | Total PP: {sum(pp_list)}")
+        if action < 4:
+            action_desc = f"MOVE {action}"
+        else:
+            action_desc = f"SWITCH to slot {action - 4}"
 
         is_attack_action = action < 4
         out_of_all_pp = sum(pp_list) <= 0
 
-        if is_attack_action and not out_of_all_pp and pp_list[action] <= 0:
-            reward = -5
-            log_step(self.episode, self.step_count, action, obs, reward, False, False)
-            self.step_count += 1
-            return obs, reward, False, False, {"player_lost": False}
+        if is_attack_action:
+            if not out_of_all_pp and pp_list[action] <= 0:
+                reward = -5
+                self.total_reward += reward
+                self.illegal_count += 1
+                print(f"EP {self.episode} STEP {self.step_count} | {action_desc} | reward={reward:+.1f} | "
+                      f"running_total={self.total_reward:+.1f} | REASON: no PP")
+                log_step(self.episode, self.step_count, action, obs, reward, False, False)
+                self.step_count += 1
+                return obs, reward, False, False, {"player_lost": False}
+        else:
+            target_slot = action - 4
+
+            if target_slot == 0:
+                reward = -5
+                self.total_reward += reward
+                self.illegal_count += 1
+                print(f"EP {self.episode} STEP {self.step_count} | {action_desc} | reward={reward:+.1f} | "
+                      f"running_total={self.total_reward:+.1f} | REASON: already active")
+                log_step(self.episode, self.step_count, action, obs, reward, False, False)
+                self.step_count += 1
+                return obs, reward, False, False, {"player_lost": False}
+
+            party_hp_ratio = obs[46 + target_slot]
+            if party_hp_ratio <= 0.0:
+                reward = -5
+                self.total_reward += reward
+                self.illegal_count += 1
+                print(f"EP {self.episode} STEP {self.step_count} | {action_desc} | reward={reward:+.1f} | "
+                      f"running_total={self.total_reward:+.1f} | REASON: fainted")
+                log_step(self.episode, self.step_count, action, obs, reward, False, False)
+                self.step_count += 1
+                return obs, reward, False, False, {"player_lost": False}
 
         turn_resolved = False
         initial_pp_sum = sum(pp_list)
         initial_p_hp = p_hp
         initial_e_hp = e_hp
+        initial_party1_ratio = obs[46]
 
         max_outer_retries = 5
         outer_attempts = 0
@@ -169,17 +277,18 @@ class PokemonBattleEnv(gym.Env):
             ack = self.sock_file.readline()
 
             timeout_counter = 0
-            max_timeout = 20
+            max_timeout = 60
 
             while timeout_counter < max_timeout:
                 time.sleep(0.1)
                 timeout_counter += 1
                 obs, current_p_hp, current_e_hp, current_battle_over, current_player_lost, current_pp_list, current_p_status1 = self._get_state()
 
-                if current_p_hp <= 0 and current_e_hp <= 0:
-                    print(f"[FLEE-SUSPECT] After action {action}, both HP readings are 0 (attempt {outer_attempts})")
-
-                if sum(current_pp_list) < initial_pp_sum or current_p_hp != initial_p_hp or current_e_hp != initial_e_hp or current_battle_over:
+                if (sum(current_pp_list) < initial_pp_sum
+                        or current_p_hp != initial_p_hp
+                        or current_e_hp != initial_e_hp
+                        or current_battle_over
+                        or (not is_attack_action and obs[46] != initial_party1_ratio)):
                     turn_resolved = True
                     break
 
@@ -188,15 +297,19 @@ class PokemonBattleEnv(gym.Env):
             is_asleep = (current_p_status1 & STATUS1_SLEEP_MASK) != 0
             is_frozen = (current_p_status1 & STATUS1_FREEZE) != 0
 
-            if is_paralyzed or is_asleep or is_frozen:
-                print(f"[STATUS-SKIP] Turn didn't resolve, but status1={current_p_status1} explains it — legitimate skipped turn")
+            if is_attack_action and (is_paralyzed or is_asleep or is_frozen):
                 reward = 0
+                self.total_reward += reward
+                print(f"EP {self.episode} STEP {self.step_count} | {action_desc} | reward={reward:+.1f} | "
+                      f"running_total={self.total_reward:+.1f} | REASON: status-skip (status1={current_p_status1})")
                 log_step(self.episode, self.step_count, action, obs, reward, False, False)
                 self.step_count += 1
                 return obs, reward, False, False, {"player_lost": False}
 
-            print(f"[WARNING] Turn never resolved after {outer_attempts} attempts — treating as invalid, ending episode")
             reward = -20
+            self.total_reward += reward
+            print(f"EP {self.episode} STEP {self.step_count} | {action_desc} | reward={reward:+.1f} | "
+                  f"running_total={self.total_reward:+.1f} | REASON: turn never resolved, ending episode")
             log_step(self.episode, self.step_count, action, obs, reward, True, False)
             log_battle_end(self.episode, False)
             self.step_count += 1
@@ -217,6 +330,19 @@ class PokemonBattleEnv(gym.Env):
 
         self.prev_player_hp = p_hp
         self.prev_enemy_hp = e_hp
+        self.total_reward += reward
+
+        if is_attack_action:
+            self.move_count += 1
+        else:
+            self.switch_count += 1
+
+        outcome = ""
+        if battle_over:
+            outcome = " | WIN" if not player_lost else " | LOSS"
+
+        print(f"EP {self.episode} STEP {self.step_count} | {action_desc} | reward={reward:+.1f} | "
+              f"running_total={self.total_reward:+.1f}{outcome}")
 
         log_step(self.episode, self.step_count, action, obs, reward, battle_over, player_lost)
 
@@ -229,6 +355,9 @@ class PokemonBattleEnv(gym.Env):
         return obs, reward, battle_over, False, {"player_lost": player_lost}
 
     def close(self):
+        print(f"\n=== Session summary ===")
+        print(f"Total reward: {self.total_reward:+.1f}")
+        print(f"Moves used: {self.move_count} | Switches used: {self.switch_count} | Illegal attempts: {self.illegal_count}")
         self.sock.close()
 
 

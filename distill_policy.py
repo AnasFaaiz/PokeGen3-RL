@@ -9,14 +9,14 @@ parsed = [json.loads(obs_str) for obs_str in df["obs_json"]]
 df["obs_parsed"] = parsed
 df["obs_len"] = [len(p) for p in parsed]
 
-df = df[df["obs_len"] == 52]
+df = df[df["obs_len"] == 64]
 
-print(f"Episode range in 52-dim data: {df['episode'].min()} to {df['episode'].max()}")
+print(f"Episode range in 64-dim data: {df['episode'].min()} to {df['episode'].max()}")
 
 MIN_EPISODE = 20  # adjust based on the printed range
 df_recent = df[df["episode"] >= MIN_EPISODE]
 
-print(f"Total 52-dim rows: {len(df)}")
+print(f"Total 64-dim rows: {len(df)}")
 print(f"Recent rows (episode >= {MIN_EPISODE}): {len(df_recent)}")
 
 if len(df_recent) == 0:
@@ -43,6 +43,8 @@ else:
         "p_atk_buff", "p_def_buff", "p_spd_buff",
         "e_atk_buff", "e_def_buff", "e_spd_buff",
         "party1_hp", "party2_hp", "party3_hp", "party4_hp", "party5_hp", "party6_hp",
+        "party1_atk_eff", "party2_atk_eff", "party3_atk_eff", "party4_atk_eff", "party5_atk_eff", "party6_atk_eff",
+        "party1_resist", "party2_resist", "party3_resist", "party4_resist", "party5_resist", "party6_resist",
     ]
     print(export_text(tree, feature_names=feature_names))
 
