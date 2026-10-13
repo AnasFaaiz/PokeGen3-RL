@@ -1,0 +1,1546 @@
+{
+  "NONE": {
+    "type1": "GRASS",
+    "type2": "POISON"
+  },
+  "IVYSAUR": {
+    "type1": "GRASS",
+    "type2": "POISON"
+  },
+  "VENUSAUR": {
+    "type1": "GRASS",
+    "type2": "POISON"
+  },
+  "CHARMANDER": {
+    "type1": "FIRE",
+    "type2": "FIRE"
+  },
+  "CHARMELEON": {
+    "type1": "FIRE",
+    "type2": "FIRE"
+  },
+  "CHARIZARD": {
+    "type1": "FIRE",
+    "type2": "FLYING"
+  },
+  "SQUIRTLE": {
+    "type1": "WATER",
+    "type2": "WATER"
+  },
+  "WARTORTLE": {
+    "type1": "WATER",
+    "type2": "WATER"
+  },
+  "BLASTOISE": {
+    "type1": "WATER",
+    "type2": "WATER"
+  },
+  "CATERPIE": {
+    "type1": "BUG",
+    "type2": "BUG"
+  },
+  "METAPOD": {
+    "type1": "BUG",
+    "type2": "BUG"
+  },
+  "BUTTERFREE": {
+    "type1": "BUG",
+    "type2": "FLYING"
+  },
+  "WEEDLE": {
+    "type1": "BUG",
+    "type2": "POISON"
+  },
+  "KAKUNA": {
+    "type1": "BUG",
+    "type2": "POISON"
+  },
+  "BEEDRILL": {
+    "type1": "BUG",
+    "type2": "POISON"
+  },
+  "PIDGEY": {
+    "type1": "NORMAL",
+    "type2": "FLYING"
+  },
+  "PIDGEOTTO": {
+    "type1": "NORMAL",
+    "type2": "FLYING"
+  },
+  "PIDGEOT": {
+    "type1": "NORMAL",
+    "type2": "FLYING"
+  },
+  "RATTATA": {
+    "type1": "NORMAL",
+    "type2": "NORMAL"
+  },
+  "RATICATE": {
+    "type1": "NORMAL",
+    "type2": "NORMAL"
+  },
+  "SPEAROW": {
+    "type1": "NORMAL",
+    "type2": "FLYING"
+  },
+  "FEAROW": {
+    "type1": "NORMAL",
+    "type2": "FLYING"
+  },
+  "EKANS": {
+    "type1": "POISON",
+    "type2": "POISON"
+  },
+  "ARBOK": {
+    "type1": "POISON",
+    "type2": "POISON"
+  },
+  "PIKACHU": {
+    "type1": "ELECTRIC",
+    "type2": "ELECTRIC"
+  },
+  "RAICHU": {
+    "type1": "ELECTRIC",
+    "type2": "ELECTRIC"
+  },
+  "SANDSHREW": {
+    "type1": "GROUND",
+    "type2": "GROUND"
+  },
+  "SANDSLASH": {
+    "type1": "GROUND",
+    "type2": "GROUND"
+  },
+  "NIDORAN_F": {
+    "type1": "POISON",
+    "type2": "POISON"
+  },
+  "NIDORINA": {
+    "type1": "POISON",
+    "type2": "POISON"
+  },
+  "NIDOQUEEN": {
+    "type1": "POISON",
+    "type2": "GROUND"
+  },
+  "NIDORAN_M": {
+    "type1": "POISON",
+    "type2": "POISON"
+  },
+  "NIDORINO": {
+    "type1": "POISON",
+    "type2": "POISON"
+  },
+  "NIDOKING": {
+    "type1": "POISON",
+    "type2": "GROUND"
+  },
+  "CLEFAIRY": {
+    "type1": "NORMAL",
+    "type2": "NORMAL"
+  },
+  "CLEFABLE": {
+    "type1": "NORMAL",
+    "type2": "NORMAL"
+  },
+  "VULPIX": {
+    "type1": "FIRE",
+    "type2": "FIRE"
+  },
+  "NINETALES": {
+    "type1": "FIRE",
+    "type2": "FIRE"
+  },
+  "JIGGLYPUFF": {
+    "type1": "NORMAL",
+    "type2": "NORMAL"
+  },
+  "WIGGLYTUFF": {
+    "type1": "NORMAL",
+    "type2": "NORMAL"
+  },
+  "ZUBAT": {
+    "type1": "POISON",
+    "type2": "FLYING"
+  },
+  "GOLBAT": {
+    "type1": "POISON",
+    "type2": "FLYING"
+  },
+  "ODDISH": {
+    "type1": "GRASS",
+    "type2": "POISON"
+  },
+  "GLOOM": {
+    "type1": "GRASS",
+    "type2": "POISON"
+  },
+  "VILEPLUME": {
+    "type1": "GRASS",
+    "type2": "POISON"
+  },
+  "PARAS": {
+    "type1": "BUG",
+    "type2": "GRASS"
+  },
+  "PARASECT": {
+    "type1": "BUG",
+    "type2": "GRASS"
+  },
+  "VENONAT": {
+    "type1": "BUG",
+    "type2": "POISON"
+  },
+  "VENOMOTH": {
+    "type1": "BUG",
+    "type2": "POISON"
+  },
+  "DIGLETT": {
+    "type1": "GROUND",
+    "type2": "GROUND"
+  },
+  "DUGTRIO": {
+    "type1": "GROUND",
+    "type2": "GROUND"
+  },
+  "MEOWTH": {
+    "type1": "NORMAL",
+    "type2": "NORMAL"
+  },
+  "PERSIAN": {
+    "type1": "NORMAL",
+    "type2": "NORMAL"
+  },
+  "PSYDUCK": {
+    "type1": "WATER",
+    "type2": "WATER"
+  },
+  "GOLDUCK": {
+    "type1": "WATER",
+    "type2": "WATER"
+  },
+  "MANKEY": {
+    "type1": "FIGHTING",
+    "type2": "FIGHTING"
+  },
+  "PRIMEAPE": {
+    "type1": "FIGHTING",
+    "type2": "FIGHTING"
+  },
+  "GROWLITHE": {
+    "type1": "FIRE",
+    "type2": "FIRE"
+  },
+  "ARCANINE": {
+    "type1": "FIRE",
+    "type2": "FIRE"
+  },
+  "POLIWAG": {
+    "type1": "WATER",
+    "type2": "WATER"
+  },
+  "POLIWHIRL": {
+    "type1": "WATER",
+    "type2": "WATER"
+  },
+  "POLIWRATH": {
+    "type1": "WATER",
+    "type2": "FIGHTING"
+  },
+  "ABRA": {
+    "type1": "PSYCHIC",
+    "type2": "PSYCHIC"
+  },
+  "KADABRA": {
+    "type1": "PSYCHIC",
+    "type2": "PSYCHIC"
+  },
+  "ALAKAZAM": {
+    "type1": "PSYCHIC",
+    "type2": "PSYCHIC"
+  },
+  "MACHOP": {
+    "type1": "FIGHTING",
+    "type2": "FIGHTING"
+  },
+  "MACHOKE": {
+    "type1": "FIGHTING",
+    "type2": "FIGHTING"
+  },
+  "MACHAMP": {
+    "type1": "FIGHTING",
+    "type2": "FIGHTING"
+  },
+  "BELLSPROUT": {
+    "type1": "GRASS",
+    "type2": "POISON"
+  },
+  "WEEPINBELL": {
+    "type1": "GRASS",
+    "type2": "POISON"
+  },
+  "VICTREEBEL": {
+    "type1": "GRASS",
+    "type2": "POISON"
+  },
+  "TENTACOOL": {
+    "type1": "WATER",
+    "type2": "POISON"
+  },
+  "TENTACRUEL": {
+    "type1": "WATER",
+    "type2": "POISON"
+  },
+  "GEODUDE": {
+    "type1": "ROCK",
+    "type2": "GROUND"
+  },
+  "GRAVELER": {
+    "type1": "ROCK",
+    "type2": "GROUND"
+  },
+  "GOLEM": {
+    "type1": "ROCK",
+    "type2": "GROUND"
+  },
+  "PONYTA": {
+    "type1": "FIRE",
+    "type2": "FIRE"
+  },
+  "RAPIDASH": {
+    "type1": "FIRE",
+    "type2": "FIRE"
+  },
+  "SLOWPOKE": {
+    "type1": "WATER",
+    "type2": "PSYCHIC"
+  },
+  "SLOWBRO": {
+    "type1": "WATER",
+    "type2": "PSYCHIC"
+  },
+  "MAGNEMITE": {
+    "type1": "ELECTRIC",
+    "type2": "STEEL"
+  },
+  "MAGNETON": {
+    "type1": "ELECTRIC",
+    "type2": "STEEL"
+  },
+  "FARFETCHD": {
+    "type1": "NORMAL",
+    "type2": "FLYING"
+  },
+  "DODUO": {
+    "type1": "NORMAL",
+    "type2": "FLYING"
+  },
+  "DODRIO": {
+    "type1": "NORMAL",
+    "type2": "FLYING"
+  },
+  "SEEL": {
+    "type1": "WATER",
+    "type2": "WATER"
+  },
+  "DEWGONG": {
+    "type1": "WATER",
+    "type2": "ICE"
+  },
+  "GRIMER": {
+    "type1": "POISON",
+    "type2": "POISON"
+  },
+  "MUK": {
+    "type1": "POISON",
+    "type2": "POISON"
+  },
+  "SHELLDER": {
+    "type1": "WATER",
+    "type2": "WATER"
+  },
+  "CLOYSTER": {
+    "type1": "WATER",
+    "type2": "ICE"
+  },
+  "GASTLY": {
+    "type1": "GHOST",
+    "type2": "POISON"
+  },
+  "HAUNTER": {
+    "type1": "GHOST",
+    "type2": "POISON"
+  },
+  "GENGAR": {
+    "type1": "GHOST",
+    "type2": "POISON"
+  },
+  "ONIX": {
+    "type1": "ROCK",
+    "type2": "GROUND"
+  },
+  "DROWZEE": {
+    "type1": "PSYCHIC",
+    "type2": "PSYCHIC"
+  },
+  "HYPNO": {
+    "type1": "PSYCHIC",
+    "type2": "PSYCHIC"
+  },
+  "KRABBY": {
+    "type1": "WATER",
+    "type2": "WATER"
+  },
+  "KINGLER": {
+    "type1": "WATER",
+    "type2": "WATER"
+  },
+  "VOLTORB": {
+    "type1": "ELECTRIC",
+    "type2": "ELECTRIC"
+  },
+  "ELECTRODE": {
+    "type1": "ELECTRIC",
+    "type2": "ELECTRIC"
+  },
+  "EXEGGCUTE": {
+    "type1": "GRASS",
+    "type2": "PSYCHIC"
+  },
+  "EXEGGUTOR": {
+    "type1": "GRASS",
+    "type2": "PSYCHIC"
+  },
+  "CUBONE": {
+    "type1": "GROUND",
+    "type2": "GROUND"
+  },
+  "MAROWAK": {
+    "type1": "GROUND",
+    "type2": "GROUND"
+  },
+  "HITMONLEE": {
+    "type1": "FIGHTING",
+    "type2": "FIGHTING"
+  },
+  "HITMONCHAN": {
+    "type1": "FIGHTING",
+    "type2": "FIGHTING"
+  },
+  "LICKITUNG": {
+    "type1": "NORMAL",
+    "type2": "NORMAL"
+  },
+  "KOFFING": {
+    "type1": "POISON",
+    "type2": "POISON"
+  },
+  "WEEZING": {
+    "type1": "POISON",
+    "type2": "POISON"
+  },
+  "RHYHORN": {
+    "type1": "GROUND",
+    "type2": "ROCK"
+  },
+  "RHYDON": {
+    "type1": "GROUND",
+    "type2": "ROCK"
+  },
+  "CHANSEY": {
+    "type1": "NORMAL",
+    "type2": "NORMAL"
+  },
+  "TANGELA": {
+    "type1": "GRASS",
+    "type2": "GRASS"
+  },
+  "KANGASKHAN": {
+    "type1": "NORMAL",
+    "type2": "NORMAL"
+  },
+  "HORSEA": {
+    "type1": "WATER",
+    "type2": "WATER"
+  },
+  "SEADRA": {
+    "type1": "WATER",
+    "type2": "WATER"
+  },
+  "GOLDEEN": {
+    "type1": "WATER",
+    "type2": "WATER"
+  },
+  "SEAKING": {
+    "type1": "WATER",
+    "type2": "WATER"
+  },
+  "STARYU": {
+    "type1": "WATER",
+    "type2": "WATER"
+  },
+  "STARMIE": {
+    "type1": "WATER",
+    "type2": "PSYCHIC"
+  },
+  "MR_MIME": {
+    "type1": "PSYCHIC",
+    "type2": "PSYCHIC"
+  },
+  "SCYTHER": {
+    "type1": "BUG",
+    "type2": "FLYING"
+  },
+  "JYNX": {
+    "type1": "ICE",
+    "type2": "PSYCHIC"
+  },
+  "ELECTABUZZ": {
+    "type1": "ELECTRIC",
+    "type2": "ELECTRIC"
+  },
+  "MAGMAR": {
+    "type1": "FIRE",
+    "type2": "FIRE"
+  },
+  "PINSIR": {
+    "type1": "BUG",
+    "type2": "BUG"
+  },
+  "TAUROS": {
+    "type1": "NORMAL",
+    "type2": "NORMAL"
+  },
+  "MAGIKARP": {
+    "type1": "WATER",
+    "type2": "WATER"
+  },
+  "GYARADOS": {
+    "type1": "WATER",
+    "type2": "FLYING"
+  },
+  "LAPRAS": {
+    "type1": "WATER",
+    "type2": "ICE"
+  },
+  "DITTO": {
+    "type1": "NORMAL",
+    "type2": "NORMAL"
+  },
+  "EEVEE": {
+    "type1": "NORMAL",
+    "type2": "NORMAL"
+  },
+  "VAPOREON": {
+    "type1": "WATER",
+    "type2": "WATER"
+  },
+  "JOLTEON": {
+    "type1": "ELECTRIC",
+    "type2": "ELECTRIC"
+  },
+  "FLAREON": {
+    "type1": "FIRE",
+    "type2": "FIRE"
+  },
+  "PORYGON": {
+    "type1": "NORMAL",
+    "type2": "NORMAL"
+  },
+  "OMANYTE": {
+    "type1": "ROCK",
+    "type2": "WATER"
+  },
+  "OMASTAR": {
+    "type1": "ROCK",
+    "type2": "WATER"
+  },
+  "KABUTO": {
+    "type1": "ROCK",
+    "type2": "WATER"
+  },
+  "KABUTOPS": {
+    "type1": "ROCK",
+    "type2": "WATER"
+  },
+  "AERODACTYL": {
+    "type1": "ROCK",
+    "type2": "FLYING"
+  },
+  "SNORLAX": {
+    "type1": "NORMAL",
+    "type2": "NORMAL"
+  },
+  "ARTICUNO": {
+    "type1": "ICE",
+    "type2": "FLYING"
+  },
+  "ZAPDOS": {
+    "type1": "ELECTRIC",
+    "type2": "FLYING"
+  },
+  "MOLTRES": {
+    "type1": "FIRE",
+    "type2": "FLYING"
+  },
+  "DRATINI": {
+    "type1": "DRAGON",
+    "type2": "DRAGON"
+  },
+  "DRAGONAIR": {
+    "type1": "DRAGON",
+    "type2": "DRAGON"
+  },
+  "DRAGONITE": {
+    "type1": "DRAGON",
+    "type2": "FLYING"
+  },
+  "MEWTWO": {
+    "type1": "PSYCHIC",
+    "type2": "PSYCHIC"
+  },
+  "MEW": {
+    "type1": "PSYCHIC",
+    "type2": "PSYCHIC"
+  },
+  "CHIKORITA": {
+    "type1": "GRASS",
+    "type2": "GRASS"
+  },
+  "BAYLEEF": {
+    "type1": "GRASS",
+    "type2": "GRASS"
+  },
+  "MEGANIUM": {
+    "type1": "GRASS",
+    "type2": "GRASS"
+  },
+  "CYNDAQUIL": {
+    "type1": "FIRE",
+    "type2": "FIRE"
+  },
+  "QUILAVA": {
+    "type1": "FIRE",
+    "type2": "FIRE"
+  },
+  "TYPHLOSION": {
+    "type1": "FIRE",
+    "type2": "FIRE"
+  },
+  "TOTODILE": {
+    "type1": "WATER",
+    "type2": "WATER"
+  },
+  "CROCONAW": {
+    "type1": "WATER",
+    "type2": "WATER"
+  },
+  "FERALIGATR": {
+    "type1": "WATER",
+    "type2": "WATER"
+  },
+  "SENTRET": {
+    "type1": "NORMAL",
+    "type2": "NORMAL"
+  },
+  "FURRET": {
+    "type1": "NORMAL",
+    "type2": "NORMAL"
+  },
+  "HOOTHOOT": {
+    "type1": "NORMAL",
+    "type2": "FLYING"
+  },
+  "NOCTOWL": {
+    "type1": "NORMAL",
+    "type2": "FLYING"
+  },
+  "LEDYBA": {
+    "type1": "BUG",
+    "type2": "FLYING"
+  },
+  "LEDIAN": {
+    "type1": "BUG",
+    "type2": "FLYING"
+  },
+  "SPINARAK": {
+    "type1": "BUG",
+    "type2": "POISON"
+  },
+  "ARIADOS": {
+    "type1": "BUG",
+    "type2": "POISON"
+  },
+  "CROBAT": {
+    "type1": "POISON",
+    "type2": "FLYING"
+  },
+  "CHINCHOU": {
+    "type1": "WATER",
+    "type2": "ELECTRIC"
+  },
+  "LANTURN": {
+    "type1": "WATER",
+    "type2": "ELECTRIC"
+  },
+  "PICHU": {
+    "type1": "ELECTRIC",
+    "type2": "ELECTRIC"
+  },
+  "CLEFFA": {
+    "type1": "NORMAL",
+    "type2": "NORMAL"
+  },
+  "IGGLYBUFF": {
+    "type1": "NORMAL",
+    "type2": "NORMAL"
+  },
+  "TOGEPI": {
+    "type1": "NORMAL",
+    "type2": "NORMAL"
+  },
+  "TOGETIC": {
+    "type1": "NORMAL",
+    "type2": "FLYING"
+  },
+  "NATU": {
+    "type1": "PSYCHIC",
+    "type2": "FLYING"
+  },
+  "XATU": {
+    "type1": "PSYCHIC",
+    "type2": "FLYING"
+  },
+  "MAREEP": {
+    "type1": "ELECTRIC",
+    "type2": "ELECTRIC"
+  },
+  "FLAAFFY": {
+    "type1": "ELECTRIC",
+    "type2": "ELECTRIC"
+  },
+  "AMPHAROS": {
+    "type1": "ELECTRIC",
+    "type2": "ELECTRIC"
+  },
+  "BELLOSSOM": {
+    "type1": "GRASS",
+    "type2": "GRASS"
+  },
+  "MARILL": {
+    "type1": "WATER",
+    "type2": "WATER"
+  },
+  "AZUMARILL": {
+    "type1": "WATER",
+    "type2": "WATER"
+  },
+  "SUDOWOODO": {
+    "type1": "ROCK",
+    "type2": "ROCK"
+  },
+  "POLITOED": {
+    "type1": "WATER",
+    "type2": "WATER"
+  },
+  "HOPPIP": {
+    "type1": "GRASS",
+    "type2": "FLYING"
+  },
+  "SKIPLOOM": {
+    "type1": "GRASS",
+    "type2": "FLYING"
+  },
+  "JUMPLUFF": {
+    "type1": "GRASS",
+    "type2": "FLYING"
+  },
+  "AIPOM": {
+    "type1": "NORMAL",
+    "type2": "NORMAL"
+  },
+  "SUNKERN": {
+    "type1": "GRASS",
+    "type2": "GRASS"
+  },
+  "SUNFLORA": {
+    "type1": "GRASS",
+    "type2": "GRASS"
+  },
+  "YANMA": {
+    "type1": "BUG",
+    "type2": "FLYING"
+  },
+  "WOOPER": {
+    "type1": "WATER",
+    "type2": "GROUND"
+  },
+  "QUAGSIRE": {
+    "type1": "WATER",
+    "type2": "GROUND"
+  },
+  "ESPEON": {
+    "type1": "PSYCHIC",
+    "type2": "PSYCHIC"
+  },
+  "UMBREON": {
+    "type1": "DARK",
+    "type2": "DARK"
+  },
+  "MURKROW": {
+    "type1": "DARK",
+    "type2": "FLYING"
+  },
+  "SLOWKING": {
+    "type1": "WATER",
+    "type2": "PSYCHIC"
+  },
+  "MISDREAVUS": {
+    "type1": "GHOST",
+    "type2": "GHOST"
+  },
+  "UNOWN": {
+    "type1": "PSYCHIC",
+    "type2": "PSYCHIC"
+  },
+  "WOBBUFFET": {
+    "type1": "PSYCHIC",
+    "type2": "PSYCHIC"
+  },
+  "GIRAFARIG": {
+    "type1": "NORMAL",
+    "type2": "PSYCHIC"
+  },
+  "PINECO": {
+    "type1": "BUG",
+    "type2": "BUG"
+  },
+  "FORRETRESS": {
+    "type1": "BUG",
+    "type2": "STEEL"
+  },
+  "DUNSPARCE": {
+    "type1": "NORMAL",
+    "type2": "NORMAL"
+  },
+  "GLIGAR": {
+    "type1": "GROUND",
+    "type2": "FLYING"
+  },
+  "STEELIX": {
+    "type1": "STEEL",
+    "type2": "GROUND"
+  },
+  "SNUBBULL": {
+    "type1": "NORMAL",
+    "type2": "NORMAL"
+  },
+  "GRANBULL": {
+    "type1": "NORMAL",
+    "type2": "NORMAL"
+  },
+  "QWILFISH": {
+    "type1": "WATER",
+    "type2": "POISON"
+  },
+  "SCIZOR": {
+    "type1": "BUG",
+    "type2": "STEEL"
+  },
+  "SHUCKLE": {
+    "type1": "BUG",
+    "type2": "ROCK"
+  },
+  "HERACROSS": {
+    "type1": "BUG",
+    "type2": "FIGHTING"
+  },
+  "SNEASEL": {
+    "type1": "DARK",
+    "type2": "ICE"
+  },
+  "TEDDIURSA": {
+    "type1": "NORMAL",
+    "type2": "NORMAL"
+  },
+  "URSARING": {
+    "type1": "NORMAL",
+    "type2": "NORMAL"
+  },
+  "SLUGMA": {
+    "type1": "FIRE",
+    "type2": "FIRE"
+  },
+  "MAGCARGO": {
+    "type1": "FIRE",
+    "type2": "ROCK"
+  },
+  "SWINUB": {
+    "type1": "ICE",
+    "type2": "GROUND"
+  },
+  "PILOSWINE": {
+    "type1": "ICE",
+    "type2": "GROUND"
+  },
+  "CORSOLA": {
+    "type1": "WATER",
+    "type2": "ROCK"
+  },
+  "REMORAID": {
+    "type1": "WATER",
+    "type2": "WATER"
+  },
+  "OCTILLERY": {
+    "type1": "WATER",
+    "type2": "WATER"
+  },
+  "DELIBIRD": {
+    "type1": "ICE",
+    "type2": "FLYING"
+  },
+  "MANTINE": {
+    "type1": "WATER",
+    "type2": "FLYING"
+  },
+  "SKARMORY": {
+    "type1": "STEEL",
+    "type2": "FLYING"
+  },
+  "HOUNDOUR": {
+    "type1": "DARK",
+    "type2": "FIRE"
+  },
+  "HOUNDOOM": {
+    "type1": "DARK",
+    "type2": "FIRE"
+  },
+  "KINGDRA": {
+    "type1": "WATER",
+    "type2": "DRAGON"
+  },
+  "PHANPY": {
+    "type1": "GROUND",
+    "type2": "GROUND"
+  },
+  "DONPHAN": {
+    "type1": "GROUND",
+    "type2": "GROUND"
+  },
+  "PORYGON2": {
+    "type1": "NORMAL",
+    "type2": "NORMAL"
+  },
+  "STANTLER": {
+    "type1": "NORMAL",
+    "type2": "NORMAL"
+  },
+  "SMEARGLE": {
+    "type1": "NORMAL",
+    "type2": "NORMAL"
+  },
+  "TYROGUE": {
+    "type1": "FIGHTING",
+    "type2": "FIGHTING"
+  },
+  "HITMONTOP": {
+    "type1": "FIGHTING",
+    "type2": "FIGHTING"
+  },
+  "SMOOCHUM": {
+    "type1": "ICE",
+    "type2": "PSYCHIC"
+  },
+  "ELEKID": {
+    "type1": "ELECTRIC",
+    "type2": "ELECTRIC"
+  },
+  "MAGBY": {
+    "type1": "FIRE",
+    "type2": "FIRE"
+  },
+  "MILTANK": {
+    "type1": "NORMAL",
+    "type2": "NORMAL"
+  },
+  "BLISSEY": {
+    "type1": "NORMAL",
+    "type2": "NORMAL"
+  },
+  "RAIKOU": {
+    "type1": "ELECTRIC",
+    "type2": "ELECTRIC"
+  },
+  "ENTEI": {
+    "type1": "FIRE",
+    "type2": "FIRE"
+  },
+  "SUICUNE": {
+    "type1": "WATER",
+    "type2": "WATER"
+  },
+  "LARVITAR": {
+    "type1": "ROCK",
+    "type2": "GROUND"
+  },
+  "PUPITAR": {
+    "type1": "ROCK",
+    "type2": "GROUND"
+  },
+  "TYRANITAR": {
+    "type1": "ROCK",
+    "type2": "DARK"
+  },
+  "LUGIA": {
+    "type1": "PSYCHIC",
+    "type2": "FLYING"
+  },
+  "HO_OH": {
+    "type1": "FIRE",
+    "type2": "FLYING"
+  },
+  "CELEBI": {
+    "type1": "PSYCHIC",
+    "type2": "GRASS"
+  },
+  "TREECKO": {
+    "type1": "GRASS",
+    "type2": "GRASS"
+  },
+  "GROVYLE": {
+    "type1": "GRASS",
+    "type2": "GRASS"
+  },
+  "SCEPTILE": {
+    "type1": "GRASS",
+    "type2": "GRASS"
+  },
+  "TORCHIC": {
+    "type1": "FIRE",
+    "type2": "FIRE"
+  },
+  "COMBUSKEN": {
+    "type1": "FIRE",
+    "type2": "FIGHTING"
+  },
+  "BLAZIKEN": {
+    "type1": "FIRE",
+    "type2": "FIGHTING"
+  },
+  "MUDKIP": {
+    "type1": "WATER",
+    "type2": "WATER"
+  },
+  "MARSHTOMP": {
+    "type1": "WATER",
+    "type2": "GROUND"
+  },
+  "SWAMPERT": {
+    "type1": "WATER",
+    "type2": "GROUND"
+  },
+  "POOCHYENA": {
+    "type1": "DARK",
+    "type2": "DARK"
+  },
+  "MIGHTYENA": {
+    "type1": "DARK",
+    "type2": "DARK"
+  },
+  "ZIGZAGOON": {
+    "type1": "NORMAL",
+    "type2": "NORMAL"
+  },
+  "LINOONE": {
+    "type1": "NORMAL",
+    "type2": "NORMAL"
+  },
+  "WURMPLE": {
+    "type1": "BUG",
+    "type2": "BUG"
+  },
+  "SILCOON": {
+    "type1": "BUG",
+    "type2": "BUG"
+  },
+  "BEAUTIFLY": {
+    "type1": "BUG",
+    "type2": "FLYING"
+  },
+  "CASCOON": {
+    "type1": "BUG",
+    "type2": "BUG"
+  },
+  "DUSTOX": {
+    "type1": "BUG",
+    "type2": "POISON"
+  },
+  "LOTAD": {
+    "type1": "WATER",
+    "type2": "GRASS"
+  },
+  "LOMBRE": {
+    "type1": "WATER",
+    "type2": "GRASS"
+  },
+  "LUDICOLO": {
+    "type1": "WATER",
+    "type2": "GRASS"
+  },
+  "SEEDOT": {
+    "type1": "GRASS",
+    "type2": "GRASS"
+  },
+  "NUZLEAF": {
+    "type1": "GRASS",
+    "type2": "DARK"
+  },
+  "SHIFTRY": {
+    "type1": "GRASS",
+    "type2": "DARK"
+  },
+  "NINCADA": {
+    "type1": "BUG",
+    "type2": "GROUND"
+  },
+  "NINJASK": {
+    "type1": "BUG",
+    "type2": "FLYING"
+  },
+  "SHEDINJA": {
+    "type1": "BUG",
+    "type2": "GHOST"
+  },
+  "TAILLOW": {
+    "type1": "NORMAL",
+    "type2": "FLYING"
+  },
+  "SWELLOW": {
+    "type1": "NORMAL",
+    "type2": "FLYING"
+  },
+  "SHROOMISH": {
+    "type1": "GRASS",
+    "type2": "GRASS"
+  },
+  "BRELOOM": {
+    "type1": "GRASS",
+    "type2": "FIGHTING"
+  },
+  "SPINDA": {
+    "type1": "NORMAL",
+    "type2": "NORMAL"
+  },
+  "WINGULL": {
+    "type1": "WATER",
+    "type2": "FLYING"
+  },
+  "PELIPPER": {
+    "type1": "WATER",
+    "type2": "FLYING"
+  },
+  "SURSKIT": {
+    "type1": "BUG",
+    "type2": "WATER"
+  },
+  "MASQUERAIN": {
+    "type1": "BUG",
+    "type2": "FLYING"
+  },
+  "WAILMER": {
+    "type1": "WATER",
+    "type2": "WATER"
+  },
+  "WAILORD": {
+    "type1": "WATER",
+    "type2": "WATER"
+  },
+  "SKITTY": {
+    "type1": "NORMAL",
+    "type2": "NORMAL"
+  },
+  "DELCATTY": {
+    "type1": "NORMAL",
+    "type2": "NORMAL"
+  },
+  "KECLEON": {
+    "type1": "NORMAL",
+    "type2": "NORMAL"
+  },
+  "BALTOY": {
+    "type1": "GROUND",
+    "type2": "PSYCHIC"
+  },
+  "CLAYDOL": {
+    "type1": "GROUND",
+    "type2": "PSYCHIC"
+  },
+  "NOSEPASS": {
+    "type1": "ROCK",
+    "type2": "ROCK"
+  },
+  "TORKOAL": {
+    "type1": "FIRE",
+    "type2": "FIRE"
+  },
+  "SABLEYE": {
+    "type1": "DARK",
+    "type2": "GHOST"
+  },
+  "BARBOACH": {
+    "type1": "WATER",
+    "type2": "GROUND"
+  },
+  "WHISCASH": {
+    "type1": "WATER",
+    "type2": "GROUND"
+  },
+  "LUVDISC": {
+    "type1": "WATER",
+    "type2": "WATER"
+  },
+  "CORPHISH": {
+    "type1": "WATER",
+    "type2": "WATER"
+  },
+  "CRAWDAUNT": {
+    "type1": "WATER",
+    "type2": "DARK"
+  },
+  "FEEBAS": {
+    "type1": "WATER",
+    "type2": "WATER"
+  },
+  "MILOTIC": {
+    "type1": "WATER",
+    "type2": "WATER"
+  },
+  "CARVANHA": {
+    "type1": "WATER",
+    "type2": "DARK"
+  },
+  "SHARPEDO": {
+    "type1": "WATER",
+    "type2": "DARK"
+  },
+  "TRAPINCH": {
+    "type1": "GROUND",
+    "type2": "GROUND"
+  },
+  "VIBRAVA": {
+    "type1": "GROUND",
+    "type2": "DRAGON"
+  },
+  "FLYGON": {
+    "type1": "GROUND",
+    "type2": "DRAGON"
+  },
+  "MAKUHITA": {
+    "type1": "FIGHTING",
+    "type2": "FIGHTING"
+  },
+  "HARIYAMA": {
+    "type1": "FIGHTING",
+    "type2": "FIGHTING"
+  },
+  "ELECTRIKE": {
+    "type1": "ELECTRIC",
+    "type2": "ELECTRIC"
+  },
+  "MANECTRIC": {
+    "type1": "ELECTRIC",
+    "type2": "ELECTRIC"
+  },
+  "NUMEL": {
+    "type1": "FIRE",
+    "type2": "GROUND"
+  },
+  "CAMERUPT": {
+    "type1": "FIRE",
+    "type2": "GROUND"
+  },
+  "SPHEAL": {
+    "type1": "ICE",
+    "type2": "WATER"
+  },
+  "SEALEO": {
+    "type1": "ICE",
+    "type2": "WATER"
+  },
+  "WALREIN": {
+    "type1": "ICE",
+    "type2": "WATER"
+  },
+  "CACNEA": {
+    "type1": "GRASS",
+    "type2": "GRASS"
+  },
+  "CACTURNE": {
+    "type1": "GRASS",
+    "type2": "DARK"
+  },
+  "SNORUNT": {
+    "type1": "ICE",
+    "type2": "ICE"
+  },
+  "GLALIE": {
+    "type1": "ICE",
+    "type2": "ICE"
+  },
+  "LUNATONE": {
+    "type1": "ROCK",
+    "type2": "PSYCHIC"
+  },
+  "SOLROCK": {
+    "type1": "ROCK",
+    "type2": "PSYCHIC"
+  },
+  "AZURILL": {
+    "type1": "NORMAL",
+    "type2": "NORMAL"
+  },
+  "SPOINK": {
+    "type1": "PSYCHIC",
+    "type2": "PSYCHIC"
+  },
+  "GRUMPIG": {
+    "type1": "PSYCHIC",
+    "type2": "PSYCHIC"
+  },
+  "PLUSLE": {
+    "type1": "ELECTRIC",
+    "type2": "ELECTRIC"
+  },
+  "MINUN": {
+    "type1": "ELECTRIC",
+    "type2": "ELECTRIC"
+  },
+  "MAWILE": {
+    "type1": "STEEL",
+    "type2": "STEEL"
+  },
+  "MEDITITE": {
+    "type1": "FIGHTING",
+    "type2": "PSYCHIC"
+  },
+  "MEDICHAM": {
+    "type1": "FIGHTING",
+    "type2": "PSYCHIC"
+  },
+  "SWABLU": {
+    "type1": "NORMAL",
+    "type2": "FLYING"
+  },
+  "ALTARIA": {
+    "type1": "DRAGON",
+    "type2": "FLYING"
+  },
+  "WYNAUT": {
+    "type1": "PSYCHIC",
+    "type2": "PSYCHIC"
+  },
+  "DUSKULL": {
+    "type1": "GHOST",
+    "type2": "GHOST"
+  },
+  "DUSCLOPS": {
+    "type1": "GHOST",
+    "type2": "GHOST"
+  },
+  "ROSELIA": {
+    "type1": "GRASS",
+    "type2": "POISON"
+  },
+  "SLAKOTH": {
+    "type1": "NORMAL",
+    "type2": "NORMAL"
+  },
+  "VIGOROTH": {
+    "type1": "NORMAL",
+    "type2": "NORMAL"
+  },
+  "SLAKING": {
+    "type1": "NORMAL",
+    "type2": "NORMAL"
+  },
+  "GULPIN": {
+    "type1": "POISON",
+    "type2": "POISON"
+  },
+  "SWALOT": {
+    "type1": "POISON",
+    "type2": "POISON"
+  },
+  "TROPIUS": {
+    "type1": "GRASS",
+    "type2": "FLYING"
+  },
+  "WHISMUR": {
+    "type1": "NORMAL",
+    "type2": "NORMAL"
+  },
+  "LOUDRED": {
+    "type1": "NORMAL",
+    "type2": "NORMAL"
+  },
+  "EXPLOUD": {
+    "type1": "NORMAL",
+    "type2": "NORMAL"
+  },
+  "CLAMPERL": {
+    "type1": "WATER",
+    "type2": "WATER"
+  },
+  "HUNTAIL": {
+    "type1": "WATER",
+    "type2": "WATER"
+  },
+  "GOREBYSS": {
+    "type1": "WATER",
+    "type2": "WATER"
+  },
+  "ABSOL": {
+    "type1": "DARK",
+    "type2": "DARK"
+  },
+  "SHUPPET": {
+    "type1": "GHOST",
+    "type2": "GHOST"
+  },
+  "BANETTE": {
+    "type1": "GHOST",
+    "type2": "GHOST"
+  },
+  "SEVIPER": {
+    "type1": "POISON",
+    "type2": "POISON"
+  },
+  "ZANGOOSE": {
+    "type1": "NORMAL",
+    "type2": "NORMAL"
+  },
+  "RELICANTH": {
+    "type1": "WATER",
+    "type2": "ROCK"
+  },
+  "ARON": {
+    "type1": "STEEL",
+    "type2": "ROCK"
+  },
+  "LAIRON": {
+    "type1": "STEEL",
+    "type2": "ROCK"
+  },
+  "AGGRON": {
+    "type1": "STEEL",
+    "type2": "ROCK"
+  },
+  "CASTFORM": {
+    "type1": "NORMAL",
+    "type2": "NORMAL"
+  },
+  "VOLBEAT": {
+    "type1": "BUG",
+    "type2": "BUG"
+  },
+  "ILLUMISE": {
+    "type1": "BUG",
+    "type2": "BUG"
+  },
+  "LILEEP": {
+    "type1": "ROCK",
+    "type2": "GRASS"
+  },
+  "CRADILY": {
+    "type1": "ROCK",
+    "type2": "GRASS"
+  },
+  "ANORITH": {
+    "type1": "ROCK",
+    "type2": "BUG"
+  },
+  "ARMALDO": {
+    "type1": "ROCK",
+    "type2": "BUG"
+  },
+  "RALTS": {
+    "type1": "PSYCHIC",
+    "type2": "PSYCHIC"
+  },
+  "KIRLIA": {
+    "type1": "PSYCHIC",
+    "type2": "PSYCHIC"
+  },
+  "GARDEVOIR": {
+    "type1": "PSYCHIC",
+    "type2": "PSYCHIC"
+  },
+  "BAGON": {
+    "type1": "DRAGON",
+    "type2": "DRAGON"
+  },
+  "SHELGON": {
+    "type1": "DRAGON",
+    "type2": "DRAGON"
+  },
+  "SALAMENCE": {
+    "type1": "DRAGON",
+    "type2": "FLYING"
+  },
+  "BELDUM": {
+    "type1": "STEEL",
+    "type2": "PSYCHIC"
+  },
+  "METANG": {
+    "type1": "STEEL",
+    "type2": "PSYCHIC"
+  },
+  "METAGROSS": {
+    "type1": "STEEL",
+    "type2": "PSYCHIC"
+  },
+  "REGIROCK": {
+    "type1": "ROCK",
+    "type2": "ROCK"
+  },
+  "REGICE": {
+    "type1": "ICE",
+    "type2": "ICE"
+  },
+  "REGISTEEL": {
+    "type1": "STEEL",
+    "type2": "STEEL"
+  },
+  "KYOGRE": {
+    "type1": "WATER",
+    "type2": "WATER"
+  },
+  "GROUDON": {
+    "type1": "GROUND",
+    "type2": "GROUND"
+  },
+  "RAYQUAZA": {
+    "type1": "DRAGON",
+    "type2": "FLYING"
+  },
+  "LATIAS": {
+    "type1": "DRAGON",
+    "type2": "PSYCHIC"
+  },
+  "LATIOS": {
+    "type1": "DRAGON",
+    "type2": "PSYCHIC"
+  },
+  "JIRACHI": {
+    "type1": "STEEL",
+    "type2": "PSYCHIC"
+  },
+  "DEOXYS": {
+    "type1": "PSYCHIC",
+    "type2": "PSYCHIC"
+  },
+  "CHIMECHO": {
+    "type1": "PSYCHIC",
+    "type2": "PSYCHIC"
+  }
+}
