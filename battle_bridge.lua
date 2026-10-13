@@ -9,9 +9,16 @@ local ADDR_ENEMY_HP = 0x02024104
 local ADDR_ENEMY_MAX_HP = 0x02024108
 local PP_ADDRS = { 0x020240A8, 0x020240A9, 0x020240AA, 0x020240AB }
 
+local PARTY_MENU_SLOT_ADDR = 0x0203CED1
+
 local pendingAction = nil
 local actionStep = 0
 local actionTimer = 0
+
+local pendingSwitch = nil
+local switchTargetSlot = 0
+local switchStep = 0
+local switchTimer = 0
 
 local autoWalkEnabled = false
 local walkStep = 0
@@ -19,7 +26,8 @@ local walkTimer = 0
 local lastSelectState = false
 local toggleCooldown = 0
 
-local PARTY_BASE = 0x02024542
+local PARTY_HP_BASE = 0x02024542
+local PARTY_START = 0x020244EC
 local PARTY_STRIDE = 0x64
 
 local WALK_SEQUENCE = {
@@ -29,10 +37,80 @@ local WALK_SEQUENCE = {
 	C.GBA_KEY.LEFT,
 }
 
+local block_orders = {
+	{ 0, 1, 2, 3 },
+	{ 0, 1, 3, 2 },
+	{ 0, 2, 1, 3 },
+	{ 0, 2, 3, 1 },
+	{ 0, 3, 1, 2 },
+	{ 0, 3, 2, 1 },
+	{ 1, 0, 2, 3 },
+	{ 1, 0, 3, 2 },
+	{ 1, 2, 0, 3 },
+	{ 1, 2, 3, 0 },
+	{ 1, 3, 0, 2 },
+	{ 1, 3, 2, 0 },
+	{ 2, 0, 1, 3 },
+	{ 2, 0, 3, 1 },
+	{ 2, 1, 0, 3 },
+	{ 2, 1, 3, 0 },
+	{ 2, 3, 0, 1 },
+	{ 2, 3, 1, 0 },
+	{ 3, 0, 1, 2 },
+	{ 3, 0, 2, 1 },
+	{ 3, 1, 0, 2 },
+	{ 3, 1, 2, 0 },
+	{ 3, 2, 0, 1 },
+	{ 3, 2, 1, 0 },
+}
+
+local EMPTY_SLOT = { species = 0, item = 0, moves = { 0, 0, 0, 0 } }
+
 function startServer()
 	server = socket.bind(nil, 8888)
 	server:listen()
 	console:log("Lua server listening on port 8888")
+end
+
+function readPartySlot(slot)
+	local base = PARTY_START + slot * PARTY_STRIDE
+	local pid = emu:read32(base)
+	if pid == 0 then
+		return nil
+	end
+
+	local key = pid ~ emu:read32(base + 4)
+	local order = block_orders[(pid % 24) + 1]
+	local function blockAddr(t)
+		for i = 1, 4 do
+			if order[i] == t then
+				return base + 0x20 + (i - 1) * 12
+			end
+		end
+	end
+	local g, a = blockAddr(0), blockAddr(1)
+	local g0 = emu:read32(g) ~ key
+	local a0 = emu:read32(a) ~ key
+	local a1 = emu:read32(a + 4) ~ key
+	return {
+		species = g0 & 0xFFFF,
+		item = g0 >> 16,
+		moves = { a0 & 0xFFFF, a0 >> 16, a1 & 0xFFFF, a1 >> 16 },
+	}
+end
+
+function getMovePP(moveIndex)
+	return emu:read8(PP_ADDRS[moveIndex + 1])
+end
+
+function isPartyWiped()
+	for i = 0, 5 do
+		local hp = emu:read16(PARTY_HP_BASE + (i * PARTY_STRIDE))
+		if hp > 0 then
+			return false
+		end
+	end
+	return true
 end
 
 function getState()
@@ -71,18 +149,25 @@ function getState()
 	local e_def_buff = emu:read8(ADDR_ENEMY_HP - 14)
 	local e_spd_buff = emu:read8(ADDR_ENEMY_HP - 13)
 
-	local party1_hp = emu:read16(PARTY_BASE + (0 * PARTY_STRIDE))
-	local party1_maxhp = emu:read16(PARTY_BASE + (0 * PARTY_STRIDE) + 2)
-	local party2_hp = emu:read16(PARTY_BASE + (1 * PARTY_STRIDE))
-	local party2_maxhp = emu:read16(PARTY_BASE + (1 * PARTY_STRIDE) + 2)
-	local party3_hp = emu:read16(PARTY_BASE + (2 * PARTY_STRIDE))
-	local party3_maxhp = emu:read16(PARTY_BASE + (2 * PARTY_STRIDE) + 2)
-	local party4_hp = emu:read16(PARTY_BASE + (3 * PARTY_STRIDE))
-	local party4_maxhp = emu:read16(PARTY_BASE + (3 * PARTY_STRIDE) + 2)
-	local party5_hp = emu:read16(PARTY_BASE + (4 * PARTY_STRIDE))
-	local party5_maxhp = emu:read16(PARTY_BASE + (4 * PARTY_STRIDE) + 2)
-	local party6_hp = emu:read16(PARTY_BASE + (5 * PARTY_STRIDE))
-	local party6_maxhp = emu:read16(PARTY_BASE + (5 * PARTY_STRIDE) + 2)
+	local party1_hp = emu:read16(PARTY_HP_BASE + (0 * PARTY_STRIDE))
+	local party1_maxhp = emu:read16(PARTY_HP_BASE + (0 * PARTY_STRIDE) + 2)
+	local party2_hp = emu:read16(PARTY_HP_BASE + (1 * PARTY_STRIDE))
+	local party2_maxhp = emu:read16(PARTY_HP_BASE + (1 * PARTY_STRIDE) + 2)
+	local party3_hp = emu:read16(PARTY_HP_BASE + (2 * PARTY_STRIDE))
+	local party3_maxhp = emu:read16(PARTY_HP_BASE + (2 * PARTY_STRIDE) + 2)
+	local party4_hp = emu:read16(PARTY_HP_BASE + (3 * PARTY_STRIDE))
+	local party4_maxhp = emu:read16(PARTY_HP_BASE + (3 * PARTY_STRIDE) + 2)
+	local party5_hp = emu:read16(PARTY_HP_BASE + (4 * PARTY_STRIDE))
+	local party5_maxhp = emu:read16(PARTY_HP_BASE + (4 * PARTY_STRIDE) + 2)
+	local party6_hp = emu:read16(PARTY_HP_BASE + (5 * PARTY_STRIDE))
+	local party6_maxhp = emu:read16(PARTY_HP_BASE + (5 * PARTY_STRIDE) + 2)
+
+	local p1 = readPartySlot(0) or EMPTY_SLOT
+	local p2 = readPartySlot(1) or EMPTY_SLOT
+	local p3 = readPartySlot(2) or EMPTY_SLOT
+	local p4 = readPartySlot(3) or EMPTY_SLOT
+	local p5 = readPartySlot(4) or EMPTY_SLOT
+	local p6 = readPartySlot(5) or EMPTY_SLOT
 
 	local battleOver = 0
 	local playerLost = 0
@@ -95,7 +180,8 @@ function getState()
 	end
 
 	return string.format(
-		"%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d",
+		"%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,"
+			.. "%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d",
 		playerHP,
 		playerMaxHP,
 		enemyHP,
@@ -137,12 +223,44 @@ function getState()
 		party5_hp,
 		party5_maxhp,
 		party6_hp,
-		party6_maxhp
+		party6_maxhp,
+		p1.species,
+		p1.item,
+		p1.moves[1],
+		p1.moves[2],
+		p1.moves[3],
+		p1.moves[4],
+		p2.species,
+		p2.item,
+		p2.moves[1],
+		p2.moves[2],
+		p2.moves[3],
+		p2.moves[4],
+		p3.species,
+		p3.item,
+		p3.moves[1],
+		p3.moves[2],
+		p3.moves[3],
+		p3.moves[4],
+		p4.species,
+		p4.item,
+		p4.moves[1],
+		p4.moves[2],
+		p4.moves[3],
+		p4.moves[4],
+		p5.species,
+		p5.item,
+		p5.moves[1],
+		p5.moves[2],
+		p5.moves[3],
+		p5.moves[4],
+		p6.species,
+		p6.item,
+		p6.moves[1],
+		p6.moves[2],
+		p6.moves[3],
+		p6.moves[4]
 	)
-end
-
-function getMovePP(moveIndex)
-	return emu:read8(PP_ADDRS[moveIndex + 1])
 end
 
 function checkToggleKey()
@@ -160,16 +278,6 @@ function checkToggleKey()
 		toggleCooldown = 20
 	end
 	lastSelectState = selectHeld
-end
-
-function isPartyWiped()
-	for i = 0, 5 do
-		local hp = emu:read16(PARTY_BASE + (i * PARTY_STRIDE))
-		if hp > 0 then
-			return false
-		end
-	end
-	return true
 end
 
 function processWalk()
@@ -194,6 +302,8 @@ function processWalk()
 end
 
 function doAction(actionIndex)
+	pendingSwitch = nil
+	switchStep = 0
 	pendingAction = actionIndex
 	actionStep = 1
 	actionTimer = 0
@@ -204,11 +314,8 @@ function processAction()
 		return
 	end
 	actionTimer = actionTimer + 1
-
-	-- Key press duration
 	local pressTime = 2
 
-	-- STEP 1-4: Back out of any sub-menus
 	if actionStep == 1 then
 		emu:addKey(C.GBA_KEY.B)
 		if actionTimer >= pressTime then
@@ -233,8 +340,6 @@ function processAction()
 			actionStep = 5
 			actionTimer = 0
 		end
-
-	-- STEP 5-8: Force cursor to Top-Left (FIGHT) on Root Menu
 	elseif actionStep == 5 then
 		emu:addKey(C.GBA_KEY.UP)
 		if actionTimer >= pressTime then
@@ -259,8 +364,6 @@ function processAction()
 			actionStep = 9
 			actionTimer = 0
 		end
-
-	-- STEP 9: Press A (Select FIGHT)
 	elseif actionStep == 9 then
 		emu:addKey(C.GBA_KEY.A)
 		if actionTimer >= pressTime then
@@ -268,15 +371,11 @@ function processAction()
 			actionStep = 10
 			actionTimer = 0
 		end
-
-	-- STEP 10: Wait for Fight menu to slide up
 	elseif actionStep == 10 then
 		if actionTimer >= 15 then
 			actionStep = 11
 			actionTimer = 0
 		end
-
-	-- STEP 11-14: Force cursor to Top-Left (Move 1)
 	elseif actionStep == 11 then
 		emu:addKey(C.GBA_KEY.UP)
 		if actionTimer >= pressTime then
@@ -301,8 +400,6 @@ function processAction()
 			actionStep = 15
 			actionTimer = 0
 		end
-
-	-- STEP 15-18: Apply Target Offsets for Move 2, 3, or 4
 	elseif actionStep == 15 then
 		if pendingAction == 1 or pendingAction == 3 then
 			emu:addKey(C.GBA_KEY.RIGHT)
@@ -331,8 +428,6 @@ function processAction()
 			actionStep = 19
 			actionTimer = 0
 		end
-
-	-- STEP 19: Press A to confirm attack
 	elseif actionStep == 19 then
 		emu:addKey(C.GBA_KEY.A)
 		if actionTimer >= pressTime then
@@ -343,32 +438,129 @@ function processAction()
 	end
 end
 
-function checkStatus()
-	local pStatus1 = emu:read32(0x020240D0)
-	local eStatus1 = emu:read32(0x02024128)
-
-	console:log(string.format("Player Status1: %d (0x%X)", pStatus1, pStatus1))
-	console:log(string.format("Enemy Status1 : %d (0x%X)", eStatus1, eStatus1))
+function doSwitch(targetSlot)
+	pendingAction = nil
+	actionStep = 0
+	pendingSwitch = true
+	switchTargetSlot = targetSlot
+	switchStep = 1
+	switchTimer = 0
 end
 
-function checkParty2MaxHP()
-	local addr = PARTY_BASE + (1 * PARTY_STRIDE) + 2
-	console:log("Party slot 2 maxHP (computed offset): " .. emu:read16(addr))
-end
-
-function dumpMoveRegion()
-	console:log("=== Move region dump (2-byte reads) ===")
-	for offset = -28, 20, 2 do
-		local addr = 0x020240AC + offset
-		console:log(string.format("0x%08X (offset %+d): %d", addr, offset, emu:read16(addr)))
+function processSwitch()
+	if not pendingSwitch then
+		return
 	end
-end
+	switchTimer = switchTimer + 1
+	local pressTime = 2
 
-function dumpMoveBytes()
-	console:log("=== Move region (1-byte reads) ===")
-	for offset = -28, 8 do
-		local addr = 0x020240AC + offset
-		console:log(string.format("0x%08X (offset %+d): %d", addr, offset, emu:read8(addr)))
+	if switchStep == 1 then
+		emu:addKey(C.GBA_KEY.B)
+		if switchTimer >= pressTime then
+			emu:clearKeys(0xFFFF)
+			switchStep = 2
+			switchTimer = 0
+		end
+	elseif switchStep == 2 then
+		if switchTimer >= pressTime then
+			switchStep = 3
+			switchTimer = 0
+		end
+	elseif switchStep == 3 then
+		emu:addKey(C.GBA_KEY.B)
+		if switchTimer >= pressTime then
+			emu:clearKeys(0xFFFF)
+			switchStep = 4
+			switchTimer = 0
+		end
+	elseif switchStep == 4 then
+		if switchTimer >= pressTime then
+			switchStep = 5
+			switchTimer = 0
+		end
+	elseif switchStep == 5 then
+		emu:addKey(C.GBA_KEY.UP)
+		if switchTimer >= pressTime then
+			emu:clearKeys(0xFFFF)
+			switchStep = 6
+			switchTimer = 0
+		end
+	elseif switchStep == 6 then
+		if switchTimer >= pressTime then
+			switchStep = 7
+			switchTimer = 0
+		end
+	elseif switchStep == 7 then
+		emu:addKey(C.GBA_KEY.LEFT)
+		if switchTimer >= pressTime then
+			emu:clearKeys(0xFFFF)
+			switchStep = 8
+			switchTimer = 0
+		end
+	elseif switchStep == 8 then
+		if switchTimer >= pressTime then
+			switchStep = 9
+			switchTimer = 0
+		end
+	elseif switchStep == 9 then
+		emu:addKey(C.GBA_KEY.DOWN)
+		if switchTimer >= pressTime then
+			emu:clearKeys(0xFFFF)
+			switchStep = 10
+			switchTimer = 0
+		end
+	elseif switchStep == 10 then
+		if switchTimer >= pressTime then
+			switchStep = 11
+			switchTimer = 0
+		end
+	elseif switchStep == 11 then
+		emu:addKey(C.GBA_KEY.A)
+		if switchTimer >= pressTime then
+			emu:clearKeys(0xFFFF)
+			switchStep = 12
+			switchTimer = 0
+		end
+	elseif switchStep == 12 then
+		if switchTimer >= 30 then
+			switchStep = 13
+			switchTimer = 0
+		end
+	elseif switchStep == 13 then
+		local currentSlot = emu:read8(PARTY_MENU_SLOT_ADDR)
+		if currentSlot == switchTargetSlot then
+			switchStep = 14
+			switchTimer = 0
+		elseif switchTimer >= 200 then
+			console:log("WARNING: couldn't reach target slot " .. switchTargetSlot .. ", stuck at " .. currentSlot)
+			switchStep = 14
+			switchTimer = 0
+		else
+			emu:addKey(C.GBA_KEY.DOWN)
+			if switchTimer >= pressTime then
+				emu:clearKeys(0xFFFF)
+				switchTimer = 0
+			end
+		end
+	elseif switchStep == 14 then
+		emu:addKey(C.GBA_KEY.A)
+		if switchTimer >= pressTime then
+			emu:clearKeys(0xFFFF)
+			switchStep = 15
+			switchTimer = 0
+		end
+	elseif switchStep == 15 then
+		if switchTimer >= 20 then
+			switchStep = 16
+			switchTimer = 0
+		end
+	elseif switchStep == 16 then
+		emu:addKey(C.GBA_KEY.A)
+		if switchTimer >= pressTime then
+			emu:clearKeys(0xFFFF)
+			switchStep = 0
+			pendingSwitch = nil
+		end
 	end
 end
 
@@ -376,6 +568,7 @@ function onFrame()
 	checkToggleKey()
 	processWalk()
 	processAction()
+	processSwitch()
 
 	if not client then
 		local newClient = server:accept()
@@ -396,18 +589,15 @@ function onFrame()
 				client:send(getState() .. "\n")
 			elseif string.match(line, "^ACTION:") then
 				local action = tonumber(string.match(line, "ACTION:(%d+)"))
-				doAction(action)
+				if action < 4 then
+					doAction(action)
+				else
+					doSwitch(action - 4)
+				end
 				client:send("ACK\n")
 			end
 		end
 	end
-end
-
-function checkClaimedPP()
-	console:log("Move 1 PP: " .. emu:read8(0x020240A8))
-	console:log("Move 2 PP: " .. emu:read8(0x020240A9))
-	console:log("Move 3 PP: " .. emu:read8(0x020240AA))
-	console:log("Move 4 PP: " .. emu:read8(0x020240AB))
 end
 
 callbacks:add("frame", onFrame)
