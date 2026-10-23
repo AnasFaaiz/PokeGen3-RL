@@ -2,3 +2,7 @@
 battle_data.csv
 battle_log.txt
 __pycache__/
+__pycache__/
+dqn_tensorboard/
+ppo_tensorboard/
+backups/
