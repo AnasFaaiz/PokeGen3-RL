@@ -1,41 +1,22 @@
--- battle_bridge.lua
-
 local server = nil
 local client = nil
 
+-- Global Addresses needed for the Action/Walk loops
 local ADDR_PLAYER_HP = 0x020240AC
-local ADDR_PLAYER_MAX_HP = 0x020240B0
 local ADDR_ENEMY_HP = 0x02024104
-local ADDR_ENEMY_MAX_HP = 0x02024108
-local PP_ADDRS = { 0x020240A8, 0x020240A9, 0x020240AA, 0x020240AB }
 
 local PARTY_MENU_SLOT_ADDR = 0x0203CED1
-
-local pendingAction = nil
-local actionStep = 0
-local actionTimer = 0
-
-local pendingSwitch = nil
-local switchTargetSlot = 0
-local switchStep = 0
-local switchTimer = 0
-
-local autoWalkEnabled = false
-local walkStep = 0
-local walkTimer = 0
-local lastSelectState = false
-local toggleCooldown = 0
-
 local PARTY_HP_BASE = 0x02024542
 local PARTY_START = 0x020244EC
 local PARTY_STRIDE = 0x64
 
-local WALK_SEQUENCE = {
-	C.GBA_KEY.UP,
-	C.GBA_KEY.RIGHT,
-	C.GBA_KEY.DOWN,
-	C.GBA_KEY.LEFT,
-}
+local pendingAction, actionStep, actionTimer = nil, 0, 0
+local pendingSwitch, switchTargetSlot, switchStep, switchTimer = nil, 0, 0, 0
+local autoWalkEnabled, walkStep, walkTimer, lastSelectState, toggleCooldown = false, 0, 0, false, 0
+
+local WALK_SEQUENCE = { C.GBA_KEY.UP, C.GBA_KEY.RIGHT, C.GBA_KEY.DOWN, C.GBA_KEY.LEFT }
+local EMPTY_SLOT = { species = 0, item = 0, moves = { 0, 0, 0, 0 } }
+local EMPTY_ENEMY_SLOT = { species = 0, item = 0, hp = 0, maxhp = 0, moves = { 0, 0, 0, 0 } }
 
 local block_orders = {
 	{ 0, 1, 2, 3 },
@@ -64,8 +45,6 @@ local block_orders = {
 	{ 3, 2, 1, 0 },
 }
 
-local EMPTY_SLOT = { species = 0, item = 0, moves = { 0, 0, 0, 0 } }
-
 function startServer()
 	server = socket.bind(nil, 8888)
 	server:listen()
@@ -78,7 +57,6 @@ function readPartySlot(slot)
 	if pid == 0 then
 		return nil
 	end
-
 	local key = pid ~ emu:read32(base + 4)
 	local order = block_orders[(pid % 24) + 1]
 	local function blockAddr(t)
@@ -99,14 +77,66 @@ function readPartySlot(slot)
 	}
 end
 
-function getMovePP(moveIndex)
-	return emu:read8(PP_ADDRS[moveIndex + 1])
+function readEnemyPartySlot(slot)
+	local base = 0x02024744 + slot * PARTY_STRIDE
+	local pid = emu:read32(base)
+	if pid == 0 then
+		return nil
+	end
+	local key = pid ~ emu:read32(base + 4)
+	local order = block_orders[(pid % 24) + 1]
+	local function blockAddr(t)
+		for i = 1, 4 do
+			if order[i] == t then
+				return base + 0x20 + (i - 1) * 12
+			end
+		end
+	end
+
+	local g, a = blockAddr(0), blockAddr(1)
+	local g0 = emu:read32(g) ~ key
+	local a0 = emu:read32(a) ~ key
+	local a1 = emu:read32(a + 4) ~ key
+
+	return {
+		species = g0 & 0xFFFF,
+		item = g0 >> 16,
+		moves = { a0 & 0xFFFF, a0 >> 16, a1 & 0xFFFF, a1 >> 16 },
+		hp = emu:read16(base + 86),
+		maxhp = emu:read16(base + 88),
+	}
+end
+
+function getBattler(base)
+	-- Returns 21 exact variables per active battler based on struct offsets
+	return {
+		emu:read16(base + 0x28),
+		emu:read16(base + 0x2A), -- 1,2: hp, maxhp
+		emu:read8(base + 0x24),
+		emu:read8(base + 0x25),
+		emu:read8(base + 0x26),
+		emu:read8(base + 0x27), -- 3-6: pp
+		emu:read16(base + 0x0C),
+		emu:read16(base + 0x0E),
+		emu:read16(base + 0x10),
+		emu:read16(base + 0x12), -- 7-10: moves
+		emu:read8(base + 0x21),
+		emu:read8(base + 0x22), -- 11-12: types
+		emu:read8(base + 0x2C), -- 13: level
+		emu:read32(base + 0x4C),
+		emu:read32(base + 0x50), -- 14-15: status1, status2
+		emu:read8(base + 0x19),
+		emu:read8(base + 0x1A),
+		emu:read8(base + 0x1B), -- 16-18: atk/def/spd buffs
+		emu:read16(base + 0x00),
+		emu:read16(base + 0x2E),
+		emu:read8(base + 0x20), -- 19-21: species, item, ability
+	}
 end
 
 function isPartyWiped()
 	for i = 0, 5 do
-		local hp = emu:read16(PARTY_HP_BASE + (i * PARTY_STRIDE))
-		if hp > 0 then
+		if emu:read16(PARTY_HP_BASE + (i * PARTY_STRIDE)) > 0 then
 			return false
 		end
 	end
@@ -114,153 +144,69 @@ function isPartyWiped()
 end
 
 function getState()
-	local playerHP = emu:read16(ADDR_PLAYER_HP)
-	local playerMaxHP = emu:read16(ADDR_PLAYER_MAX_HP)
-	local enemyHP = emu:read16(ADDR_ENEMY_HP)
-	local enemyMaxHP = emu:read16(ADDR_ENEMY_MAX_HP)
+	local b0 = getBattler(0x02024084) -- Player 1 (Left)
+	local b1 = getBattler(0x020240DC) -- Enemy 1 (Left)
+	local b2 = getBattler(0x02024134) -- Player 2 (Right)
+	local b3 = getBattler(0x0202418C) -- Enemy 2 (Right)
 
-	local pp1 = getMovePP(0)
-	local pp2 = getMovePP(1)
-	local pp3 = getMovePP(2)
-	local pp4 = getMovePP(3)
-
-	local move1 = emu:read16(ADDR_PLAYER_HP - 28)
-	local move2 = emu:read16(ADDR_PLAYER_HP - 26)
-	local move3 = emu:read16(ADDR_PLAYER_HP - 24)
-	local move4 = emu:read16(ADDR_PLAYER_HP - 22)
-
-	local p_type1 = emu:read8(ADDR_PLAYER_HP - 7)
-	local p_type2 = emu:read8(ADDR_PLAYER_HP - 6)
-	local e_type1 = emu:read8(ADDR_ENEMY_HP - 7)
-	local e_type2 = emu:read8(ADDR_ENEMY_HP - 6)
-
-	local p_level = emu:read8(ADDR_PLAYER_HP + 2)
-	local e_level = emu:read8(ADDR_ENEMY_HP + 2)
-
-	local pStatus1 = emu:read32(0x020240D0)
-	local eStatus1 = emu:read32(0x02024128)
-	local pStatus2 = emu:read32(0x020240D4)
-	local eStatus2 = emu:read32(0x0202412C)
-
-	local p_atk_buff = emu:read8(ADDR_PLAYER_HP - 15)
-	local p_def_buff = emu:read8(ADDR_PLAYER_HP - 14)
-	local p_spd_buff = emu:read8(ADDR_PLAYER_HP - 13)
-	local e_atk_buff = emu:read8(ADDR_ENEMY_HP - 15)
-	local e_def_buff = emu:read8(ADDR_ENEMY_HP - 14)
-	local e_spd_buff = emu:read8(ADDR_ENEMY_HP - 13)
-
-	local party1_hp = emu:read16(PARTY_HP_BASE + (0 * PARTY_STRIDE))
-	local party1_maxhp = emu:read16(PARTY_HP_BASE + (0 * PARTY_STRIDE) + 2)
-	local party2_hp = emu:read16(PARTY_HP_BASE + (1 * PARTY_STRIDE))
-	local party2_maxhp = emu:read16(PARTY_HP_BASE + (1 * PARTY_STRIDE) + 2)
-	local party3_hp = emu:read16(PARTY_HP_BASE + (2 * PARTY_STRIDE))
-	local party3_maxhp = emu:read16(PARTY_HP_BASE + (2 * PARTY_STRIDE) + 2)
-	local party4_hp = emu:read16(PARTY_HP_BASE + (3 * PARTY_STRIDE))
-	local party4_maxhp = emu:read16(PARTY_HP_BASE + (3 * PARTY_STRIDE) + 2)
-	local party5_hp = emu:read16(PARTY_HP_BASE + (4 * PARTY_STRIDE))
-	local party5_maxhp = emu:read16(PARTY_HP_BASE + (4 * PARTY_STRIDE) + 2)
-	local party6_hp = emu:read16(PARTY_HP_BASE + (5 * PARTY_STRIDE))
-	local party6_maxhp = emu:read16(PARTY_HP_BASE + (5 * PARTY_STRIDE) + 2)
-
-	local p1 = readPartySlot(0) or EMPTY_SLOT
-	local p2 = readPartySlot(1) or EMPTY_SLOT
-	local p3 = readPartySlot(2) or EMPTY_SLOT
-	local p4 = readPartySlot(3) or EMPTY_SLOT
-	local p5 = readPartySlot(4) or EMPTY_SLOT
-	local p6 = readPartySlot(5) or EMPTY_SLOT
-
-	local battleOver = 0
-	local playerLost = 0
-
-	if enemyHP <= 0 then
+	local battleOver, playerLost = 0, 0
+	-- Simple battle over logic (b1 and b3 HP check)
+	if b1[1] <= 0 and b3[1] <= 0 then
 		battleOver = 1
-	elseif playerHP <= 0 and isPartyWiped() then
-		battleOver = 1
-		playerLost = 1
+	elseif b0[1] <= 0 and b2[1] <= 0 and isPartyWiped() then
+		battleOver, playerLost = 1, 1
 	end
 
-	return string.format(
-		"%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,"
-			.. "%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d",
-		playerHP,
-		playerMaxHP,
-		enemyHP,
-		enemyMaxHP,
-		battleOver,
-		playerLost,
-		pp1,
-		pp2,
-		pp3,
-		pp4,
-		move1,
-		move2,
-		move3,
-		move4,
-		p_type1,
-		p_type2,
-		e_type1,
-		e_type2,
-		p_level,
-		e_level,
-		pStatus1,
-		eStatus1,
-		pStatus2,
-		eStatus2,
-		p_atk_buff,
-		p_def_buff,
-		p_spd_buff,
-		e_atk_buff,
-		e_def_buff,
-		e_spd_buff,
-		party1_hp,
-		party1_maxhp,
-		party2_hp,
-		party2_maxhp,
-		party3_hp,
-		party3_maxhp,
-		party4_hp,
-		party4_maxhp,
-		party5_hp,
-		party5_maxhp,
-		party6_hp,
-		party6_maxhp,
-		p1.species,
-		p1.item,
-		p1.moves[1],
-		p1.moves[2],
-		p1.moves[3],
-		p1.moves[4],
-		p2.species,
-		p2.item,
-		p2.moves[1],
-		p2.moves[2],
-		p2.moves[3],
-		p2.moves[4],
-		p3.species,
-		p3.item,
-		p3.moves[1],
-		p3.moves[2],
-		p3.moves[3],
-		p3.moves[4],
-		p4.species,
-		p4.item,
-		p4.moves[1],
-		p4.moves[2],
-		p4.moves[3],
-		p4.moves[4],
-		p5.species,
-		p5.item,
-		p5.moves[1],
-		p5.moves[2],
-		p5.moves[3],
-		p5.moves[4],
-		p6.species,
-		p6.item,
-		p6.moves[1],
-		p6.moves[2],
-		p6.moves[3],
-		p6.moves[4]
-	)
+	local p_party = {}
+	local e_party = {}
+	for i = 0, 5 do
+		local p = readPartySlot(i) or EMPTY_SLOT
+		local e = readEnemyPartySlot(i) or EMPTY_ENEMY_SLOT
+		local php = emu:read16(PARTY_HP_BASE + (i * PARTY_STRIDE))
+		local pmax = emu:read16(PARTY_HP_BASE + (i * PARTY_STRIDE) + 2)
+		table.insert(p_party, php)
+		table.insert(p_party, pmax)
+		table.insert(p_party, p.species)
+		table.insert(p_party, p.item)
+		for m = 1, 4 do
+			table.insert(p_party, p.moves[m])
+		end
+
+		table.insert(e_party, e.species)
+		table.insert(e_party, e.item)
+		table.insert(e_party, e.hp)
+		table.insert(e_party, e.maxhp)
+		for m = 1, 4 do
+			table.insert(e_party, e.moves[m])
+		end
+	end
+
+	local weather = emu:read8(0x02024082)
+
+	local out = {}
+	for _, v in ipairs(b0) do
+		table.insert(out, v)
+	end
+	for _, v in ipairs(b1) do
+		table.insert(out, v)
+	end
+	for _, v in ipairs(b2) do
+		table.insert(out, v)
+	end
+	for _, v in ipairs(b3) do
+		table.insert(out, v)
+	end
+	table.insert(out, battleOver)
+	table.insert(out, playerLost)
+	for _, v in ipairs(p_party) do
+		table.insert(out, v)
+	end
+	for _, v in ipairs(e_party) do
+		table.insert(out, v)
+	end
+	table.insert(out, weather)
+
+	return table.concat(out, ",")
 end
 
 function checkToggleKey()
@@ -315,6 +261,10 @@ function processAction()
 	end
 	actionTimer = actionTimer + 1
 	local pressTime = 2
+
+	-- Parse the 0-11 action into a Move (0-3) and a Target (0=Left, 1=Right, 2=Partner)
+	local moveIdx = pendingAction % 4
+	local targetId = math.floor(pendingAction / 4)
 
 	if actionStep == 1 then
 		emu:addKey(C.GBA_KEY.B)
@@ -401,7 +351,7 @@ function processAction()
 			actionTimer = 0
 		end
 	elseif actionStep == 15 then
-		if pendingAction == 1 or pendingAction == 3 then
+		if moveIdx == 1 or moveIdx == 3 then
 			emu:addKey(C.GBA_KEY.RIGHT)
 		end
 		if actionTimer >= pressTime then
@@ -415,7 +365,7 @@ function processAction()
 			actionTimer = 0
 		end
 	elseif actionStep == 17 then
-		if pendingAction == 2 or pendingAction == 3 then
+		if moveIdx == 2 or moveIdx == 3 then
 			emu:addKey(C.GBA_KEY.DOWN)
 		end
 		if actionTimer >= pressTime then
@@ -430,6 +380,51 @@ function processAction()
 		end
 	elseif actionStep == 19 then
 		emu:addKey(C.GBA_KEY.A)
+		if actionTimer >= pressTime then
+			emu:clearKeys(0xFFFF)
+			actionStep = 20
+			actionTimer = 0
+		end
+	-- --- NEW TARGETING LOGIC START ---
+	elseif actionStep == 20 then
+		if actionTimer >= 20 then -- Wait for target menu to open
+			actionStep = 21
+			actionTimer = 0
+		end
+	elseif actionStep == 21 then
+		if targetId == 0 or targetId == 1 then
+			emu:addKey(C.GBA_KEY.UP) -- Aim at enemies
+		elseif targetId == 2 then
+			emu:addKey(C.GBA_KEY.DOWN) -- Aim at partner
+		end
+		if actionTimer >= pressTime then
+			emu:clearKeys(0xFFFF)
+			actionStep = 22
+			actionTimer = 0
+		end
+	elseif actionStep == 22 then
+		if actionTimer >= pressTime then
+			actionStep = 23
+			actionTimer = 0
+		end
+	elseif actionStep == 23 then
+		if targetId == 0 then
+			emu:addKey(C.GBA_KEY.LEFT) -- Aim at Left Enemy
+		elseif targetId == 1 then
+			emu:addKey(C.GBA_KEY.RIGHT) -- Aim at Right Enemy
+		end
+		if actionTimer >= pressTime then
+			emu:clearKeys(0xFFFF)
+			actionStep = 24
+			actionTimer = 0
+		end
+	elseif actionStep == 24 then
+		if actionTimer >= pressTime then
+			actionStep = 25
+			actionTimer = 0
+		end
+	elseif actionStep == 25 then
+		emu:addKey(C.GBA_KEY.A) -- Confirm Target!
 		if actionTimer >= pressTime then
 			emu:clearKeys(0xFFFF)
 			actionStep = 0
@@ -533,10 +528,14 @@ function processSwitch()
 			switchTimer = 0
 		elseif switchTimer >= 200 then
 			console:log("WARNING: couldn't reach target slot " .. switchTargetSlot .. ", stuck at " .. currentSlot)
-			switchStep = 14
-			switchTimer = 0
+			pendingSwitch = nil
+			switchStep = 0
 		else
-			emu:addKey(C.GBA_KEY.DOWN)
+			if currentSlot < switchTargetSlot then
+				emu:addKey(C.GBA_KEY.DOWN)
+			else
+				emu:addKey(C.GBA_KEY.UP)
+			end
 			if switchTimer >= pressTime then
 				emu:clearKeys(0xFFFF)
 				switchTimer = 0
@@ -567,6 +566,20 @@ end
 function onFrame()
 	checkToggleKey()
 	processWalk()
+
+	local enemyHP = emu:read16(ADDR_ENEMY_HP)
+	local playerHP = emu:read16(ADDR_PLAYER_HP)
+	local inBattle = (enemyHP > 0 and enemyHP < 999 and playerHP > 0)
+
+	if not inBattle and (pendingAction or pendingSwitch) then
+		console:log("Battle ended mid-action, aborting pending action/switch")
+		pendingAction = nil
+		pendingSwitch = nil
+		actionStep = 0
+		switchStep = 0
+		emu:clearKeys(0xFFFF)
+	end
+
 	processAction()
 	processSwitch()
 
@@ -589,10 +602,10 @@ function onFrame()
 				client:send(getState() .. "\n")
 			elseif string.match(line, "^ACTION:") then
 				local action = tonumber(string.match(line, "ACTION:(%d+)"))
-				if action < 4 then
+				if action < 12 then
 					doAction(action)
 				else
-					doSwitch(action - 4)
+					doSwitch(action - 11)
 				end
 				client:send("ACK\n")
 			end
