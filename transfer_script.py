@@ -1,47 +1,93 @@
+import os
 import torch
+import numpy as np
+import gymnasium as gym
+from gymnasium import spaces
+
 from stable_baselines3 import DQN
-from env import PokemonBattleEnv
+from sb3_contrib import MaskablePPO
 
-OLD_ACTIONS = 4
-NEW_ACTIONS = 10
 
-old_model = DQN.load("pokemon_dqn_v5")
+# 1. Dummy environment matching your exact V7 shapes (no emulator/socket connection required)
+class DummyPokemonEnv(gym.Env):
+    def __init__(self):
+        super().__init__()
+        self.action_space = spaces.Discrete(17)
+        self.observation_space = spaces.Box(
+            low=0.0, high=1.0, shape=(285,), dtype=np.float32
+        )
 
-env = PokemonBattleEnv()  # action_space must already be Discrete(10) here
-new_model = DQN(
-    "MlpPolicy", env,
-    learning_rate=1e-3, buffer_size=5000, learning_starts=50,
-    exploration_fraction=0.5, exploration_final_eps=0.1,
-    verbose=1, tensorboard_log="./dqn_tensorboard/",
-)
+    def action_masks(self):
+        return np.ones(17, dtype=bool)
 
-old_sd = old_model.policy.q_net.state_dict()
-new_sd = new_model.policy.q_net.state_dict()
+    def reset(self, seed=None, options=None):
+        return np.zeros(285, dtype=np.float32), {}
 
-first_layer_key = "q_net.0.weight"
-output_weight_key = "q_net.4.weight"
-output_bias_key = "q_net.4.bias"
+    def step(self, action):
+        return np.zeros(285, dtype=np.float32), 0.0, True, False, {}
 
-# input layer: 64 -> 64, unchanged, direct copy
-new_sd[first_layer_key] = old_sd[first_layer_key]
 
-# output layer: 4 -> 10 actions, copy existing 4, leave 6 new ones random-init
-old_out_w = old_sd[output_weight_key]
-new_out_w = new_sd[output_weight_key].clone()
-new_out_w[:OLD_ACTIONS, :] = old_out_w
-new_sd[output_weight_key] = new_out_w
+def main():
+    old_model_path = "pokemon_dqn_v6.zip" if os.path.exists("pokemon_dqn_v6.zip") else "pokemon_dqn_v6"
+    print(f"Loading existing model from {old_model_path}...")
+    
+    old_model = DQN.load(old_model_path)
+    old_sd = old_model.policy.q_net.state_dict()
 
-old_out_b = old_sd[output_bias_key]
-new_out_b = new_sd[output_bias_key].clone()
-new_out_b[:OLD_ACTIONS] = old_out_b
-new_sd[output_bias_key] = new_out_b
+    env = DummyPokemonEnv()
+    new_model = MaskablePPO(
+        "MlpPolicy",
+        env,
+        learning_rate=3e-4,
+        ent_coef=0.05,
+        verbose=1,
+        tensorboard_log="./ppo_tensorboard/",
+    )
+    new_sd = new_model.policy.state_dict()
 
-for key in old_sd:
-    if key not in (first_layer_key, output_weight_key, output_bias_key):
-        new_sd[key] = old_sd[key]
+    print("\n--- Transferring Input Layer ---")
+    old_in_w = old_sd["q_net.0.weight"]
+    old_in_b = old_sd["q_net.0.bias"]
+    old_in_features = old_in_w.shape[1]
+    print(f"Detected old observation input dim: {old_in_features} -> New observation dim: 285")
 
-new_model.policy.q_net.load_state_dict(new_sd)
-new_model.policy.q_net_target.load_state_dict(new_sd)
+    # Map input weights to Policy (Actor) and Value (Critic) nets; remaining features stay 0
+    new_in_w = new_sd["mlp_extractor.policy_net.0.weight"].clone()
+    new_in_w[:, :old_in_features] = old_in_w
+    new_sd["mlp_extractor.policy_net.0.weight"] = new_in_w
+    new_sd["mlp_extractor.value_net.0.weight"] = new_in_w.clone()
 
-new_model.save("pokemon_dqn_v6")
-print("Transfer complete: 64-dim input unchanged, output expanded 4->10, saved as pokemon_dqn_v6")
+    new_sd["mlp_extractor.policy_net.0.bias"] = old_in_b
+    new_sd["mlp_extractor.value_net.0.bias"] = old_in_b.clone()
+
+    print("\n--- Transferring Hidden Layer ---")
+    new_sd["mlp_extractor.policy_net.2.weight"] = old_sd["q_net.2.weight"]
+    new_sd["mlp_extractor.value_net.2.weight"] = old_sd["q_net.2.weight"]
+    new_sd["mlp_extractor.policy_net.2.bias"] = old_sd["q_net.2.bias"]
+    new_sd["mlp_extractor.value_net.2.bias"] = old_sd["q_net.2.bias"]
+
+    print("\n--- Transferring Output Layer (Actions) ---")
+    old_out_w = old_sd["q_net.4.weight"]
+    old_out_b = old_sd["q_net.4.bias"]
+    num_old_actions = old_out_w.shape[0]
+    print(f"Detected old action count: {num_old_actions} -> New action count: 17")
+
+    # Dynamically copy detected actions (0 to num_old_actions)
+    new_out_w = new_sd["action_net.weight"].clone()
+    new_out_w[:num_old_actions, :] = old_out_w
+    new_sd["action_net.weight"] = new_out_w
+
+    new_out_b = new_sd["action_net.bias"].clone()
+    new_out_b[:num_old_actions] = old_out_b
+    new_sd["action_net.bias"] = new_out_b
+
+    print("\nLoading weights into MaskablePPO policy...")
+    new_model.policy.load_state_dict(new_sd)
+
+    output_model_name = "pokemon_ppo_masked_v7"
+    new_model.save(output_model_name)
+    print(f"\nTransfer complete! Saved weights as {output_model_name}.zip")
+
+
+if __name__ == "__main__":
+    main()
