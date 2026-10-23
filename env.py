@@ -4,19 +4,22 @@ import json
 import numpy as np
 import gymnasium as gym
 from gymnasium import spaces
-from logger import init_csv, log_step, log_battle_end
+from logger import init_csv, log_step, log_battle_end, decode_action
 
+# --- Load Static Game Data ---
 with open("emerald_moves.json") as f:
     _raw_moves = json.load(f)
 MOVE_TYPES = {int(k): v["type_id"] for k, v in _raw_moves.items()}
 MOVE_POWER = {int(k): v["power"] for k, v in _raw_moves.items()}
 MOVE_ACCURACY = {int(k): v["accuracy"] for k, v in _raw_moves.items()}
 MOVE_DAMAGE_CLASS = {int(k): v["damage_class_id"] for k, v in _raw_moves.items()}
+MOVE_PRIORITY = {int(k): v.get("priority", 0) for k, v in _raw_moves.items()}
+MOVE_NAMES = {int(k): v.get("name", f"Move_{k}") for k, v in _raw_moves.items()}
 
 with open("species_id_to_name.json") as f:
     SPECIES_ID_TO_NAME = {int(k): v for k, v in json.load(f).items()}
-with open("species_types.json") as f:
-    SPECIES_TYPES = json.load(f)
+with open("species_data.json") as f:
+    SPECIES_DATA = json.load(f)
 
 TYPE_NAME_TO_ID = {
     "NORMAL": 0, "FIGHTING": 1, "FLYING": 2, "POISON": 3, "GROUND": 4,
@@ -25,18 +28,31 @@ TYPE_NAME_TO_ID = {
     "ICE": 15, "DRAGON": 16, "DARK": 17,
 }
 
+# Bitmask Status Definitions
+STATUS1_SLEEP_MASK = 0x07
+STATUS1_PARALYSIS = 0x40
+STATUS1_FREEZE = 0x20
+STATUS2_CONFUSION_MASK = 0x00000007
+STATUS2_SUBSTITUTE     = 0x01000000
+STATUS2_TORMENT        = 0x80000000
+
 def get_species_types(species_id):
     name = SPECIES_ID_TO_NAME.get(species_id)
-    if name is None:
+    if not name:
         return 0, 0
-    t = SPECIES_TYPES.get(name, {"type1": "NORMAL", "type2": "NORMAL"})
-    return TYPE_NAME_TO_ID[t["type1"]], TYPE_NAME_TO_ID[t["type2"]]
+    d = SPECIES_DATA.get(name, {"type1": "NORMAL", "type2": "NORMAL"})
+    return TYPE_NAME_TO_ID.get(d["type1"], 0), TYPE_NAME_TO_ID.get(d["type2"], 0)
+
+def get_species_info(species_id):
+    name = SPECIES_ID_TO_NAME.get(species_id)
+    if not name:
+        return 0, 0, 300
+    d = SPECIES_DATA.get(name, {"type1": "NORMAL", "type2": "NORMAL", "base_total": 300})
+    return TYPE_NAME_TO_ID.get(d["type1"], 0), TYPE_NAME_TO_ID.get(d["type2"], 0), d.get("base_total", 300)
 
 def _remap_pokeapi_type(t):
-    if t <= 8:
-        return t
-    if t == 17:
-        return 9
+    if t <= 8: return t
+    if t == 17: return 9
     return t + 1
 
 with open("type_chart.json") as f:
@@ -58,29 +74,6 @@ def get_effectiveness(move_type, defender_type1, defender_type2):
         mult2 = 1.0
     return mult1 * mult2
 
-def best_move_effectiveness(moves, e_type1, e_type2):
-    best = 0.0
-    for m in moves:
-        if m == 0:
-            continue
-        mt = MOVE_TYPES.get(m, 17)
-        eff = get_effectiveness(mt, e_type1, e_type2)
-        if eff > best:
-            best = eff
-    return best
-
-def type_resistance(my_type1, my_type2, e_type1, e_type2):
-    worst = 0.0
-    for et in {e_type1, e_type2}:
-        eff = get_effectiveness(et, my_type1, my_type2)
-        if eff > worst:
-            worst = eff
-    return worst
-
-STATUS1_SLEEP_MASK = 0x07
-STATUS1_PARALYSIS = 0x40
-STATUS1_FREEZE = 0x20
-
 
 class PokemonBattleEnv(gym.Env):
     def __init__(self, host="127.0.0.1", port=8888, action_wait=2.0):
@@ -90,284 +83,213 @@ class PokemonBattleEnv(gym.Env):
         self.sock_file = self.sock.makefile("r")
         self.action_wait = action_wait
 
-        self.action_space = spaces.Discrete(10)
-        self.observation_space = spaces.Box(low=0.0, high=1.0, shape=(64,), dtype=np.float32)
+        # 17 Actions: Moves (0-11) + Bench Switches (12-16)
+        self.action_space = spaces.Discrete(17)
+        # 285 Dimensions: 4 Battlers (188) + 12 Bench (96) + 1 Weather
+        self.observation_space = spaces.Box(low=0.0, high=1.0, shape=(285,), dtype=np.float32)
 
         self.prev_player_hp = None
         self.prev_enemy_hp = None
-
         init_csv()
         self.episode = 0
         self.step_count = 0
-
-        # running totals for the session, printed on close()
+        self.global_step = 0
         self.total_reward = 0.0
         self.move_count = 0
         self.switch_count = 0
         self.illegal_count = 0
+        self.current_action_prob = 1.0
+
+    def _parse_battler(self, raw, target_type1, target_type2):
+        hp, maxhp, pp1, pp2, pp3, pp4, m1, m2, m3, m4, t1, t2, lvl, s1, s2, atk_b, def_b, spd_b, spc, item, ability = raw
+
+        confused = 1.0 if (s2 & STATUS2_CONFUSION_MASK) != 0 else 0.0
+        substitute = 1.0 if (s2 & STATUS2_SUBSTITUTE) != 0 else 0.0
+        tormented = 1.0 if (s2 & STATUS2_TORMENT) != 0 else 0.0
+
+        _, _, base_total = get_species_info(spc)
+        m1_t, m2_t, m3_t, m4_t = (MOVE_TYPES.get(m, 17) for m in (m1, m2, m3, m4))
+        m1_eff = get_effectiveness(m1_t, target_type1, target_type2)
+        m2_eff = get_effectiveness(m2_t, target_type1, target_type2)
+        m3_eff = get_effectiveness(m3_t, target_type1, target_type2)
+        m4_eff = get_effectiveness(m4_t, target_type1, target_type2)
+
+        return [
+            hp / max(maxhp, 1), pp1 / 40.0, pp2 / 40.0, pp3 / 40.0, pp4 / 40.0,
+            m1 / 355.0, m2 / 355.0, m3 / 355.0, m4 / 355.0,
+            m1_t / 17.0, m2_t / 17.0, m3_t / 17.0, m4_t / 17.0,
+            m1_eff / 4.0, m2_eff / 4.0, m3_eff / 4.0, m4_eff / 4.0,
+            MOVE_POWER.get(m1, 0) / 250.0, MOVE_POWER.get(m2, 0) / 250.0,
+            MOVE_POWER.get(m3, 0) / 250.0, MOVE_POWER.get(m4, 0) / 250.0,
+            MOVE_ACCURACY.get(m1, 100) / 100.0, MOVE_ACCURACY.get(m2, 100) / 100.0,
+            MOVE_ACCURACY.get(m3, 100) / 100.0, MOVE_ACCURACY.get(m4, 100) / 100.0,
+            MOVE_DAMAGE_CLASS.get(m1, 0) / 2.0, MOVE_DAMAGE_CLASS.get(m2, 0) / 2.0,
+            MOVE_DAMAGE_CLASS.get(m3, 0) / 2.0, MOVE_DAMAGE_CLASS.get(m4, 0) / 2.0,
+            MOVE_PRIORITY.get(m1, 0) / 5.0, MOVE_PRIORITY.get(m2, 0) / 5.0,
+            MOVE_PRIORITY.get(m3, 0) / 5.0, MOVE_PRIORITY.get(m4, 0) / 5.0,
+            t1 / 18.0, t2 / 18.0, lvl / 100.0, s1 / 255.0,
+            confused, substitute, tormented,
+            atk_b / 12.0, def_b / 12.0, spd_b / 12.0,
+            spc / 412.0, base_total / 720.0, item / 376.0, ability / 78.0
+        ]
 
     def _get_state(self):
         self.sock.sendall(b"GET_STATE\n")
-        raw = self.sock_file.readline()
-        parts = [int(x) for x in raw.strip().split(",")]
+        raw = [int(x) for x in self.sock_file.readline().strip().split(",")]
 
-        (player_hp, player_max, enemy_hp, enemy_max, battle_over, player_lost,
-         pp1, pp2, pp3, pp4, move1, move2, move3, move4,
-         p_type1, p_type2, e_type1, e_type2, p_level, e_level,
-         p_status1, e_status1, p_status2, e_status2,
-         p_atk, p_def, p_spd, e_atk, e_def, e_spd,
-         party1_hp, party1_maxhp, party2_hp, party2_maxhp, party3_hp, party3_maxhp,
-         party4_hp, party4_maxhp, party5_hp, party5_maxhp, party6_hp, party6_maxhp,
-         p1_species, p1_item, p1_m1, p1_m2, p1_m3, p1_m4,
-         p2_species, p2_item, p2_m1, p2_m2, p2_m3, p2_m4,
-         p3_species, p3_item, p3_m1, p3_m2, p3_m3, p3_m4,
-         p4_species, p4_item, p4_m1, p4_m2, p4_m3, p4_m4,
-         p5_species, p5_item, p5_m1, p5_m2, p5_m3, p5_m4,
-         p6_species, p6_item, p6_m1, p6_m2, p6_m3, p6_m4) = parts
+        b0_raw, b1_raw, b2_raw, b3_raw = raw[0:21], raw[21:42], raw[42:63], raw[63:84]
+        battle_over, player_lost, party_raw, weather = raw[84], raw[85], raw[86:-1], raw[-1]
 
-        move1_type = MOVE_TYPES.get(move1, 17)
-        move2_type = MOVE_TYPES.get(move2, 17)
-        move3_type = MOVE_TYPES.get(move3, 17)
-        move4_type = MOVE_TYPES.get(move4, 17)
+        b0_features = self._parse_battler(b0_raw, b1_raw[10], b1_raw[11])
+        b1_features = self._parse_battler(b1_raw, b0_raw[10], b0_raw[11])
+        b2_features = self._parse_battler(b2_raw, b3_raw[10], b3_raw[11])
+        b3_features = self._parse_battler(b3_raw, b2_raw[10], b2_raw[11])
 
-        move1_eff = get_effectiveness(move1_type, e_type1, e_type2)
-        move2_eff = get_effectiveness(move2_type, e_type1, e_type2)
-        move3_eff = get_effectiveness(move3_type, e_type1, e_type2)
-        move4_eff = get_effectiveness(move4_type, e_type1, e_type2)
+        obs_list = b0_features + b1_features + b2_features + b3_features + [x / 412.0 for x in party_raw] + [weather / 64.0]
+        obs = np.array(obs_list, dtype=np.float32)
 
-        move1_power = MOVE_POWER.get(move1, 0)
-        move2_power = MOVE_POWER.get(move2, 0)
-        move3_power = MOVE_POWER.get(move3, 0)
-        move4_power = MOVE_POWER.get(move4, 0)
+        pp_list = [b0_raw[2], b0_raw[3], b0_raw[4], b0_raw[5]]
+        moves_list = [b0_raw[6], b0_raw[7], b0_raw[8], b0_raw[9]]
+        
+        return obs, b0_raw[0], b1_raw[0], bool(battle_over), bool(player_lost), pp_list, b0_raw[13], moves_list
 
-        move1_acc = MOVE_ACCURACY.get(move1, 100)
-        move2_acc = MOVE_ACCURACY.get(move2, 100)
-        move3_acc = MOVE_ACCURACY.get(move3, 100)
-        move4_acc = MOVE_ACCURACY.get(move4, 100)
+    def action_masks(self):
+        if not hasattr(self, 'last_obs'): return np.ones(17, dtype=bool)
+        mask = np.zeros(17, dtype=bool)
 
-        move1_class = MOVE_DAMAGE_CLASS.get(move1, 0)
-        move2_class = MOVE_DAMAGE_CLASS.get(move2, 0)
-        move3_class = MOVE_DAMAGE_CLASS.get(move3, 0)
-        move4_class = MOVE_DAMAGE_CLASS.get(move4, 0)
+        pp_ratios = self.last_obs[1:5]
+        out_of_all_pp = np.sum(pp_ratios) <= 0.0
+        valid_moves = [(out_of_all_pp or pp_ratios[i] > 0.0) for i in range(4)]
 
-        party1_ratio = party1_hp / max(party1_maxhp, 1)
-        party2_ratio = party2_hp / max(party2_maxhp, 1)
-        party3_ratio = party3_hp / max(party3_maxhp, 1)
-        party4_ratio = party4_hp / max(party4_maxhp, 1)
-        party5_ratio = party5_hp / max(party5_maxhp, 1)
-        party6_ratio = party6_hp / max(party6_maxhp, 1)
+        e1_hp, p2_hp, e3_hp = self.last_obs[47], self.last_obs[94], self.last_obs[141]
 
-        party_slots = [
-            (p1_species, [p1_m1, p1_m2, p1_m3, p1_m4]),
-            (p2_species, [p2_m1, p2_m2, p2_m3, p2_m4]),
-            (p3_species, [p3_m1, p3_m2, p3_m3, p3_m4]),
-            (p4_species, [p4_m1, p4_m2, p4_m3, p4_m4]),
-            (p5_species, [p5_m1, p5_m2, p5_m3, p5_m4]),
-            (p6_species, [p6_m1, p6_m2, p6_m3, p6_m4]),
-        ]
-        party_atk = []
-        party_def = []
-        for species, moves in party_slots:
-            t1, t2 = get_species_types(species)
-            party_atk.append(best_move_effectiveness(moves, e_type1, e_type2) / 4.0)
-            party_def.append(type_resistance(t1, t2, e_type1, e_type2) / 4.0)
+        for i in range(4):
+            if valid_moves[i] and e1_hp > 0.0: mask[i] = True         # Target Enemy Left
+            if valid_moves[i] and e3_hp > 0.0: mask[4 + i] = True     # Target Enemy Right
+            if valid_moves[i] and p2_hp > 0.0: mask[8 + i] = True     # Target Partner
 
-        obs = np.array([
-            player_hp / max(player_max, 1),
-            enemy_hp / max(enemy_max, 1),
-            pp1 / 40.0, pp2 / 40.0, pp3 / 40.0, pp4 / 40.0,
-            move1 / 355.0, move2 / 355.0, move3 / 355.0, move4 / 355.0,
-            move1_type / 17.0, move2_type / 17.0, move3_type / 17.0, move4_type / 17.0,
-            move1_eff / 4.0, move2_eff / 4.0, move3_eff / 4.0, move4_eff / 4.0,
-            move1_power / 250.0, move2_power / 250.0, move3_power / 250.0, move4_power / 250.0,
-            move1_acc / 100.0, move2_acc / 100.0, move3_acc / 100.0, move4_acc / 100.0,
-            move1_class / 2.0, move2_class / 2.0, move3_class / 2.0, move4_class / 2.0,
-            p_type1 / 18.0, p_type2 / 18.0, e_type1 / 18.0, e_type2 / 18.0,
-            p_level / 100.0, e_level / 100.0,
-            p_status1 / 255.0, e_status1 / 255.0,
-            p_status2 / 4294967295.0, e_status2 / 4294967295.0,
-            p_atk / 12.0, p_def / 12.0, p_spd / 12.0,
-            e_atk / 12.0, e_def / 12.0, e_spd / 12.0,
-            party1_ratio, party2_ratio, party3_ratio, party4_ratio, party5_ratio, party6_ratio,
-            *party_atk,
-            *party_def,
-        ], dtype=np.float32)
+        for i in range(1, 6):
+            if self.last_obs[188 + (i * 8)] > 0.0: mask[11 + i] = True # Bench Switches
 
-        return obs, player_hp, enemy_hp, bool(battle_over), bool(player_lost), [pp1, pp2, pp3, pp4], p_status1
+        if not np.any(mask): mask[0] = True # Failsafe
+        return mask
 
     def reset(self, seed=None, options=None):
         super().reset(seed=seed)
         self.episode += 1
         self.step_count = 0
         while True:
-            obs, p_hp, e_hp, _, _, _, _ = self._get_state()
-            if e_hp > 0 and p_hp > 0:
-                break
+            obs, p_hp, e_hp, _, _, _, _, _ = self._get_state()
+            if e_hp > 0 and p_hp > 0: break
             time.sleep(0.5)
 
-        self.prev_player_hp = p_hp
-        self.prev_enemy_hp = e_hp
+        self.prev_player_hp, self.prev_enemy_hp, self.last_obs = p_hp, e_hp, obs
         return obs, {}
 
     def step(self, action):
-        obs, p_hp, e_hp, battle_over, player_lost, pp_list, p_status1 = self._get_state()
+        obs, p_hp, e_hp, battle_over, player_lost, pp_list, p_status1, moves_list = self._get_state()
+
+        # --- Track Enemy PP before the turn resolves ---
+        prev_e1_pp = [round(self.last_obs[48 + i] * 40.0) for i in range(4)]
+        prev_e1_moves = [round(self.last_obs[52 + i] * 355.0) for i in range(4)]
 
         if e_hp <= 0 or p_hp <= 0:
-            print("[WARNING] step() called but doesn't look like an active battle — skipping")
             return obs, 0, True, False, {"player_lost": player_lost}
 
-        if action < 4:
-            action_desc = f"MOVE {action}"
-        else:
-            action_desc = f"SWITCH to slot {action - 4}"
+        is_attack_action = action < 12
+        action_desc = decode_action(action, move_names=[MOVE_NAMES.get(m, f"Move_{m}") for m in moves_list])
 
-        is_attack_action = action < 4
-        out_of_all_pp = sum(pp_list) <= 0
-
-        if is_attack_action:
-            if not out_of_all_pp and pp_list[action] <= 0:
-                reward = -5
-                self.total_reward += reward
-                self.illegal_count += 1
-                print(f"EP {self.episode} STEP {self.step_count} | {action_desc} | reward={reward:+.1f} | "
-                      f"running_total={self.total_reward:+.1f} | REASON: no PP")
-                log_step(self.episode, self.step_count, action, obs, reward, False, False)
-                self.step_count += 1
-                return obs, reward, False, False, {"player_lost": False}
-        else:
-            target_slot = action - 4
-
-            if target_slot == 0:
-                reward = -5
-                self.total_reward += reward
-                self.illegal_count += 1
-                print(f"EP {self.episode} STEP {self.step_count} | {action_desc} | reward={reward:+.1f} | "
-                      f"running_total={self.total_reward:+.1f} | REASON: already active")
-                log_step(self.episode, self.step_count, action, obs, reward, False, False)
-                self.step_count += 1
-                return obs, reward, False, False, {"player_lost": False}
-
-            party_hp_ratio = obs[46 + target_slot]
-            if party_hp_ratio <= 0.0:
-                reward = -5
-                self.total_reward += reward
-                self.illegal_count += 1
-                print(f"EP {self.episode} STEP {self.step_count} | {action_desc} | reward={reward:+.1f} | "
-                      f"running_total={self.total_reward:+.1f} | REASON: fainted")
-                log_step(self.episode, self.step_count, action, obs, reward, False, False)
-                self.step_count += 1
-                return obs, reward, False, False, {"player_lost": False}
-
+        # --- Execute Keystrokes via Lua Bridge ---
         turn_resolved = False
-        initial_pp_sum = sum(pp_list)
-        initial_p_hp = p_hp
-        initial_e_hp = e_hp
-        initial_party1_ratio = obs[46]
+        initial_pp_sum, initial_p_hp, initial_e_hp = sum(pp_list), p_hp, e_hp
 
-        max_outer_retries = 5
-        outer_attempts = 0
-
-        current_p_hp, current_e_hp = p_hp, e_hp
-        current_battle_over, current_player_lost, current_pp_list = battle_over, player_lost, pp_list
-        current_p_status1 = p_status1
-
-        while not turn_resolved and outer_attempts < max_outer_retries:
-            outer_attempts += 1
+        for _ in range(5):
+            if turn_resolved: break
             self.sock.sendall(f"ACTION:{action}\n".encode())
-            ack = self.sock_file.readline()
+            _ = self.sock_file.readline()
 
-            timeout_counter = 0
-            max_timeout = 60
-
-            while timeout_counter < max_timeout:
+            for _ in range(60):
                 time.sleep(0.1)
-                timeout_counter += 1
-                obs, current_p_hp, current_e_hp, current_battle_over, current_player_lost, current_pp_list, current_p_status1 = self._get_state()
+                (obs, current_p_hp, current_e_hp, current_battle_over, 
+                 current_player_lost, current_pp_list, current_p_status1, moves_list) = self._get_state()
 
-                if (sum(current_pp_list) < initial_pp_sum
-                        or current_p_hp != initial_p_hp
-                        or current_e_hp != initial_e_hp
-                        or current_battle_over
-                        or (not is_attack_action and obs[46] != initial_party1_ratio)):
+                if (sum(current_pp_list) < initial_pp_sum or current_p_hp != initial_p_hp 
+                        or current_e_hp != initial_e_hp or current_battle_over):
                     turn_resolved = True
                     break
 
+        # Handle turn timeouts (e.g. paralysis/sleep blocks animations)
         if not turn_resolved:
-            is_paralyzed = (current_p_status1 & STATUS1_PARALYSIS) != 0
-            is_asleep = (current_p_status1 & STATUS1_SLEEP_MASK) != 0
-            is_frozen = (current_p_status1 & STATUS1_FREEZE) != 0
-
-            if is_attack_action and (is_paralyzed or is_asleep or is_frozen):
-                reward = 0
-                self.total_reward += reward
-                print(f"EP {self.episode} STEP {self.step_count} | {action_desc} | reward={reward:+.1f} | "
-                      f"running_total={self.total_reward:+.1f} | REASON: status-skip (status1={current_p_status1})")
-                log_step(self.episode, self.step_count, action, obs, reward, False, False)
+            if is_attack_action and (current_p_status1 & (STATUS1_PARALYSIS | STATUS1_SLEEP_MASK | STATUS1_FREEZE)):
                 self.step_count += 1
-                return obs, reward, False, False, {"player_lost": False}
-
-            reward = -20
-            self.total_reward += reward
-            print(f"EP {self.episode} STEP {self.step_count} | {action_desc} | reward={reward:+.1f} | "
-                  f"running_total={self.total_reward:+.1f} | REASON: turn never resolved, ending episode")
-            log_step(self.episode, self.step_count, action, obs, reward, True, False)
-            log_battle_end(self.episode, False)
+                return obs, 0.0, False, False, {"player_lost": False}
+            self.total_reward -= 20.0
             self.step_count += 1
-            return obs, reward, True, False, {"player_lost": False}
+            return obs, -20.0, True, False, {"player_lost": False}
 
-        p_hp = current_p_hp
-        e_hp = current_e_hp
-        battle_over = current_battle_over
-        player_lost = current_player_lost
-        pp_list = current_pp_list
+        p_hp, e_hp, battle_over, player_lost = current_p_hp, current_e_hp, current_battle_over, current_player_lost
 
-        reward = (self.prev_enemy_hp - e_hp) - (self.prev_player_hp - p_hp)
+        # Reward Calculation
+        reward = float((self.prev_enemy_hp - e_hp) - (self.prev_player_hp - p_hp))
         if battle_over:
-            if player_lost:
-                reward -= 100
-            else:
-                reward += 100
+            reward += -100.0 if player_lost else 100.0
 
-        self.prev_player_hp = p_hp
-        self.prev_enemy_hp = e_hp
+        self.prev_player_hp, self.prev_enemy_hp = p_hp, e_hp
         self.total_reward += reward
+        if is_attack_action: self.move_count += 1
+        else: self.switch_count += 1
 
-        if is_attack_action:
-            self.move_count += 1
-        else:
-            self.switch_count += 1
+        # --- NEW LIVE FEED & ENEMY LOGGING BLOCK ---
+        self.global_step += 1
+        
+        # 1. Reverse-engineer Enemy Details
+        e1_spc_id = int(obs[90] * 412.0)
+        e1_name = SPECIES_ID_TO_NAME.get(e1_spc_id, "Unknown")[:8]
+        e1_lvl = int(obs[82] * 100.0)
+        e1_status = int(obs[83] * 255.0)
+        e1_atk_buff = int(obs[87] * 12.0) - 6
+        
+        # Detect Enemy Attack by checking if any PP dropped
+        current_e1_pp = [round(obs[48 + i] * 40.0) for i in range(4)]
+        e1_used_move = "-"
+        for i in range(4):
+            if current_e1_pp[i] < prev_e1_pp[i]:
+                e1_used_move = MOVE_NAMES.get(prev_e1_moves[i], "Unknown")
+                break
+        
+        eff = (obs[13 + (action % 4)] * 4.0) if is_attack_action else 1.0
+        legal = int(np.sum(self.action_masks()))
+        outcome = " | WIN" if battle_over and not player_lost else " | LOSS" if battle_over else ""
 
-        outcome = ""
-        if battle_over:
-            outcome = " | WIN" if not player_lost else " | LOSS"
+        # 2. Print Enhanced Live Feed (Now showing P1 action vs E1 action)
+        print(f"GLB {self.global_step:05d} | EP {self.episode:03d} ST {self.step_count:02d} | "
+              f"P1: {action_desc[:17].ljust(17)} | E1: {e1_used_move[:12].ljust(12)} | "
+              f"P1 HP:{int(p_hp):3d} E1 HP:{int(e_hp):3d} [{e1_name.ljust(8)} L{e1_lvl:2d}] | "
+              f"Eff:{eff:3.1f}x AtkBuff:{e1_atk_buff:+2d} | Rew:{reward:+6.1f}{outcome}")
 
-        print(f"EP {self.episode} STEP {self.step_count} | {action_desc} | reward={reward:+.1f} | "
-              f"running_total={self.total_reward:+.1f}{outcome}")
-
-        log_step(self.episode, self.step_count, action, obs, reward, battle_over, player_lost)
-
-        if battle_over:
-            won = not player_lost
-            log_battle_end(self.episode, won)
+        # 3. Push Enemy Details to CSV Logger
+        obs_dict = {
+            "p1_hp": obs[0]*100, 
+            "e1_hp": obs[47]*100, 
+            "p2_hp": obs[94]*100, 
+            "e3_hp": obs[141]*100, 
+            "eff_mult": eff,
+            "e1_species": e1_name,
+            "e1_level": e1_lvl,
+            "e1_status": e1_status,
+            "e1_atk_buff": e1_atk_buff,
+            "e1_used_move": e1_used_move
+        }
+        
+        action_meta = {"desc": action_desc, "legal_count": legal, "prob": getattr(self, "current_action_prob", 0.0)}
+        
+        log_step(self.episode, self.step_count, action, reward, battle_over, player_lost, obs_dict, action_meta)
+        if battle_over: log_battle_end(self.episode, not player_lost, self.step_count, self.total_reward)
 
         self.step_count += 1
-
+        self.last_obs = obs
         return obs, reward, battle_over, False, {"player_lost": player_lost}
 
     def close(self):
-        print(f"\n=== Session summary ===")
-        print(f"Total reward: {self.total_reward:+.1f}")
-        print(f"Moves used: {self.move_count} | Switches used: {self.switch_count} | Illegal attempts: {self.illegal_count}")
+        print(f"\n=== Session summary ===\nTotal reward: {self.total_reward:+.1f}")
         self.sock.close()
-
-
-if __name__ == "__main__":
-    env = PokemonBattleEnv()
-    obs, info = env.reset()
-    print("Initial obs:", obs)
-    print("Obs length:", len(obs))
-
-    obs, reward, terminated, truncated, info = env.step(0)
-    print("After action 0:", obs, reward, terminated)
-
-    env.close()
