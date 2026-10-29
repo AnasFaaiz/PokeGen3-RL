@@ -17,3 +17,6 @@ analysis/
 *.gba
 *.sav
 *.ss*
+
+archive/
+.venv/
