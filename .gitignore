@@ -2,20 +2,15 @@
 battle_data.csv
 battle_log.txt
 __pycache__/
-
 # generated / local
-__pycache__/
 *.pyc
 dqn_tensorboard/
 ppo_tensorboard/
 backups/
 logs/
 analysis/
-
 # never commit ROMs or saves
 *.gba
 *.sav
 *.ss*
-
 archive/
-.venv/
