@@ -9,10 +9,9 @@ __pycache__/
 dqn_tensorboard/
 ppo_tensorboard/
 backups/
-checkpoints/
 logs/
 analysis/
-*.zip
+
 # never commit ROMs or saves
 *.gba
 *.sav
