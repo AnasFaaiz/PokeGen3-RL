@@ -120,6 +120,149 @@ M.CB2_PARTY_MENU = 0x081B01B0 -- CB2_UpdatePartyMenu
 M.CB2_EVOLUTION_LOAD = 0x0813DD7C -- CB2_EvolutionSceneLoadGraphics
 M.CB2_EVOLUTION_UPDATE = 0x0813E3A4 -- CB2_EvolutionSceneUpdate
 
+-- ================================================================= overworld
+-- Everything below drives scripted navigation (games/overworld_nav.lua).
+-- Addresses from pokeemerald.sym; struct offsets from include/global.fieldmap.h
+-- and include/global.h. Symbol sizes match the structs exactly (gObjectEvents
+-- is 0x240 = 16 * 0x24, gPlayerAvatar 0x24, gBackupMapLayout 0x0C), which is a
+-- good independent check that these are the right symbols.
+M.OW = {
+	-- struct BackupMapLayout { s32 width; s32 height; u16 *map; }
+	BACKUP_MAP_LAYOUT = 0x03005DC0,
+	MAP_HEADER = 0x02037318, -- gMapHeader
+	OBJECT_EVENTS = 0x02037350, -- gObjectEvents[16]
+	PLAYER_AVATAR = 0x02037590, -- gPlayerAvatar
+	SAVEBLOCK1_PTR = 0x03005D8C, -- gSaveBlock1Ptr (pointer, not struct)
+
+	-- sLockFieldControls (script.c): nonzero whenever the player's input is
+	-- taken away -- a Match Call, an NPC/sign text box, an item pickup, and
+	-- so on. All of them look the same to the nav script: steps fail, so it
+	-- keeps bumping into a wall it can't see, burning replans until it gives
+	-- up. This flag is how it tells "a text box is up" from "actually stuck".
+	LOCK_FIELD_CONTROLS = 0x03000F2C,
+
+	OBJECT_EVENT_SIZE = 0x24,
+	OBJECT_EVENT_COUNT = 16,
+	-- struct ObjectEvent
+	OE_ACTIVE_BYTE = 0x00, -- bit 0 = active
+	OE_GRAPHICS_ID = 0x05, -- which sprite: identifies the nurse
+	OE_ELEVATION = 0x0B, -- low nibble = currentElevation
+	OE_COORDS = 0x10, -- s16 x, s16 y
+	OE_FACING = 0x18, -- low nibble = facingDirection
+	OE_BEHAVIOR = 0x1E, -- currentMetatileBehavior
+
+	-- struct PlayerAvatar
+	PA_FLAGS = 0x00,
+	PA_RUNNING_STATE = 0x02, -- 0 not moving, 1 turning, 2 moving
+	PA_TILE_TRANSITION = 0x03, -- 0 settled on a tile, 1/2 mid-step
+	PA_OBJECT_EVENT_ID = 0x05,
+
+	-- struct MapHeader
+	MH_MAP_LAYOUT = 0x00, -- const struct MapLayout *
+	MH_EVENTS = 0x04, -- const struct MapEvents *
+	MH_CONNECTIONS = 0x0C,
+	-- struct MapLayout
+	ML_PRIMARY_TILESET = 0x10,
+	ML_SECONDARY_TILESET = 0x14,
+	-- struct Tileset
+	TS_METATILE_ATTRIBUTES = 0x10,
+	-- struct MapEvents
+	ME_WARP_COUNT = 0x01,
+	ME_WARPS = 0x08, -- const struct WarpEvent *
+	-- struct WarpEvent { s16 x, y; u8 elevation; u8 warpId; u8 mapNum; u8 mapGroup; }
+	WARP_EVENT_SIZE = 0x08,
+	WE_X = 0x00,
+	WE_Y = 0x02,
+	WE_WARP_ID = 0x05,
+	WE_MAP_NUM = 0x06,
+	WE_MAP_GROUP = 0x07,
+
+	-- struct SaveBlock1 (via gSaveBlock1Ptr)
+	SB1_POS = 0x00, -- struct Coords16
+	SB1_LOCATION = 0x04, -- struct WarpData: where we are now
+	SB1_LAST_HEAL_LOCATION = 0x1C, -- struct WarpData: whiteout / heal respawn
+	-- struct WarpData { s8 mapGroup; s8 mapNum; s8 warpId; /*pad*/ s16 x, y; }
+	WD_MAP_GROUP = 0x00,
+	WD_MAP_NUM = 0x01,
+	WD_WARP_ID = 0x02,
+	WD_X = 0x04,
+	WD_Y = 0x06,
+
+	-- Map grid packing (include/global.fieldmap.h)
+	MAPGRID_METATILE_ID_MASK = 0x03FF,
+	MAPGRID_COLLISION_MASK = 0x0C00,
+	MAPGRID_ELEVATION_MASK = 0xF000,
+	MAPGRID_COLLISION_SHIFT = 10,
+	MAPGRID_ELEVATION_SHIFT = 12,
+	MAPGRID_UNDEFINED = 0x03FF,
+	METATILE_ATTR_BEHAVIOR_MASK = 0x00FF,
+	NUM_METATILES_IN_PRIMARY = 512,
+	NUM_METATILES_TOTAL = 1024,
+
+	ELEVATION_TRANSITION = 0,
+	ELEVATION_MULTI_LEVEL = 15,
+
+	-- Directions, as the game numbers them (DIR_* in global.fieldmap.h).
+	DIR_SOUTH = 1,
+	DIR_NORTH = 2,
+	DIR_WEST = 3,
+	DIR_EAST = 4,
+
+	-- OBJ_EVENT_GFX_NURSE. The healing counter is found by looking for this
+	-- sprite rather than by hardcoding coordinates, so it works in any
+	-- Pokemon Center without knowing which map id that Center has.
+	NURSE_GFX_ID = 58,
+	-- The nurse stands behind a counter, so the player talks to her from two
+	-- tiles away in a straight line rather than from an adjacent tile.
+	NURSE_TALK_RANGE = 2,
+}
+
+-- Land wild-encounter tiles: behaviours with TILE_FLAG_HAS_ENCOUNTERS set in
+-- sTileBitAttributes (src/metatile_behavior.c), minus the surfable ones, since
+-- the agent walks rather than surfs. Using the game's own flag rather than
+-- "tall grass" also covers long grass, ash, cave and desert encounters.
+M.OW.ENCOUNTER_BEHAVIORS = {
+	[0x02] = true, -- MB_TALL_GRASS
+	[0x03] = true, -- MB_LONG_GRASS
+	[0x05] = true, -- MB_UNUSED_05
+	[0x06] = true, -- MB_DEEP_SAND
+	[0x08] = true, -- MB_CAVE
+	[0x0B] = true, -- MB_INDOOR_ENCOUNTER
+	[0x23] = true, -- MB_ASHGRASS
+	[0x24] = true, -- MB_FOOTPRINTS
+}
+
+-- Tiles that warp to another map when stepped on.
+M.OW.WARP_BEHAVIORS = {
+	[0x5F] = true, -- MB_NON_ANIMATED_DOOR
+	[0x61] = true, -- MB_EAST_ARROW_WARP
+	[0x62] = true, -- MB_WEST_ARROW_WARP
+	[0x63] = true, -- MB_NORTH_ARROW_WARP
+	[0x64] = true, -- MB_SOUTH_ARROW_WARP
+	[0x68] = true, -- MB_ANIMATED_DOOR
+	[0x69] = true, -- MB_UP_ESCALATOR
+	[0x6A] = true, -- MB_DOWN_ESCALATOR
+}
+
+-- Ledge hops. Walkable, but a hop is a committed two-tile move that can't be
+-- reversed, so the planner treats them as walls.
+M.OW.LEDGE_BEHAVIORS = {
+	[0x37] = true,
+	[0x38] = true,
+	[0x39] = true,
+	[0x3A] = true,
+}
+
+-- Directional walls. The game checks these twice per step: the tile being
+-- LEFT must not block movement outward, and the tile being ENTERED must not
+-- block movement inward (IsMetatileDirectionallyImpassable). This is what
+-- makes cliff edges one-way; planning with collision bits alone would route
+-- the player off a cliff and strand them.
+M.OW.BLOCKED_NORTH = { [0x31] = true, [0x33] = true, [0x34] = true, [0xBF] = true }
+M.OW.BLOCKED_SOUTH = { [0x32] = true, [0x35] = true, [0x36] = true, [0xBF] = true }
+M.OW.BLOCKED_EAST = { [0x2F] = true, [0x33] = true, [0x35] = true, [0xC0] = true, [0xBD] = true }
+M.OW.BLOCKED_WEST = { [0x30] = true, [0x34] = true, [0x36] = true, [0xC0] = true, [0xBD] = true }
+
 -- ---------------------------------------------------------------- memory map
 -- Regions the address finder dumps (bus addresses, sizes in bytes).
 M.RAM_REGIONS = {

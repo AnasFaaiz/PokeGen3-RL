@@ -1,32 +1,8 @@
--- battle_bridge.lua -- shared, game-agnostic bridge between mGBA and env.py.
--- Logic only; addresses come from a per-game config file.
---
--- Design rules (each one replaces a class of bugs from the old version):
---   1. "Are we in a battle" comes from the game's own flag (gMain.inBattle),
---      never from HP values. HP memory keeps stale values after a battle,
---      which caused input to leak into the overworld.
---   2. Outside a battle the bridge presses NOTHING (except optional
---      auto-walk, toggled with L). Every post-battle screen, evolution
---      included, runs while inBattle is still set.
---   3. Menus are navigated by reading the cursor position after every press,
---      not by timed key sequences. A press that doesn't land is retried, and
---      a stuck cursor fails the action cleanly instead of drifting.
---   4. env.py learns that a turn is over from the game's controller state
---      (STATUS command), not from "did HP change". No more blind re-sends.
---   5. Switch targets are identified by personality value (PID), because
---      the game reorders the party while the battle party menu is open.
---
--- Commands on port 8888 (one per line):
---   GET_STATE  -> comma-separated observation values (see getState)
---   STATUS     -> STATUS:<phase>:<lastResult>
---                 phase: NOT_IN_BATTLE, BUSY, CHOOSE_ACTION, FORCED_SWITCH,
---                        BATTLE_OVER, WAITING
---                 lastResult: NONE, PENDING, OK, FAILED, ABORTED
---   ACTION:n   -> ACK, or REJECT:<reason>
--- Port 8889 serves the memory-address finder (SIGNALS, DUMP).
-
 local GAME_CONFIG_FILE = "/home/kazuto/Documents/Projects/PokeGen3-RL/games/emerald/emerald_config.lua"
 local CONFIG = dofile(GAME_CONFIG_FILE)
+
+local NAV_FILE = string.gsub(GAME_CONFIG_FILE, "emerald_config%.lua$", "overworld_nav.lua")
+local Nav = dofile(NAV_FILE)
 
 local MAIN_PORT = 8888
 local PROBE_PORT = 8889
@@ -35,40 +11,30 @@ local LOG_CALLBACK2_CHANGES = true
 local KEY = C.GBA_KEY
 local ALL_KEYS = 0x3FF
 
--- ===================================================================== state
-
 local server, client, clientBuf = nil, nil, ""
 local probeServer, probeClient, probeBuf = nil, nil, ""
 local frameCount = 0
 
--- Current bridge-driven action, or nil.
 local task = nil
 local lastResult = "NONE"
 local TASK_MAX_FRAMES = 1200 -- 20 s: generous, a normal action takes < 3 s
 
--- Party order reported to env.py: active mon first, then the rest in field
--- order. reportedPids[k] is the PID in reported slot k-1 (0-based slots).
 local fieldOrderPids = {}
 local reportedPids = {}
 
--- One key at a time: press for PRESS_FRAMES, release for RELEASE_FRAMES so
--- every tap reaches the game as a fresh press (menus check JOY_NEW).
 local PRESS_FRAMES, RELEASE_FRAMES = 2, 4
 local input = { key = nil, stage = 0, timer = 0 }
 
--- In-battle prompt automation
 local promptCooldown = 0
 local watchdog = { sig = nil, frames = 0 }
 local WATCHDOG_FRAMES = 600 -- 10 s stuck on the same screen -> nudge with B
 
--- Auto-walk (overworld only, toggled with L)
-local autoWalkEnabled, walkStep, walkTimer, lastToggleHeld, toggleCooldown = false, 0, 0, false, 0
-local WALK_SEQUENCE = { KEY.UP, KEY.RIGHT, KEY.DOWN, KEY.LEFT }
+local automationEnabled = true
+local lastToggleHeld, toggleCooldown = false, 0
 
 local lastLoggedCb2 = nil
 local wasInBattle = false
 
--- Gen 3 party substructure orders, keyed by PID % 24 (same for all Gen 3).
 local block_orders = {
 	{ 0, 1, 2, 3 },
 	{ 0, 1, 3, 2 },
@@ -96,10 +62,6 @@ local block_orders = {
 	{ 3, 2, 1, 0 },
 }
 
--- ============================================================ memory helpers
-
--- Function pointers in RAM carry the Thumb bit (bit 0); the .sym file lists
--- the even address. Compare with bit 0 ignored.
 local function sameFn(a, b)
 	if a == nil or b == nil then
 		return false
@@ -173,8 +135,6 @@ local function memIndexOf(pid, mem)
 	return nil
 end
 
--- ===================================================================== input
-
 local function inputBusy()
 	return input.stage ~= 0
 end
@@ -210,8 +170,38 @@ local function cancelInput()
 	input.stage, input.timer, input.key = 0, 0, nil
 end
 
--- Direction that moves a 2x2 grid cursor (bit 0 = column, bit 1 = row)
--- one step toward target, or nil when already there.
+local navHeld = nil
+local navIO = {
+	log = function(msg)
+		console:log(msg)
+	end,
+	hold = function(key)
+		navHeld = key
+	end,
+	release = function()
+		navHeld = nil
+		-- emu:addKey persists until cleared, so a release has to reach the
+		-- emulator now, not just update our own bookkeeping.
+		emu:clearKeys(ALL_KEYS)
+	end,
+}
+
+-- Mirror navHeld into the emulator every frame. Clearing when nothing is held
+-- matters: without it a released key stays down and the player runs on past
+-- the tile Nav meant to stop on.
+local function applyNavKeys()
+	emu:clearKeys(ALL_KEYS)
+	if navHeld then
+		emu:addKey(navHeld)
+	end
+end
+
+local function stopNav()
+	Nav.cancel()
+	navHeld = nil
+	emu:clearKeys(ALL_KEYS)
+end
+
 local function gridStep(cur, target)
 	if (cur & 1) ~= (target & 1) then
 		return ((target & 1) == 1) and KEY.RIGHT or KEY.LEFT
@@ -221,8 +211,6 @@ local function gridStep(cur, target)
 	end
 	return nil
 end
-
--- ================================================================ party data
 
 local function decryptPartySlot(base)
 	local pid = emu:read32(base)
@@ -251,8 +239,6 @@ local function decryptPartySlot(base)
 	}
 end
 
--- Memory holds the party in field order except while the in-battle party
--- menu is open, so only refresh the cache while BattleMainCB2 runs.
 local function refreshFieldOrder(cb2)
 	if not sameFn(cb2, CONFIG.CB2_BATTLE_MAIN) then
 		return
@@ -287,9 +273,6 @@ local function buildReportedOrder()
 	return order, mem
 end
 
--- ================================================================ GET_STATE
-
--- 21 values per battler, in the order env.py's _parse_battler() unpacks.
 local function getBattler(base)
 	local o = CONFIG.BATTLER_OFFSETS
 	return {
@@ -420,9 +403,6 @@ function getState()
 	return table.concat(out, ",")
 end
 
--- ===================================================================== phase
-
--- Which player battler is waiting for input (0, or 2 in doubles), or nil.
 local function choosingBattler()
 	if isInputHandler(controllerFn(0)) then
 		return 0
@@ -459,8 +439,6 @@ computePhase = function()
 	return "WAITING", nil
 end
 
--- ===================================================================== tasks
-
 local function finishTask(result, why)
 	if result ~= "OK" then
 		console:log(string.format("[bridge] %s %s: %s", task and task.kind or "?", result, why or ""))
@@ -483,8 +461,6 @@ local function newTask(kind, battler)
 	}
 end
 
--- Tap a direction; fail the task if the cursor refuses to move after
--- several taps (e.g. trying to reach a move slot that doesn't exist).
 local function navTap(key, cursorValue)
 	local sig = tostring(key) .. ":" .. tostring(cursorValue)
 	if task.navKey == sig then
@@ -650,11 +626,12 @@ local function runTask()
 	end
 end
 
--- action 0-11: move (action % 4) on target (action // 4: 0 enemy left,
--- 1 enemy right, 2 partner). action 12-16: switch to reported slot 1-5.
 local function handleAction(action)
 	if action == nil or action < 0 or action > 16 then
 		return "REJECT:bad_action"
+	end
+	if not automationEnabled then
+		return "REJECT:automation_off"
 	end
 	if task then
 		return "REJECT:busy"
@@ -698,11 +675,6 @@ local function handleAction(action)
 	return "ACK"
 end
 
--- ========================================================= prompt automation
-
--- Handles every in-battle screen that is not the model's decision: level-up
--- box, "learn a new move?" (always declined), "use next Pokemon?" (yes),
--- "change Pokemon?" when the enemy switches (no), evolution (let it happen).
 local function battleAutomation(cb2)
 	if inputBusy() then
 		return
@@ -742,10 +714,6 @@ local function battleAutomation(cb2)
 			tap(KEY.B)
 			promptCooldown = 20
 		elseif choosingBattler() == nil then
-			-- Nothing recognised and the game isn't waiting for the model.
-			-- If it sits on the same script opcode for a long time, it is
-			-- probably waiting for a button we don't know about: nudge with B
-			-- and log it so the prompt can be identified and handled properly.
 			local sig = tostring(op) .. ":" .. tostring(ctrl0)
 			if sig == watchdog.sig then
 				watchdog.frames = watchdog.frames + 1
@@ -769,16 +737,11 @@ local function battleAutomation(cb2)
 		return
 	end
 
-	-- Any other screen while still in battle, after the battle is decided:
-	-- e.g. the summary screen that evolution's "forget a move?" opens. Back
-	-- out with B (keeps the existing moves).
 	if battleOutcome() ~= 0 and not sameFn(cb2, CONFIG.CB2_PARTY_MENU) then
 		tap(KEY.B)
 		promptCooldown = 30
 	end
 end
-
--- ================================================================= auto-walk
 
 local function checkToggleKey()
 	if toggleCooldown > 0 then
@@ -787,27 +750,18 @@ local function checkToggleKey()
 	end
 	local held = (emu:getKey(KEY.L) == 1)
 	if held and not lastToggleHeld then
-		autoWalkEnabled = not autoWalkEnabled
-		console:log("Auto-walk: " .. (autoWalkEnabled and "ON" or "OFF"))
-		if not autoWalkEnabled then
+		automationEnabled = not automationEnabled
+		console:log("Automation: " .. (automationEnabled and "ON" or "OFF"))
+		if not automationEnabled then
+			if task then
+				finishTask("ABORTED", "automation turned off")
+			end
+			stopNav()
 			cancelInput()
 		end
 		toggleCooldown = 20
 	end
 	lastToggleHeld = held
-end
-
-local function processWalk(cb2)
-	if not autoWalkEnabled or not sameFn(cb2, CONFIG.CB2_OVERWORLD) then
-		return
-	end
-	walkTimer = walkTimer + 1
-	emu:addKey(WALK_SEQUENCE[walkStep + 1])
-	if walkTimer >= 15 then
-		emu:clearKeys(ALL_KEYS)
-		walkStep = (walkStep + 1) % 4
-		walkTimer = 0
-	end
 end
 
 -- ============================================================ finder (probe)
@@ -856,8 +810,6 @@ local function readRegion(start, size)
 	return table.concat(parts)
 end
 
--- Outgoing probe data is queued and sent in chunks across frames, so a
--- 288 KB dump never stalls the emulator or gets cut off by a full buffer.
 local probeOut, probeOutPos, probeStall = "", 1, 0
 local PROBE_CHUNK = 32768
 
@@ -928,8 +880,6 @@ local function startServers()
 	console:log(string.format("Bridge listening on %d (env) and %d (address finder)", MAIN_PORT, PROBE_PORT))
 end
 
--- Reads available data into buf and returns complete lines (handles
--- partial and multiple lines per receive, which receive(1024) alone didn't).
 local function readLines(sock, buf)
 	local lines = {}
 	if not sock:hasdata() then
@@ -955,6 +905,65 @@ local function readLines(sock, buf)
 end
 
 local function handleMainLine(line)
+	if string.match(line, "^AUTO:") then
+		local what = string.match(line, "^AUTO:(%u+)")
+		if what == "ON" or what == "OFF" then
+			automationEnabled = (what == "ON")
+			console:log("Automation: " .. what .. " (set over the socket)")
+			if not automationEnabled then
+				if task then
+					finishTask("ABORTED", "automation turned off")
+				end
+				stopNav()
+				cancelInput()
+			end
+			client:send("ACK\n")
+		elseif what == "STATUS" then
+			client:send("AUTO:" .. (automationEnabled and "ON" or "OFF") .. "\n")
+		else
+			client:send("REJECT:bad_auto\n")
+		end
+		return
+	end
+
+	if string.match(line, "^NAV:") then
+		local what = string.match(line, "^NAV:(%u+)")
+		if what == "HUNT" or what == "GRASS" or what == "HEAL" then
+			if not automationEnabled then
+				client:send("REJECT:automation_off\n")
+			elseif isInBattle() then
+				client:send("REJECT:in_battle\n")
+			else
+				stopNav()
+				Nav.start(what)
+				client:send("ACK\n")
+			end
+		elseif what == "STATUS" then
+			client:send("NAV:" .. Nav.status() .. "\n")
+		elseif what == "CANCEL" then
+			stopNav()
+			client:send("ACK\n")
+		elseif what == "RESET" then
+			Nav.resetMapChain()
+			client:send("ACK\n")
+		else
+			client:send("REJECT:bad_nav\n")
+		end
+		return
+	elseif line == "NAV_DEBUG" then
+		local ok, text = pcall(Nav.debug)
+		client:send(ok and text or ("NAVDBG:ERROR " .. tostring(text) .. "\n"))
+		return
+	elseif line == "MAP_DUMP" then
+		local ok, text = pcall(Nav.dump)
+		client:send(ok and text or ("MAP:ERROR " .. tostring(text) .. "\n"))
+		return
+	elseif line == "PARTY_HP" then
+		local cur, max, conscious = Nav.partyHp()
+		client:send(string.format("PARTY_HP:%d:%d:%d\n", cur, max, conscious))
+		return
+	end
+
 	if line == "GET_STATE" then
 		client:send(getState() .. "\n")
 	elseif line == "STATUS" then
@@ -1025,12 +1034,28 @@ function onFrame()
 		console:log(string.format("callback2 -> 0x%08X%s", cb2, inBattle and " (in battle)" or ""))
 	end
 
+	Nav.observe()
+
 	if inBattle and not wasInBattle then
-		-- Release anything auto-walk was holding so it can't move a menu cursor.
+		Nav.noteBattleMap()
+		-- Release anything navigation was holding so it can't
+		-- move a menu cursor on the first frame of the battle.
 		cancelInput()
-		walkTimer = 0
+		if Nav.active() then
+			Nav.update(true)
+		end
+		navHeld = nil
 	end
 	wasInBattle = inBattle
+
+	if not automationEnabled then
+		-- Hands off the controls entirely; reads still work.
+		if inBattle then
+			refreshFieldOrder(cb2)
+		end
+		serviceSockets()
+		return
+	end
 
 	if inBattle then
 		refreshFieldOrder(cb2)
@@ -1043,15 +1068,46 @@ function onFrame()
 		if task then
 			finishTask("ABORTED", "not in battle")
 		end
-		if inputBusy() and not autoWalkEnabled then
-			cancelInput()
-		end
 		watchdog.sig, watchdog.frames, promptCooldown = nil, 0, 0
-		processWalk(cb2)
+		if Nav.active() then
+			-- Scripted navigation owns the controls while it runs; the
+			-- menu-tap path stays out of the way.
+			Nav.update(false)
+			applyNavKeys()
+		else
+			if navHeld then
+				navHeld = nil
+				emu:clearKeys(ALL_KEYS)
+			end
+			if inputBusy() then
+				cancelInput()
+			end
+		end
 	end
 
 	serviceSockets()
 end
+
+Nav.init(CONFIG, {
+	read8 = function(a)
+		return emu:read8(a)
+	end,
+	read16 = function(a)
+		return emu:read16(a)
+	end,
+	read32 = function(a)
+		return emu:read32(a)
+	end,
+	readRange = function(a, n)
+		local ok, data = pcall(function()
+			return emu:readRange(a, n)
+		end)
+		if ok and type(data) == "string" and #data == n then
+			return data
+		end
+		return nil
+	end,
+}, navIO, KEY)
 
 callbacks:add("frame", onFrame)
 startServers()
