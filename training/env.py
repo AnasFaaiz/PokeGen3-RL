@@ -38,6 +38,28 @@ STATUS1_FREEZE = 0x20
 STATUS2_CONFUSION_MASK = 0x00000007
 STATUS2_SUBSTITUTE     = 0x01000000
 STATUS2_TORMENT        = 0x80000000
+STATUS2_WRAPPED            = 0x0000E000   # Wrap / Bind / Fire Spin / Clamp ...
+STATUS2_ESCAPE_PREVENTION  = 0x04000000   # Mean Look / Spider Web / Block
+ABILITY_SHADOW_TAG, ABILITY_MAGNET_PULL, ABILITY_ARENA_TRAP, ABILITY_LEVITATE = 23, 42, 71, 26
+TYPE_FLYING, TYPE_STEEL = 2, 8
+
+
+def is_trapped(player_raw, enemy_raw):
+    """True if the game will refuse to switch the player's active Pokemon out.
+    Raw battler layout: [10]=type1 [11]=type2 [14]=status2 [20]=ability.
+    Anything not visible here (e.g. Ingrain) is caught by the failed-switch
+    flag in step()."""
+    if player_raw[14] & (STATUS2_WRAPPED | STATUS2_ESCAPE_PREVENTION):
+        return True
+    e_ability = enemy_raw[20]
+    p_types = (player_raw[10], player_raw[11])
+    if e_ability == ABILITY_SHADOW_TAG:
+        return True
+    if e_ability == ABILITY_ARENA_TRAP:
+        return TYPE_FLYING not in p_types and player_raw[20] != ABILITY_LEVITATE
+    if e_ability == ABILITY_MAGNET_PULL:
+        return TYPE_STEEL in p_types
+    return False
 
 def get_species_types(species_id):
     name = SPECIES_ID_TO_NAME.get(species_id)
@@ -120,6 +142,22 @@ TURN_TIMEOUT_S = 60.0        # one turn, including animations; a hang past this 
 POLL_S = 0.05
 MAX_CONSECUTIVE_REJECTS = 10
 
+# --- Overworld navigation (scripted, never learned) ---
+# Between battles the bridge walks the player back to wild grass, and to a
+# Pokemon Center first when the party is in no state to fight. None of this
+# is in the observation or action space: the model only plays battles.
+#
+# Healing before a wipe rather than after is worth the detour -- a whiteout
+# costs money and drops the player at the last heal point, which may be
+# nowhere near the grass the agent was training in.
+HEAL_HP_FRACTION = 0.35      # heal when the team is below this share of max HP
+HEAL_MIN_CONSCIOUS = 2       # ...or when fewer than this many can still fight
+NAV_TIMEOUT_S = 180.0
+NAV_POLL_S = 0.25
+NAV_RETRIES = 3
+NAV_RETRY_DELAY_S = 2.0
+OVERWORLD_WAIT_S = 60.0
+
 
 class PokemonBattleEnv(gym.Env):
     def __init__(self, host="127.0.0.1", port=8888, action_wait=2.0, turn_timeout=TURN_TIMEOUT_S):
@@ -154,6 +192,8 @@ class PokemonBattleEnv(gym.Env):
         self.last_party_raw = [0] * 96
         self.last_active_slot = 0
         self.last_awaiting_forced_switch = False
+        self.last_trapped = False
+        self.switch_blocked = False   # a switch was refused this battle
 
     # ------------------------------------------------------------- protocol
     def _request(self, line):
@@ -230,6 +270,7 @@ class PokemonBattleEnv(gym.Env):
         self.last_party_raw = party_raw   # raw ints, unscaled -- used by action_masks()
         self.last_active_slot = active_slot
         self.last_awaiting_forced_switch = bool(awaiting_forced_switch)
+        self.last_trapped = is_trapped(b0_raw, b1_raw)
 
         b0_features = self._parse_battler(b0_raw, b1_raw[10], b1_raw[11])
         b1_features = self._parse_battler(b1_raw, b0_raw[10], b0_raw[11])
@@ -295,8 +336,11 @@ class PokemonBattleEnv(gym.Env):
             if valid_moves[i] and e3_hp > 0.0: mask[4 + i] = True     # Target Enemy Right
             if valid_moves[i] and p2_hp > 0.0: mask[8 + i] = True     # Target Partner
 
+        # Trapped (Mean Look, Shadow Tag, Ingrain...): the game refuses the
+        # switch and the bridge wastes ~3 s in the party menu, so hide them.
+        can_switch = not (getattr(self, 'last_trapped', False) or getattr(self, 'switch_blocked', False))
         for i in range(1, 6):
-            if self.last_party_raw[i * 8] > 0: mask[11 + i] = True    # Bench switches (slot 0 = active)
+            if can_switch and self.last_party_raw[i * 8] > 0: mask[11 + i] = True    # Bench switches (slot 0 = active)
 
         if not np.any(mask): mask[0] = True  # Failsafe
         return mask
@@ -307,7 +351,15 @@ class PokemonBattleEnv(gym.Env):
         self.episode += 1
         self.step_count = 0
         self.consecutive_switches = 0
+        self.switch_blocked = False
+        self.last_trapped = False
         self.consecutive_rejects = 0
+
+        phase, _ = self._status()
+        if phase not in READY_PHASES:
+            # Not mid-battle: walk the player to the next encounter, healing
+            # first if the party can't take another fight.
+            self._navigate_to_next_battle()
 
         phase, _ = self._status()
         if phase not in READY_PHASES:
@@ -319,6 +371,105 @@ class PokemonBattleEnv(gym.Env):
         self.prev_p_team, self.prev_e_team = st["p_team"], st["e_team"]
         self.last_obs = st["obs"]
         return st["obs"], {}
+
+    def _party_hp(self):
+        """(current HP, max HP, conscious count) across the party."""
+        reply = self._request("PARTY_HP")
+        parts = reply.split(":")
+        if len(parts) != 4 or parts[0] != "PARTY_HP":
+            return None, None, None
+        return int(parts[1]), int(parts[2]), int(parts[3])
+
+    def _needs_healing(self):
+        cur, mx, conscious = self._party_hp()
+        if not mx:
+            return False
+        if cur / mx < HEAL_HP_FRACTION:
+            return True
+        # A wipe can also be one battle away while the HP fraction still looks
+        # fine, if everything left is concentrated in a single Pokemon.
+        return 0 < conscious < HEAL_MIN_CONSCIOUS
+
+    def _wait_for_overworld(self):
+        """After a battle the bridge keeps clicking through post-battle screens
+        (level-ups, evolution) while the game still reports in-battle, and
+        NAV is rejected until that is over. Returns True once the player is
+        free in the overworld, False if a new battle is ready first or the
+        wait runs out."""
+        deadline = time.monotonic() + OVERWORLD_WAIT_S
+        while time.monotonic() < deadline:
+            phase, _ = self._status()
+            if phase == "NOT_IN_BATTLE":
+                return True
+            if phase in READY_PHASES:
+                return False
+            time.sleep(POLL_S)
+        return False
+
+    def _watch_nav(self):
+        """Poll NAV:STATUS until it settles. Returns "battle", "failed",
+        "idle" or "timeout"."""
+        deadline = time.monotonic() + NAV_TIMEOUT_S
+        last_phase = None
+        while time.monotonic() < deadline:
+            status = self._request("NAV:STATUS")
+            # Surface Match Call / text-box handling so it is visible in training logs.
+            phase_name = status.split(" ")[0]
+            if phase_name != last_phase:
+                if phase_name == "NAV:WALKING:dialog":
+                    print("[nav] field input locked (text box / call / scene) -- tapping through it")
+                elif last_phase == "NAV:WALKING:dialog":
+                    print("[nav] dialog cleared -- resuming")
+                last_phase = phase_name
+            if status.startswith(("NAV:BATTLE", "NAV:ARRIVED")):
+                return "battle"
+            if status.startswith("NAV:FAILED"):
+                print(f"[nav] {status}")
+                return "failed"
+            if status == "NAV:IDLE":
+                return "idle"
+            # A battle can start mid-walk; the bridge reports it, but check the
+            # battle phase too so we never miss the handoff.
+            phase, _ = self._status()
+            if phase in READY_PHASES:
+                return "battle"
+            time.sleep(NAV_POLL_S)
+        self._request("NAV:CANCEL")
+        return "timeout"
+
+    def _navigate_to_next_battle(self):
+        """Walk to encounter tiles (grass or cave; healing first if needed) and block until a battle
+        starts. Failures are not fatal: the player may be mid-cutscene (a
+        whiteout replays the Center scene), so retry a few times, then fall
+        back to waiting for a battle however it starts."""
+        for attempt in range(1, NAV_RETRIES + 1):
+            if not self._wait_for_overworld():
+                return
+
+            try:
+                goal = "HEAL" if self._needs_healing() else "HUNT"
+            except (OSError, ValueError):
+                goal = "HUNT"
+
+            reply = self._request(f"NAV:{goal}")
+            if reply != "ACK":
+                print(f"[nav] {goal} rejected: {reply} (attempt {attempt}/{NAV_RETRIES})")
+                time.sleep(NAV_RETRY_DELAY_S)
+                continue
+
+            if goal == "HEAL":
+                print("[nav] party is low -- heading to the Pokemon Center")
+
+            outcome = self._watch_nav()
+            if outcome in ("battle", "idle"):
+                return
+            if outcome == "timeout":
+                print("[nav] timed out -- continuing without it")
+                return
+            print(f"[nav] attempt {attempt}/{NAV_RETRIES} failed")
+            time.sleep(NAV_RETRY_DELAY_S)
+
+        print("[nav] giving up -- waiting for a battle to start on its own")
 
     def _outcome_bonus(self, outcome):
         if outcome == OUTCOME_WON:
@@ -371,6 +522,8 @@ class PokemonBattleEnv(gym.Env):
             reward += self._outcome_bonus(st["outcome"])
 
         action_failed = (result == "FAILED")
+        if action_failed and not is_attack_action:
+            self.switch_blocked = True   # trapped by something we can't see
         if not action_failed:
             if is_attack_action:
                 self.consecutive_switches = 0
@@ -412,6 +565,8 @@ class PokemonBattleEnv(gym.Env):
         else:
             outcome_txt = ""
         failed_txt = " | ACTION FAILED" if action_failed else ""
+        if not action_failed and getattr(self, 'last_trapped', False):
+            failed_txt += " | TRAPPED (switches masked)"
 
         print(f"GLB {self.global_step:05d} | EP {self.episode:03d} ST {self.step_count:02d} | "
               f"P1: {action_desc[:17].ljust(17)} | E1: {e1_used_move[:12].ljust(12)} | "

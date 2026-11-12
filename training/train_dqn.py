@@ -31,13 +31,6 @@ class WinRateCallback(BaseCallback):
             self.logger.record("rollout/win_rate_pct", win_rate)
 
 
-# --- Crash-Safety Checkpoint Callback ---
-# Overwrites ONE file ("latest_safety.zip") every save_freq steps, instead of
-# accumulating numbered files like CheckpointCallback does. Purely a crash/
-# hang recovery net -- not meant to be browsed or compared like the regular
-# milestone checkpoints below. save_freq=256 means a hang costs at most ~255
-# steps instead of up to a full n_steps=2048 rollout (what actually happened
-# during the run that got lost to an mGBA hang).
 class SafetyCheckpointCallback(BaseCallback):
     def __init__(self, save_freq=256, save_path="./backups/", verbose=0):
         super().__init__(verbose)
