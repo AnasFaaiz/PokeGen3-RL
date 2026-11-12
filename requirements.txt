@@ -1,0 +1,8 @@
+numpy
+gymnasium
+stable-baselines3
+sb3-contrib
+torch
+tensorboard
+pandas
+scikit-learn
