@@ -13,6 +13,33 @@ import socket
 import sys
 import time
 
+from exp_tables import box_level, species_names
+
+BALL_NAMES = {1: "Master", 2: "Ultra", 3: "Great", 4: "Poke", 5: "Safari", 6: "Net",
+              7: "Dive", 8: "Nest", 9: "Repeat", 10: "Timer", 11: "Luxury", 12: "Premier"}
+
+
+def pretty(line):
+    """Decode INVENTORY / BOX replies; anything else passes through."""
+    if line.startswith("INV:") and not line.startswith("INV:ERR"):
+        f = dict(kv.split("=", 1) for kv in line[4:].split(";"))
+        balls = ", ".join(
+            f"{BALL_NAMES.get(int(i), i)} x{q}"
+            for i, q in (b.split(":") for b in f["balls"].split(",") if b)
+        ) or "none"
+        return (f"money={f['money']}  balls: {balls}\n"
+                f"party size={f['party']} levels=[{f['lv']}]  "
+                f"outcome={f['outcome']} trainer_battle={f['trainer']}")
+    if line.startswith("BOX:") and not line.startswith("BOX:ERR"):
+        names = species_names()
+        rows = []
+        for ent in filter(None, line[4:].split(",")):
+            pos, sp, exp = ent.split(":")
+            sp, exp = int(sp), int(exp)
+            rows.append(f"  box {pos:>5}  {names.get(sp, sp)!s:<12} Lv{box_level(sp, exp)}  (exp {exp})")
+        return f"{len(rows)} PC mons\n" + "\n".join(rows)
+    return line
+
 BANNER = """commands:
   MAP_DUMP            ASCII map of where you are
   NAV_DEBUG           why the planner can or cannot find grass
@@ -26,6 +53,8 @@ BANNER = """commands:
   AUTO:STATUS         is automation on?
   STATUS              battle phase
   GET_STATE           the raw observation vector
+  INVENTORY           money, ball counts, party levels, last battle outcome (read-only)
+  BOX                 every occupied PC slot with species and derived level (read-only)
   watch               poll NAV:STATUS until it settles
   quit
 """
@@ -90,7 +119,7 @@ def main():
                  "training stopped? The bridge takes one client at a time.")
 
     if args.command:
-        print(b.send(args.command))
+        print(pretty(b.send(args.command)))
         if args.watch:
             b.watch()
         return
@@ -110,7 +139,7 @@ def main():
             b.watch()
             continue
         try:
-            print(b.send(line))
+            print(pretty(b.send(line)))
         except OSError as e:
             sys.exit(f"connection lost: {e}")
 

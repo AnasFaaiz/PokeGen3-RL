@@ -270,4 +270,28 @@ M.RAM_REGIONS = {
 	{ name = "iwram", start = 0x03000000, size = 0x8000 },
 }
 
+-- ================================================================= inventory
+-- Read-only catch/box observability (INVENTORY and BOX bridge commands).
+-- UNCONFIRMED: SAVEBLOCK2_PTR, STORAGE_PTR and PARTY_COUNT_ADDR come from
+-- pokeemerald.sym as remembered (gSaveBlock1Ptr 0x03005D8C is confirmed, and
+-- the other two sit right after it). Verify with `bridge_cli.py INVENTORY`
+-- against the in-game bag/money/PC before trusting. Struct offsets are from
+-- pret source. All three base pointers move on save load: re-read each time.
+M.INV = {
+	SAVEBLOCK2_PTR = 0x03005D90, -- gSaveBlock2Ptr
+	STORAGE_PTR = 0x03005D94, -- gPokemonStoragePtr
+	PARTY_COUNT_ADDR = 0x020244E9, -- gPlayerPartyCount
+	SB1_MONEY = 0x490, -- u32, XOR SB2 key
+	SB1_BALLS = 0x650, -- 16 x {u16 itemId, u16 qty^key16}
+	BALL_SLOTS = 16,
+	SB2_ENC_KEY = 0xAC, -- u32 encryptionKey
+	PARTY_LEVEL_OFFSET = 0x54, -- u8, unencrypted
+	STORAGE_BOXES_OFFSET = 0x04, -- boxes[14][30] of BoxPokemon (0x50 each)
+	BOX_MON_SIZE = 0x50,
+	BOX_COUNT = 14,
+	BOX_SLOTS = 30,
+	BATTLE_TYPE_TRAINER_BIT = 0x0008,
+	OUTCOME_CAUGHT = 7,
+}
+
 return M
