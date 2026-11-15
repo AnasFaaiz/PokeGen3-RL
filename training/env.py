@@ -7,7 +7,7 @@ import gymnasium as gym
 from gymnasium import spaces
 from catch_policy import CatchContext, CatchPolicy
 from exp_tables import box_level
-from logger import init_csv, log_step, log_battle_end, log_reject, log_level_gap, log_catch, decode_action, outcome_name
+from logger import init_csv, log_step, log_battle_end, log_reject, log_level_gap, log_catch, log_battle_row, log_throw, decode_action, outcome_name
 
 # --- Load Static Game Data ---
 _DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "games", "emerald", "game_data")
@@ -220,6 +220,7 @@ class PokemonBattleEnv(gym.Env):
         self.catch_policy = CatchPolicy(enabled=SCRIPTED_CATCH)
         self.box_cache = None            # (levels, species set) of the PC, refreshed lazily
         self.box_cache_episode = 0
+        self.last_roster_episode = -1
         self.prev_e_alive = None
         self.last_party_raw = [0] * 96
         self.last_active_slot = 0
@@ -472,10 +473,13 @@ class PokemonBattleEnv(gym.Env):
                 area_max=area_max, trainer=trainer, balls=self._ball_total(inv) or 0)
             if not pol.decide(ctx):
                 break
+            sp_name = SPECIES_ID_TO_NAME.get(ctx.enemy_species, ctx.enemy_species)
             reply = self._request("THROW")
             if reply != "ACK":
                 print(f"[catch] throw rejected: {reply}")
                 pol.record_throw(ok=False)
+                log_throw(self.episode, map_key, sp_name, ctx.enemy_level, pol.thrown + 1,
+                          f"REJECTED:{reply}", area_max, min(party), pol.last_reason)
                 break
             print(f"[catch] throwing at L{ctx.enemy_level} (ball {pol.thrown + 1}, "
                   f"area max L{area_max}, party min L{min(party)})")
@@ -484,6 +488,10 @@ class PokemonBattleEnv(gym.Env):
             if phase is None:
                 break
             st = self._get_state()
+            ended = phase in END_PHASES or st["battle_over"]
+            log_throw(self.episode, map_key, sp_name, ctx.enemy_level, pol.thrown,
+                      outcome_name(st["outcome"]) if ended else ("FAILED" if result == "FAILED" else "OK"),
+                      area_max, min(party), pol.last_reason)
             if phase in END_PHASES or st["battle_over"]:
                 self._finish_catch_battle(st, ctx, start_balls)
                 return True, st
@@ -532,7 +540,8 @@ class PokemonBattleEnv(gym.Env):
             "balls": self._ball_total(inv),
         }
         self.catch_policy.start_battle()
-        if inv and self.episode % ROSTER_LOG_EVERY == 1:
+        if inv and self.episode % ROSTER_LOG_EVERY == 1 and self.episode != self.last_roster_episode:
+            self.last_roster_episode = self.episode
             try:
                 box = self._request("BOX")
                 top = []
@@ -838,6 +847,8 @@ class PokemonBattleEnv(gym.Env):
                 "caught": int(st["outcome"] == OUTCOME_CAUGHT),
             }
             log_battle_end(self.episode, st["outcome"], self.step_count - 1, self.total_reward,
+                           info["battle_stats"])
+            log_battle_row(self.episode, st["outcome"], self.step_count, self.total_reward,
                            info["battle_stats"])
         return obs, reward, terminated, False, info
 

@@ -80,19 +80,73 @@ def alert_loss():
     except FileNotFoundError:
         os.system('echo -e "\\a"')
 
+CSV_HEADER = [
+    "timestamp", "episode", "step", "action_id", "action_desc",
+    "p1_hp_pct", "e1_hp_pct", "p2_hp_pct", "e3_hp_pct",
+    "eff_mult", "chosen_prob", "num_legal_actions",
+    "reward", "terminated", "player_lost", "turn_timeout",
+    "p1_species", "p1_level",
+    "e1_species", "e1_level", "e1_status", "e1_atk_buff", "e1_used_move",
+    "obs_json",
+]
+
+BATTLES_FILE = os.path.join(_LOG_DIR, "battles.csv")
+BATTLES_HEADER = [
+    "timestamp", "episode", "outcome", "trainer_battle", "lead_level", "enemy_level", "level_gap",
+    "steps", "return", "moves", "voluntary_switches", "forced_switches", "failed_switches",
+    "balls_thrown", "caught",
+]
+THROWS_FILE = os.path.join(_LOG_DIR, "throws.csv")
+THROWS_HEADER = [
+    "timestamp", "episode", "map", "species", "level", "ball_number", "result",
+    "area_max", "party_min_level", "reason",
+]
+
+
+def _append_row(path, header, row):
+    new = not os.path.exists(path)
+    with open(path, "a", newline="") as f:
+        w = csv.writer(f)
+        if new:
+            w.writerow(header)
+        w.writerow(row)
+
+
 def init_csv():
-    if not os.path.exists(CSV_FILE):
-        with open(CSV_FILE, "w", newline="") as f:
-            writer = csv.writer(f)
-            writer.writerow([
-                "timestamp", "episode", "step", "action_id", "action_desc",
-                "p1_hp_pct", "e1_hp_pct", "p2_hp_pct", "e3_hp_pct",
-                "eff_mult", "chosen_prob", "num_legal_actions",
-                "reward", "terminated", "player_lost", "turn_timeout",
-                "p1_species", "p1_level",
-                "e1_species", "e1_level", "e1_status", "e1_atk_buff", "e1_used_move",
-                "obs_json"
-            ])
+    """Create battle_data.csv with the current header. If an existing file has a
+    different (older) header, rename it aside instead of mixing schemas."""
+    if os.path.exists(CSV_FILE):
+        with open(CSV_FILE, "r", encoding="utf-8", errors="replace") as f:
+            first = f.readline().strip().split(",")
+        if first == CSV_HEADER:
+            return
+        stamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        aside = os.path.join(_LOG_DIR, f"battle_data_oldschema_{stamp}.csv")
+        os.rename(CSV_FILE, aside)
+        print(f"[logger] battle_data.csv had an older header; moved to {os.path.basename(aside)}")
+    with open(CSV_FILE, "w", newline="") as f:
+        csv.writer(f).writerow(CSV_HEADER)
+
+
+def log_battle_row(episode, outcome, steps, total_return, stats):
+    """One row per finished battle. stats is the env's battle_stats dict."""
+    _append_row(BATTLES_FILE, BATTLES_HEADER, [
+        datetime.now().strftime("%Y-%m-%d %H:%M:%S"), episode, outcome_name(outcome),
+        stats.get("trainer_battle"), stats.get("lead_level"), stats.get("enemy_level"),
+        stats.get("level_gap"), steps, round(total_return, 2), stats.get("moves"),
+        stats.get("voluntary_switches"), stats.get("forced_switches"), stats.get("failed_switches"),
+        stats.get("balls_thrown"), stats.get("caught"),
+    ])
+
+
+def log_throw(episode, map_key, species, level, ball_number, result, area_max, party_min, reason):
+    """One row per scripted throw: OK (ball thrown, battle continues), CAUGHT,
+    FAILED, REJECTED:<why>, or the battle outcome if it ended another way."""
+    _append_row(THROWS_FILE, THROWS_HEADER, [
+        datetime.now().strftime("%Y-%m-%d %H:%M:%S"), episode, map_key, species, level,
+        ball_number, result, area_max, party_min, reason,
+    ])
+
 
 def log_step(
     episode,
