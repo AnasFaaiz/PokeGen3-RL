@@ -272,11 +272,11 @@ M.RAM_REGIONS = {
 
 -- ================================================================= inventory
 -- Read-only catch/box observability (INVENTORY and BOX bridge commands).
--- UNCONFIRMED: SAVEBLOCK2_PTR, STORAGE_PTR and PARTY_COUNT_ADDR come from
--- pokeemerald.sym as remembered (gSaveBlock1Ptr 0x03005D8C is confirmed, and
--- the other two sit right after it). Verify with `bridge_cli.py INVENTORY`
--- against the in-game bag/money/PC before trusting. Struct offsets are from
--- pret source. All three base pointers move on save load: re-read each time.
+-- SAVEBLOCK2_PTR, STORAGE_PTR and PARTY_COUNT_ADDR are confirmed against
+-- pret's pokeemerald.sym and verified live (INVENTORY/BOX match the game).
+-- The bag/throw addresses below come from the same .sym but are not yet
+-- verified live. Struct offsets are from pret source. The save-block and
+-- storage base pointers move on load: re-read each time.
 M.INV = {
 	SAVEBLOCK2_PTR = 0x03005D90, -- gSaveBlock2Ptr
 	STORAGE_PTR = 0x03005D94, -- gPokemonStoragePtr
@@ -285,6 +285,8 @@ M.INV = {
 	SB1_BALLS = 0x650, -- 16 x {u16 itemId, u16 qty^key16}
 	BALL_SLOTS = 16,
 	SB2_ENC_KEY = 0xAC, -- u32 encryptionKey
+	SB2_DEX_OWNED = 0x28, -- struct Pokedex at SB2+0x18, owned[] at +0x10
+	DEX_BYTES = 52,
 	PARTY_LEVEL_OFFSET = 0x54, -- u8, unencrypted
 	STORAGE_BOXES_OFFSET = 0x04, -- boxes[14][30] of BoxPokemon (0x50 each)
 	BOX_MON_SIZE = 0x50,
@@ -292,6 +294,28 @@ M.INV = {
 	BOX_SLOTS = 30,
 	BATTLE_TYPE_TRAINER_BIT = 0x0008,
 	OUTCOME_CAUGHT = 7,
+
+	-- Bag-from-battle (from pokeemerald.sym; verify live before use).
+	-- struct BagPosition (0x1C): exitCallback u32 @0, location u8 @4,
+	-- pocket u8 @5, pocketSwitchArrowPos u16 @6, cursorPosition[5] u16 @8,
+	-- scrollPosition[5] u16 @0x12. Pocket order: Items 0, Balls 1, TMs 2,
+	-- Berries 3, Key items 4. It persists across battles.
+	BAG_POSITION = 0x0203CE58, -- gBagPosition
+	BAG_POCKET_OFFSET = 0x05,
+	BAG_CURSOR_OFFSET = 0x08,
+	BAG_SCROLL_OFFSET = 0x12,
+	BAG_POCKET_BALLS = 1,
+	BAG_MENU = 0x0203CE54, -- gBagMenu (pointer)
+	SPECIAL_VAR_ITEM_ID = 0x0203CE7C, -- gSpecialVar_ItemId
+	LAST_USED_ITEM = 0x02024208, -- gLastUsedItem (u16)
+	BATTLE_COMMUNICATION = 0x02024332, -- gBattleCommunication[8]
+	BATTLE_RESULTS = 0x03005D10, -- gBattleResults
+	CB2_BAG_FROM_BATTLE = 0x081AABB0, -- CB2_BagMenuFromBattle (entry only: sets up, then hands over)
+	CB2_BAG_RUN = 0x081AAD5C, -- CB2_BagMenuRun: the callback while the bag is on screen (confirmed live)
+	FN_OPEN_BAG_CHOOSE = 0x080598A4, -- OpenBagAndChooseItem (controller fn)
+	FN_COMPLETE_CHOSE_ITEM = 0x080598E0, -- CompleteWhenChoseItem (controller fn)
+	FN_ITEM_USE_POKEBALL = 0x080FE394, -- ItemUseInBattle_PokeBall
+	CB2_RETURN_TO_FIELD = 0x080860C8,
 }
 
 return M

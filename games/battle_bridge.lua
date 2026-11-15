@@ -1,40 +1,29 @@
 local GAME_CONFIG_FILE = "/home/kazuto/Documents/Projects/PokeGen3-RL/games/emerald/emerald_config.lua"
 local CONFIG = dofile(GAME_CONFIG_FILE)
-
 local NAV_FILE = string.gsub(GAME_CONFIG_FILE, "emerald_config%.lua$", "overworld_nav.lua")
 local Nav = dofile(NAV_FILE)
-
 local MAIN_PORT = 8888
 local PROBE_PORT = 8889
 local LOG_CALLBACK2_CHANGES = true
-
 local KEY = C.GBA_KEY
 local ALL_KEYS = 0x3FF
-
 local server, client, clientBuf = nil, nil, ""
 local probeServer, probeClient, probeBuf = nil, nil, ""
 local frameCount = 0
-
 local task = nil
 local lastResult = "NONE"
-local TASK_MAX_FRAMES = 1200 -- 20 s: generous, a normal action takes < 3 s
-
+local TASK_MAX_FRAMES = 1200
 local fieldOrderPids = {}
 local reportedPids = {}
-
 local PRESS_FRAMES, RELEASE_FRAMES = 2, 4
 local input = { key = nil, stage = 0, timer = 0 }
-
 local promptCooldown = 0
 local watchdog = { sig = nil, frames = 0 }
-local WATCHDOG_FRAMES = 600 -- 10 s stuck on the same screen -> nudge with B
-
+local WATCHDOG_FRAMES = 600
 local automationEnabled = true
 local lastToggleHeld, toggleCooldown = false, 0
-
 local lastLoggedCb2 = nil
 local wasInBattle = false
-
 local block_orders = {
 	{ 0, 1, 2, 3 },
 	{ 0, 1, 3, 2 },
@@ -61,34 +50,27 @@ local block_orders = {
 	{ 3, 2, 0, 1 },
 	{ 3, 2, 1, 0 },
 }
-
 local function sameFn(a, b)
 	if a == nil or b == nil then
 		return false
 	end
 	return (a | 1) == (b | 1)
 end
-
 local function inRom(p)
 	return p >= 0x08000000 and p < 0x0A000000
 end
-
 local function readCb2()
 	return emu:read32(CONFIG.MAIN_CALLBACK2_ADDR)
 end
-
 local function isInBattle()
 	return (emu:read8(CONFIG.GMAIN_INBATTLE_ADDR) & CONFIG.GMAIN_INBATTLE_MASK) ~= 0
 end
-
 local function battleOutcome()
 	return emu:read8(CONFIG.BATTLE_OUTCOME_ADDR)
 end
-
 local function controllerFn(battler)
 	return emu:read32(CONFIG.CONTROLLER_FUNCS_ADDR + battler * 4)
 end
-
 local function scriptOpcode()
 	local p = emu:read32(CONFIG.BATTLESCRIPT_PTR_ADDR)
 	if inRom(p) then
@@ -96,25 +78,20 @@ local function scriptOpcode()
 	end
 	return nil
 end
-
 local function isDoubleBattle()
 	return (emu:read32(CONFIG.BATTLE_TYPE_FLAGS_ADDR) & CONFIG.BATTLE_TYPE_DOUBLE_BIT) ~= 0
 end
-
 local function battlerBase(battler)
 	return CONFIG.BATTLE_MONS_ADDR + battler * CONFIG.BATTLE_MON_STRIDE
 end
-
 local function isInputHandler(fn)
 	return sameFn(fn, CONFIG.FN_CHOOSE_ACTION)
 		or sameFn(fn, CONFIG.FN_CHOOSE_MOVE)
 		or sameFn(fn, CONFIG.FN_CHOOSE_TARGET)
 end
-
 local function partySlotBase(slot)
 	return CONFIG.PARTY_START + slot * CONFIG.PARTY_STRIDE
 end
-
 local function memoryPids()
 	local t = {}
 	for i = 0, 5 do
@@ -122,7 +99,6 @@ local function memoryPids()
 	end
 	return t
 end
-
 local function memIndexOf(pid, mem)
 	if pid == nil or pid == 0 then
 		return nil
@@ -134,11 +110,9 @@ local function memIndexOf(pid, mem)
 	end
 	return nil
 end
-
 local function inputBusy()
 	return input.stage ~= 0
 end
-
 local function tap(key)
 	if input.stage ~= 0 then
 		return false
@@ -147,7 +121,6 @@ local function tap(key)
 	emu:addKey(key)
 	return true
 end
-
 local function updateInput()
 	if input.stage == 1 then
 		input.timer = input.timer + 1
@@ -164,12 +137,10 @@ local function updateInput()
 		end
 	end
 end
-
 local function cancelInput()
 	emu:clearKeys(ALL_KEYS)
 	input.stage, input.timer, input.key = 0, 0, nil
 end
-
 local navHeld = nil
 local navIO = {
 	log = function(msg)
@@ -180,28 +151,20 @@ local navIO = {
 	end,
 	release = function()
 		navHeld = nil
-		-- emu:addKey persists until cleared, so a release has to reach the
-		-- emulator now, not just update our own bookkeeping.
 		emu:clearKeys(ALL_KEYS)
 	end,
 }
-
--- Mirror navHeld into the emulator every frame. Clearing when nothing is held
--- matters: without it a released key stays down and the player runs on past
--- the tile Nav meant to stop on.
 local function applyNavKeys()
 	emu:clearKeys(ALL_KEYS)
 	if navHeld then
 		emu:addKey(navHeld)
 	end
 end
-
 local function stopNav()
 	Nav.cancel()
 	navHeld = nil
 	emu:clearKeys(ALL_KEYS)
 end
-
 local function gridStep(cur, target)
 	if (cur & 1) ~= (target & 1) then
 		return ((target & 1) == 1) and KEY.RIGHT or KEY.LEFT
@@ -211,7 +174,6 @@ local function gridStep(cur, target)
 	end
 	return nil
 end
-
 local function decryptPartySlot(base)
 	local pid = emu:read32(base)
 	if pid == 0 then
@@ -238,82 +200,18 @@ local function decryptPartySlot(base)
 		maxhp = emu:read16(base + CONFIG.PARTY_MAXHP_OFFSET),
 	}
 end
-
--- ---------------------------------------------------------------- inventory
--- Read-only: ball counts, money, party levels, PC box contents. Reads the
--- save-block pointers fresh every call (they move on load).
-local function validEwram(p)
-	return p >= 0x02000000 and p < 0x02040000
-end
-
-local function inventoryLine()
-	local I = CONFIG.INV
-	local sb1 = emu:read32(CONFIG.OW.SAVEBLOCK1_PTR)
-	local sb2 = emu:read32(I.SAVEBLOCK2_PTR)
-	if not (validEwram(sb1) and validEwram(sb2)) then
-		return "INV:ERR:bad_saveblock_ptr:" .. string.format("%08X,%08X", sb1, sb2)
-	end
-	local key = emu:read32(sb2 + I.SB2_ENC_KEY)
-	local money = emu:read32(sb1 + I.SB1_MONEY) ~ key
-	local balls = {}
-	for i = 0, I.BALL_SLOTS - 1 do
-		local a = sb1 + I.SB1_BALLS + i * 4
-		local id = emu:read16(a)
-		if id ~= 0 then
-			balls[#balls + 1] = string.format("%d:%d", id, emu:read16(a + 2) ~ (key & 0xFFFF))
-		end
-	end
-	local count = emu:read8(I.PARTY_COUNT_ADDR)
-	local lv = {}
-	for i = 0, math.min(count, 6) - 1 do
-		lv[#lv + 1] = emu:read8(partySlotBase(i) + I.PARTY_LEVEL_OFFSET)
-	end
-	local btf = emu:read32(CONFIG.BATTLE_TYPE_FLAGS_ADDR)
-	return string.format(
-		"INV:money=%d;balls=%s;party=%d;lv=%s;outcome=%d;trainer=%d",
-		money,
-		table.concat(balls, ","),
-		count,
-		table.concat(lv, ","),
-		battleOutcome(),
-		(btf & I.BATTLE_TYPE_TRAINER_BIT) ~= 0 and 1 or 0
-	)
-end
-
--- BOX: one "box.slot:species:exp" entry per occupied slot (exp is the raw
--- Growth substruct experience; level is derived on the Python side).
-local function boxLine()
-	local I = CONFIG.INV
-	local st = emu:read32(I.STORAGE_PTR)
-	if not validEwram(st) then
-		return "BOX:ERR:bad_storage_ptr:" .. string.format("%08X", st)
-	end
-	local out = {}
-	for b = 0, I.BOX_COUNT - 1 do
-		for s = 0, I.BOX_SLOTS - 1 do
-			local base = st + I.STORAGE_BOXES_OFFSET + (b * I.BOX_SLOTS + s) * I.BOX_MON_SIZE
-			local pid = emu:read32(base)
-			-- empty slots are all zero; checking species below skips bad-egg junk
-			if pid ~= 0 then
-				local key = pid ~ emu:read32(base + 4)
-				local order = block_orders[(pid % 24) + 1]
-				local g
-				for i = 1, 4 do
-					if order[i] == 0 then
-						g = base + 0x20 + (i - 1) * 12
-					end
-				end
-				local species = (emu:read32(g) ~ key) & 0xFFFF
-				local exp = emu:read32(g + 4) ~ key
-				if species ~= 0 then
-					out[#out + 1] = string.format("%d.%d:%d:%d", b, s, species, exp)
-				end
-			end
-		end
-	end
-	return "BOX:" .. table.concat(out, ",")
-end
-
+local Inv = dofile(string.gsub(GAME_CONFIG_FILE, "emerald_config%.lua$", "inventory.lua"))({
+	CONFIG = CONFIG,
+	emu = emu,
+	partySlotBase = partySlotBase,
+	battleOutcome = battleOutcome,
+	readCb2 = readCb2,
+	controllerFn = controllerFn,
+	sameFn = sameFn,
+	block_orders = block_orders,
+})
+local inventoryLine, boxLine, bagLine, dexLine, ballSlots =
+	Inv.inventoryLine, Inv.boxLine, Inv.bagLine, Inv.dexLine, Inv.ballSlots
 local function refreshFieldOrder(cb2)
 	if not sameFn(cb2, CONFIG.CB2_BATTLE_MAIN) then
 		return
@@ -327,7 +225,6 @@ local function refreshFieldOrder(cb2)
 	end
 	fieldOrderPids = t
 end
-
 local function buildReportedOrder()
 	local mem = memoryPids()
 	local activePid = emu:read32(battlerBase(0) + CONFIG.BATTLER_OFFSETS.personality)
@@ -344,10 +241,9 @@ local function buildReportedOrder()
 	end
 	for i = 0, 5 do
 		add(mem[i])
-	end -- anything the cache missed
+	end
 	return order, mem
 end
-
 local function getBattler(base)
 	local o = CONFIG.BATTLER_OFFSETS
 	return {
@@ -374,9 +270,7 @@ local function getBattler(base)
 		emu:read8(base + o.ability),
 	}
 end
-
 local EMPTY_BATTLER = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }
-
 local function weatherCategory()
 	local w = emu:read16(CONFIG.WEATHER_ADDR)
 	if (w & CONFIG.WEATHER_RAIN_MASK) ~= 0 then
@@ -393,9 +287,7 @@ local function weatherCategory()
 	end
 	return 0
 end
-
-local computePhase -- defined below
-
+local computePhase
 function getState()
 	local b0 = getBattler(CONFIG.BATTLER_BASE_P1)
 	local b1 = getBattler(CONFIG.BATTLER_BASE_E1)
@@ -404,7 +296,6 @@ function getState()
 	if not isDoubleBattle() then
 		b2, b3 = EMPTY_BATTLER, EMPTY_BATTLER
 	end
-
 	local inBattle = isInBattle()
 	local outcome = battleOutcome()
 	local battleOver = (inBattle and outcome ~= 0) and 1 or 0
@@ -412,8 +303,6 @@ function getState()
 	if battleOver == 1 and (outcome == CONFIG.OUTCOME_LOST or outcome == CONFIG.OUTCOME_FORFEITED) then
 		playerLost = 1
 	end
-
-	-- Player party: active mon first, then field order (see buildReportedOrder).
 	local order, mem = buildReportedOrder()
 	reportedPids = order
 	local p_party = {}
@@ -437,7 +326,6 @@ function getState()
 			end
 		end
 	end
-
 	local e_party = {}
 	for i = 0, 5 do
 		local e = decryptPartySlot(CONFIG.ENEMY_PARTY_START + i * CONFIG.PARTY_STRIDE)
@@ -455,7 +343,6 @@ function getState()
 			end
 		end
 	end
-
 	local phase = computePhase()
 	local out = {}
 	for _, list in ipairs({ b0, b1, b2, b3 }) do
@@ -471,13 +358,12 @@ function getState()
 	for _, v in ipairs(e_party) do
 		out[#out + 1] = v
 	end
-	out[#out + 1] = weatherCategory() -- 0 none, 1 rain, 2 sand, 3 sun, 4 hail
-	out[#out + 1] = 0 -- activeSlot: always 0 now (active is reported first)
+	out[#out + 1] = weatherCategory()
+	out[#out + 1] = 0
 	out[#out + 1] = (phase == "FORCED_SWITCH") and 1 or 0
-	out[#out + 1] = outcome -- raw gBattleOutcome
+	out[#out + 1] = outcome
 	return table.concat(out, ",")
 end
-
 local function choosingBattler()
 	if isInputHandler(controllerFn(0)) then
 		return 0
@@ -487,7 +373,6 @@ local function choosingBattler()
 	end
 	return nil
 end
-
 computePhase = function()
 	if not isInBattle() then
 		return "NOT_IN_BATTLE", nil
@@ -513,7 +398,6 @@ computePhase = function()
 	end
 	return "WAITING", nil
 end
-
 local function finishTask(result, why)
 	if result ~= "OK" then
 		console:log(string.format("[bridge] %s %s: %s", task and task.kind or "?", result, why or ""))
@@ -521,7 +405,6 @@ local function finishTask(result, why)
 	lastResult = result
 	task = nil
 end
-
 local function newTask(kind, battler)
 	return {
 		kind = kind,
@@ -535,7 +418,6 @@ local function newTask(kind, battler)
 		waitFrames = 0,
 	}
 end
-
 local function navTap(key, cursorValue)
 	local sig = tostring(key) .. ":" .. tostring(cursorValue)
 	if task.navKey == sig then
@@ -550,14 +432,12 @@ local function navTap(key, cursorValue)
 	tap(key)
 	task.cooldown = 2
 end
-
 local function runMoveTask(cb2)
 	if not sameFn(cb2, CONFIG.CB2_BATTLE_MAIN) then
 		return
 	end
 	local b = task.battler
 	local ctrl = controllerFn(b)
-
 	if sameFn(ctrl, CONFIG.FN_CHOOSE_ACTION) then
 		local cur = emu:read8(CONFIG.ACTION_CURSOR_ADDR + b)
 		local dir = gridStep(cur, 0)
@@ -576,13 +456,12 @@ local function runMoveTask(cb2)
 		else
 			task.aPresses = task.aPresses + 1
 			if task.aPresses > 3 then
-				-- The game keeps refusing the move (no PP, disabled, ...).
 				finishTask("FAILED", "move " .. task.moveIdx .. " refused by game")
 				return
 			end
 			tap(KEY.A)
 			task.stage = "move_pressed"
-			task.cooldown = 30 -- room for a "no PP left" message
+			task.cooldown = 30
 		end
 	elseif sameFn(ctrl, CONFIG.FN_CHOOSE_TARGET) then
 		local cur = emu:read8(CONFIG.TARGET_CURSOR_ADDR)
@@ -594,12 +473,9 @@ local function runMoveTask(cb2)
 			task.cooldown = 6
 		end
 	elseif task.stage ~= "start" then
-		-- The controller left the input handlers: the game took the choice
-		-- (this also covers Struggle, where FIGHT skips the move menu).
 		finishTask("OK")
 	end
 end
-
 local function runSwitchTask(cb2)
 	local b = task.battler
 	if sameFn(cb2, CONFIG.CB2_BATTLE_MAIN) then
@@ -614,13 +490,13 @@ local function runSwitchTask(cb2)
 		end
 		if task.kind == "forced" then
 			return
-		end -- waiting for the party menu
+		end
 		if sameFn(ctrl, CONFIG.FN_CHOOSE_MOVE) then
-			tap(KEY.B) -- back to the action menu
+			tap(KEY.B)
 			task.cooldown = 6
 		elseif sameFn(ctrl, CONFIG.FN_CHOOSE_ACTION) then
 			local cur = emu:read8(CONFIG.ACTION_CURSOR_ADDR + b)
-			local dir = gridStep(cur, 2) -- 2 = POKEMON
+			local dir = gridStep(cur, 2)
 			if dir then
 				navTap(dir, cur)
 			else
@@ -631,22 +507,17 @@ local function runSwitchTask(cb2)
 		end
 		return
 	end
-
 	if not sameFn(cb2, CONFIG.CB2_PARTY_MENU) then
 		return
-	end -- fades/transitions
-
+	end
 	local partyAction = emu:read8(CONFIG.PARTY_MENU_ACTION_ADDR)
 	local function giveUp(why)
 		if partyAction ~= CONFIG.PARTY_ACTION_SEND_OUT then
-			tap(KEY.B) -- leave the menu; B does nothing on a forced send-out
+			tap(KEY.B)
 		end
 		finishTask("FAILED", why)
 	end
-
 	if task.stage == "confirm_pressed" then
-		-- Still in the menu after confirming: the game refused the choice
-		-- (fainted, already in battle, ...). Give it time for the message.
 		task.waitFrames = task.waitFrames + 1
 		if task.waitFrames > 180 then
 			giveUp("party menu refused slot")
@@ -654,13 +525,12 @@ local function runSwitchTask(cb2)
 		return
 	end
 	if task.stage == "slot_pressed" then
-		tap(KEY.A) -- first item of the submenu: SHIFT / SEND OUT
+		tap(KEY.A)
 		task.stage = "confirm_pressed"
 		task.waitFrames = 0
 		task.cooldown = 20
 		return
 	end
-
 	local j = memIndexOf(task.pid, memoryPids())
 	if j == nil then
 		giveUp("target Pokemon not found in party")
@@ -675,7 +545,132 @@ local function runSwitchTask(cb2)
 		task.cooldown = 20
 	end
 end
-
+local THROW_USE_WAIT = 240
+local THROW_RETRY_EVERY = 45
+local function runThrowTask(cb2)
+	local I = CONFIG.INV
+	local slots, total = ballSlots()
+	if total < task.startBalls then
+		finishTask("OK")
+		return
+	end
+	if sameFn(cb2, I.CB2_BAG_RUN) then
+		task.inBag = true
+		task.outFrames = 0
+		local bp = I.BAG_POSITION
+		local pocket = emu:read8(bp + I.BAG_POCKET_OFFSET)
+		if pocket ~= I.BAG_POCKET_BALLS then
+			task.stage = "start"
+			task.aPresses = 0
+			if task.pocketFrom == pocket and (task.pocketWait or 0) < 90 then
+				task.pocketWait = (task.pocketWait or 0) + 1
+				return
+			end
+			task.pocketFrom, task.pocketWait = pocket, 0
+			console:log(
+				string.format(
+					"[bridge] throw: pocket %d, want %d: pressing %s",
+					pocket,
+					I.BAG_POCKET_BALLS,
+					(pocket == 0) and "RIGHT" or "LEFT"
+				)
+			)
+			navTap((pocket == 0) and KEY.RIGHT or KEY.LEFT, pocket)
+			task.cooldown = 10
+			return
+		end
+		task.pocketFrom = nil
+		local target
+		for i, sl in ipairs(slots) do
+			if sl.id == task.ballId then
+				target = i - 1
+			end
+		end
+		if target == nil then
+			tap(KEY.B)
+			finishTask("FAILED", "ball " .. task.ballId .. " not in bag")
+			return
+		end
+		local cursor = emu:read16(bp + I.BAG_CURSOR_OFFSET + pocket * 2)
+		local scroll = emu:read16(bp + I.BAG_SCROLL_OFFSET + pocket * 2)
+		local row = scroll + cursor
+		if task.stage == "use_pressed" then
+			task.waitFrames = task.waitFrames + 1
+			if task.waitFrames % 60 == 0 then
+				console:log(
+					string.format(
+						"[bridge] throw: waiting after Use: wait=%d presses=%d cb2=%08X ctrl0=%08X row=%d pocket=%d balls=%d",
+						task.waitFrames,
+						task.aPresses,
+						cb2,
+						controllerFn(task.battler),
+						row,
+						pocket,
+						total
+					)
+				)
+			end
+			if task.waitFrames > THROW_USE_WAIT then
+				tap(KEY.B)
+				finishTask("FAILED", "bag still open after Use (ball refused?) after " .. task.aPresses .. " A presses")
+			elseif task.waitFrames % THROW_RETRY_EVERY == 0 then
+				tap(KEY.A)
+				task.aPresses = task.aPresses + 1
+			end
+		elseif row ~= target then
+			navTap((row < target) and KEY.DOWN or KEY.UP, row)
+		elseif task.stage == "item_pressed" then
+			console:log(string.format("[bridge] throw: Use pressed (ball id %d, row %d)", task.ballId, row))
+			tap(KEY.A)
+			task.stage = "use_pressed"
+			task.waitFrames = 0
+			task.aPresses = 1
+			task.cooldown = 6
+		else
+			console:log(string.format("[bridge] throw: ball selected (ball id %d, row %d)", task.ballId, row))
+			tap(KEY.A)
+			task.stage = "item_pressed"
+			task.cooldown = 20
+		end
+		return
+	end
+	if task.stage == "use_pressed" then
+		task.outFrames = (task.outFrames or 0) + 1
+		if task.outFrames > 30 then
+			console:log(
+				string.format(
+					"[bridge] throw: bag closed after Use (cb2 %08X, balls %d -> %d)",
+					cb2,
+					task.startBalls,
+					total
+				)
+			)
+			finishTask("OK")
+			return
+		end
+	end
+	if sameFn(cb2, CONFIG.CB2_BATTLE_MAIN) then
+		local ctrl = controllerFn(task.battler)
+		if sameFn(ctrl, CONFIG.FN_CHOOSE_ACTION) then
+			if task.inBag then
+				finishTask("FAILED", "bag closed without a throw")
+			elseif task.stage == "start" then
+				local cur = emu:read8(CONFIG.ACTION_CURSOR_ADDR + task.battler)
+				local dir = gridStep(cur, 1)
+				if dir then
+					navTap(dir, cur)
+				else
+					tap(KEY.A)
+					task.stage = "bag_pressed"
+					task.cooldown = 20
+				end
+			end
+		elseif sameFn(ctrl, CONFIG.FN_CHOOSE_MOVE) then
+			tap(KEY.B)
+			task.cooldown = 6
+		end
+	end
+end
 local function runTask()
 	task.frames = task.frames + 1
 	if not isInBattle() then
@@ -683,7 +678,16 @@ local function runTask()
 		return
 	end
 	if task.frames > TASK_MAX_FRAMES then
-		finishTask("FAILED", "timed out in stage " .. task.stage)
+		finishTask(
+			"FAILED",
+			string.format(
+				"timed out in stage %s (cb2 %08X, ctrl0 %08X, wait %s)",
+				task.stage,
+				readCb2(),
+				controllerFn(task.battler),
+				tostring(task.waitFrames)
+			)
+		)
 		return
 	end
 	if inputBusy() then
@@ -696,11 +700,52 @@ local function runTask()
 	local cb2 = readCb2()
 	if task.kind == "move" then
 		runMoveTask(cb2)
+	elseif task.kind == "throw" then
+		runThrowTask(cb2)
 	else
 		runSwitchTask(cb2)
 	end
 end
-
+local function handleThrow(ballId)
+	if not automationEnabled then
+		return "REJECT:automation_off"
+	end
+	if task then
+		return "REJECT:busy"
+	end
+	local phase, battler = computePhase()
+	if phase ~= "CHOOSE_ACTION" then
+		return "REJECT:" .. phase
+	end
+	if (emu:read32(CONFIG.BATTLE_TYPE_FLAGS_ADDR) & CONFIG.INV.BATTLE_TYPE_TRAINER_BIT) ~= 0 then
+		return "REJECT:trainer_battle"
+	end
+	if isDoubleBattle() then
+		return "REJECT:double_battle"
+	end
+	local slots, total = ballSlots()
+	if total <= 0 then
+		return "REJECT:no_balls"
+	end
+	if ballId == nil then
+		ballId = 4
+		local have = false
+		for _, sl in ipairs(slots) do
+			if sl.id == ballId then
+				have = true
+			end
+		end
+		if not have then
+			ballId = slots[1].id
+		end
+	end
+	task = newTask("throw", battler)
+	task.ballId = ballId
+	task.startBalls = total
+	task.inBag = false
+	lastResult = "PENDING"
+	return "ACK"
+end
 local function handleAction(action)
 	if action == nil or action < 0 or action > 16 then
 		return "REJECT:bad_action"
@@ -712,7 +757,6 @@ local function handleAction(action)
 		return "REJECT:busy"
 	end
 	local phase, battler = computePhase()
-
 	if phase == "CHOOSE_ACTION" then
 		if action < 12 then
 			task = newTask("move", battler)
@@ -749,7 +793,6 @@ local function handleAction(action)
 	lastResult = "PENDING"
 	return "ACK"
 end
-
 local function battleAutomation(cb2)
 	if inputBusy() then
 		return
@@ -758,28 +801,26 @@ local function battleAutomation(cb2)
 		promptCooldown = promptCooldown - 1
 		return
 	end
-
 	if sameFn(cb2, CONFIG.CB2_EVOLUTION_LOAD) or sameFn(cb2, CONFIG.CB2_EVOLUTION_UPDATE) then
-		tap(KEY.A) -- never B: B cancels the evolution
+		tap(KEY.A)
 		promptCooldown = 15
 		watchdog.sig, watchdog.frames = nil, 0
 		return
 	end
-
 	if sameFn(cb2, CONFIG.CB2_BATTLE_MAIN) then
 		local op = scriptOpcode()
 		local ctrl0 = controllerFn(0)
 		if op == CONFIG.OP_LEARNMOVE_YESNO then
-			tap(KEY.B) -- "Delete a move?" -> No
+			tap(KEY.B)
 			promptCooldown = 20
 		elseif op == CONFIG.OP_STOPLEARNING_YESNO then
-			tap(KEY.A) -- "Stop learning?" -> Yes (B here would loop back)
+			tap(KEY.A)
 			promptCooldown = 20
 		elseif op == CONFIG.OP_YESNOBOX then
 			if emu:read16(battlerBase(0) + CONFIG.BATTLER_OFFSETS.hp) == 0 then
-				tap(KEY.A) -- our mon fainted: "Use next Pokemon?" -> Yes
+				tap(KEY.A)
 			else
-				tap(KEY.B) -- enemy is switching: "Change Pokemon?" -> No
+				tap(KEY.B)
 			end
 			promptCooldown = 20
 		elseif op == CONFIG.OP_LVLUP_BOX then
@@ -811,13 +852,11 @@ local function battleAutomation(cb2)
 		watchdog.sig, watchdog.frames = nil, 0
 		return
 	end
-
 	if battleOutcome() ~= 0 and not sameFn(cb2, CONFIG.CB2_PARTY_MENU) then
 		tap(KEY.B)
 		promptCooldown = 30
 	end
 end
-
 local function checkToggleKey()
 	if toggleCooldown > 0 then
 		toggleCooldown = toggleCooldown - 1
@@ -838,9 +877,6 @@ local function checkToggleKey()
 	end
 	lastToggleHeld = held
 end
-
--- ============================================================ finder (probe)
-
 local function signalsLine()
 	local phase = computePhase()
 	local opcode = isInBattle() and scriptOpcode() or nil
@@ -869,7 +905,6 @@ local function signalsLine()
 		input.key or -1
 	)
 end
-
 local function readRegion(start, size)
 	local ok, data = pcall(function()
 		return emu:readRange(start, size)
@@ -877,17 +912,14 @@ local function readRegion(start, size)
 	if ok and type(data) == "string" and #data == size then
 		return data
 	end
-	-- Fallback for builds without readRange: 4 bytes at a time.
 	local parts = {}
 	for a = start, start + size - 1, 4 do
 		parts[#parts + 1] = string.pack("<I4", emu:read32(a))
 	end
 	return table.concat(parts)
 end
-
 local probeOut, probeOutPos, probeStall = "", 1, 0
 local PROBE_CHUNK = 32768
-
 local function probeQueue(data)
 	if probeOutPos > #probeOut then
 		probeOut, probeOutPos = data, 1
@@ -896,7 +928,6 @@ local function probeQueue(data)
 		probeOutPos = 1
 	end
 end
-
 local function probeFlush()
 	if not probeClient or probeOutPos > #probeOut then
 		return
@@ -909,7 +940,7 @@ local function probeFlush()
 		local n = probeClient:send(chunk)
 		if n == true then
 			n = #chunk
-		end -- some builds return true instead of a count
+		end
 		if type(n) ~= "number" or n <= 0 then
 			probeStall = probeStall + 1
 			if probeStall > 600 then
@@ -922,7 +953,6 @@ local function probeFlush()
 		probeOutPos = probeOutPos + n
 	end
 end
-
 local function handleProbeLine(line)
 	if line == "SIGNALS" then
 		probeQueue(signalsLine() .. "\n")
@@ -942,9 +972,6 @@ local function handleProbeLine(line)
 		probeQueue(table.concat(t, ",") .. "\n")
 	end
 end
-
--- ================================================================== sockets
-
 local function startServers()
 	server = socket.bind(nil, MAIN_PORT)
 	server:listen()
@@ -954,7 +981,6 @@ local function startServers()
 	end
 	console:log(string.format("Bridge listening on %d (env) and %d (address finder)", MAIN_PORT, PROBE_PORT))
 end
-
 local function readLines(sock, buf)
 	local lines = {}
 	if not sock:hasdata() then
@@ -978,7 +1004,6 @@ local function readLines(sock, buf)
 	end
 	return lines, buf, true
 end
-
 local function handleMainLine(line)
 	if string.match(line, "^AUTO:") then
 		local what = string.match(line, "^AUTO:(%u+)")
@@ -1000,7 +1025,6 @@ local function handleMainLine(line)
 		end
 		return
 	end
-
 	if string.match(line, "^NAV:") then
 		local what = string.match(line, "^NAV:(%u+)")
 		if what == "HUNT" or what == "GRASS" or what == "HEAL" then
@@ -1038,15 +1062,22 @@ local function handleMainLine(line)
 		client:send(string.format("PARTY_HP:%d:%d:%d\n", cur, max, conscious))
 		return
 	end
-
 	if line == "INVENTORY" then
 		client:send(inventoryLine() .. "\n")
 		return
 	elseif line == "BOX" then
 		client:send(boxLine() .. "\n")
 		return
+	elseif string.match(line, "^THROW") then
+		client:send(handleThrow(tonumber(string.match(line, "^THROW:(%d+)"))) .. "\n")
+		return
+	elseif line == "DEX" then
+		client:send(dexLine() .. "\n")
+		return
+	elseif line == "BAG" then
+		client:send(bagLine() .. "\n")
+		return
 	end
-
 	if line == "GET_STATE" then
 		client:send(getState() .. "\n")
 	elseif line == "STATUS" then
@@ -1057,7 +1088,6 @@ local function handleMainLine(line)
 		client:send(handleAction(action) .. "\n")
 	end
 end
-
 local function serviceSockets()
 	if not client then
 		local c = server:accept()
@@ -1077,7 +1107,6 @@ local function serviceSockets()
 			end
 		end
 	end
-
 	if probeServer then
 		if not probeClient then
 			local c = probeServer:accept()
@@ -1101,28 +1130,19 @@ local function serviceSockets()
 		end
 	end
 end
-
--- ==================================================================== frame
-
 function onFrame()
 	frameCount = frameCount + 1
 	updateInput()
 	checkToggleKey()
-
 	local cb2 = readCb2()
 	local inBattle = isInBattle()
-
 	if LOG_CALLBACK2_CHANGES and cb2 ~= lastLoggedCb2 then
 		lastLoggedCb2 = cb2
 		console:log(string.format("callback2 -> 0x%08X%s", cb2, inBattle and " (in battle)" or ""))
 	end
-
 	Nav.observe()
-
 	if inBattle and not wasInBattle then
 		Nav.noteBattleMap()
-		-- Release anything navigation was holding so it can't
-		-- move a menu cursor on the first frame of the battle.
 		cancelInput()
 		if Nav.active() then
 			Nav.update(true)
@@ -1130,16 +1150,13 @@ function onFrame()
 		navHeld = nil
 	end
 	wasInBattle = inBattle
-
 	if not automationEnabled then
-		-- Hands off the controls entirely; reads still work.
 		if inBattle then
 			refreshFieldOrder(cb2)
 		end
 		serviceSockets()
 		return
 	end
-
 	if inBattle then
 		refreshFieldOrder(cb2)
 		if task then
@@ -1153,8 +1170,6 @@ function onFrame()
 		end
 		watchdog.sig, watchdog.frames, promptCooldown = nil, 0, 0
 		if Nav.active() then
-			-- Scripted navigation owns the controls while it runs; the
-			-- menu-tap path stays out of the way.
 			Nav.update(false)
 			applyNavKeys()
 		else
@@ -1167,10 +1182,8 @@ function onFrame()
 			end
 		end
 	end
-
 	serviceSockets()
 end
-
 Nav.init(CONFIG, {
 	read8 = function(a)
 		return emu:read8(a)
@@ -1191,6 +1204,5 @@ Nav.init(CONFIG, {
 		return nil
 	end,
 }, navIO, KEY)
-
 callbacks:add("frame", onFrame)
 startServers()

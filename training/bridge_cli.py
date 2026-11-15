@@ -54,6 +54,8 @@ BANNER = """commands:
   STATUS              battle phase
   GET_STATE           the raw observation vector
   INVENTORY           money, ball counts, party levels, last battle outcome (read-only)
+  THROW[:itemId]      throw a ball (default Poke Ball) in a wild single battle; poll STATUS after
+  BAG                 bag pocket/cursor, current callback and controller fn (read-only)
   BOX                 every occupied PC slot with species and derived level (read-only)
   watch               poll NAV:STATUS until it settles
   quit
