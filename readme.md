@@ -124,8 +124,12 @@ part of the policy's 17 actions, so the checkpoint is unchanged.
   during those throws.
 
 Set `SCRIPTED_CATCH = False` in `env.py` to turn it off (`run_eval.py` already
-does). Catches are logged to `logs/catches.csv`, and `logs/level_gap.csv`
-records party-vs-PC levels every 25 battles. Swapping the party for the
+does). Logs: `logs/catches.csv` (every catch), `logs/throws.csv` (every throw and its
+result), `logs/battles.csv` (one row per battle: outcome, wild or trainer,
+level gap, switch counts, balls) and `logs/level_gap.csv` (party-vs-PC levels
+every 25 battles). `battle_data.csv` is the per-step log; if its header is
+older than the current columns, the old file is renamed to
+`battle_data_oldschema_<time>.csv` when training starts. Swapping the party for the
 low-level stock from the PC is not built yet.
 
 Read-only and manual bridge commands (`python training/bridge_cli.py <CMD>`,
