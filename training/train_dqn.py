@@ -21,8 +21,13 @@ class WinRateCallback(BaseCallback):
         if dones is not None and infos is not None:
             for i, done in enumerate(dones):
                 if done:
-                    player_lost = infos[i].get("player_lost", False)
-                    self.battle_results.append(0.0 if player_lost else 1.0)
+                    # Only decisive battles count: a catch or a run is neither a
+                    # win nor a loss. Fall back to player_lost if no outcome.
+                    outcome = infos[i].get("outcome")
+                    if outcome in (1, 2, 9):
+                        self.battle_results.append(1.0 if outcome == 1 else 0.0)
+                    elif outcome is None:
+                        self.battle_results.append(0.0 if infos[i].get("player_lost", False) else 1.0)
 
         # Per-battle behaviour stats (voluntary switches, turns, ...) from the env
         if dones is not None and infos is not None:
@@ -65,7 +70,11 @@ if __name__ == "__main__":
     env = PokemonBattleEnv()
     env = ActionMasker(env, mask_fn)
 
-    model_name = "pokemon_ppo_masked_v7_expanded"
+    # Absolute path, so it loads (and saves) the same checkpoint no matter which
+    # folder training is launched from.
+    model_name = os.path.join(
+        os.path.dirname(os.path.abspath(__file__)), "..", "checkpoints", "current",
+        "pokemon_ppo_masked_v7_expanded")
 
     # 2. Setup the automated milestone backups (numbered, accumulating --
     #    saved exactly when the brain updates, i.e. every n_steps=2048)
