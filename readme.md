@@ -95,11 +95,49 @@ python training/run_eval.py
 - **Damage dealt / taken**: scaled by the *fraction of max team HP* changed
   (not raw HP), so a knockout is worth roughly the same regardless of level.
 - **Win / loss**: ±100, read directly from `gBattleOutcome`.
-- **Switching**: no reward by itself. An escalating penalty applies from the
-  *second* consecutive switch onward, so one tactical switch is free but
-  stalling by repeated switching is discouraged.
+- **KO bonus**: +5 per enemy faint, -5 per faint of your own.
+- **Costs**: -0.25 per decision turn and -3 per *voluntary* switch. Forced
+  switches (after a faint) and switches the game refused are free.
+- **Catching** (outcome 7): +10 only for a Pokemon caught by hand mid-fight,
+  and -1 per ball used during the fight. Scripted catches happen before the
+  agent acts and are not rewarded or charged.
+- **Rejected actions**: never stored as training steps. The env retries the
+  action, then falls back to a legal one, and logs each reject to
+  `logs/rejects.csv`.
 - **Timeouts / bridge failures**: episode ends `truncated` with reward 0 —
   never penalized, since it's not something the model controlled.
+
+## Catching
+
+A scripted rule (`training/catch_policy.py`) keeps a pool of low-level Pokemon
+on hand for when the party has outleveled the area it hunts in. It is not
+part of the policy's 17 actions, so the checkpoint is unchanged.
+
+- **Trigger:** every party member is at least 12 levels above the highest
+  wild level recently seen on this map (last 20 encounters, at least 10
+  needed), and the PC holds fewer than 6 Pokemon at or just above that level.
+- **Action:** catch the wild Pokemon, up to 4 balls each, skipping species
+  already in the PC. Wild battles only.
+- **When it runs:** in `reset()`, before the agent's first move, so no action
+  the policy chose is ever replaced. If a ball catches it, `reset()` moves on
+  to the next encounter. The agent is not charged for HP lost or balls spent
+  during those throws.
+
+Set `SCRIPTED_CATCH = False` in `env.py` to turn it off (`run_eval.py` already
+does). Catches are logged to `logs/catches.csv`, and `logs/level_gap.csv`
+records party-vs-PC levels every 25 battles. Swapping the party for the
+low-level stock from the PC is not built yet.
+
+Read-only and manual bridge commands (`python training/bridge_cli.py <CMD>`,
+training stopped):
+
+| Command | What it does |
+|---|---|
+| `INVENTORY` | money, ball counts, party levels, last outcome, trainer-battle flag |
+| `BOX` | every occupied PC slot with species and level |
+| `DEX` | Pokedex owned flags |
+| `BAG` | bag pocket/cursor and current callback |
+| `THROW[:itemId]` | throw a ball in a wild single battle (default Poke Ball) |
 
 ## Memory address finder
 
@@ -138,9 +176,10 @@ python tools/mem_finder.py analyze analysis/mem_sessions/<session> --sym pokeeme
 ## Project layout
 
 ```
-games/emerald/          battle_bridge.lua, emerald_config.lua, game data (species/moves/types)
-training/                env.py, train_dqn.py, expand_model.py, logger.py, run_eval.py
-tools/                   mem_finder.py
+games/battle_bridge.lua  the mGBA bridge (battle tasks, throw task, socket server)
+games/emerald/          emerald_config.lua, inventory.lua (read-only readers), overworld_nav.lua, game data
+training/                env.py, train_dqn.py, catch_policy.py, exp_tables.py, bridge_cli.py,
+                         expand_model.py, logger.py, mem_finder.py
 checkpoints/current/     the model currently being trained/loaded
 backups/                 auto-generated milestone + crash-safety checkpoints (not committed)
 analysis/mem_sessions/   mem_finder.py output (not committed)
