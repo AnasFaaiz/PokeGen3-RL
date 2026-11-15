@@ -47,6 +47,32 @@ def log_reject(episode, step, action, reply, phase, mask, retry, substituted_wit
                     "".join("1" if m else "0" for m in mask) if mask is not None else "",
                     retry, "" if substituted_with is None else substituted_with])
 
+LEVEL_GAP_FILE = os.path.join(_LOG_DIR, "level_gap.csv")
+
+def log_level_gap(episode, party_levels, box_top, balls, money):
+    """Periodic roster snapshot: party levels vs the strongest PC mons."""
+    new = not os.path.exists(LEVEL_GAP_FILE)
+    with open(LEVEL_GAP_FILE, "a", newline="") as f:
+        w = csv.writer(f)
+        if new:
+            w.writerow(["timestamp", "episode", "party_levels", "box_top5_levels", "balls", "money"])
+        w.writerow([datetime.now().strftime("%Y-%m-%d %H:%M:%S"), episode,
+                    " ".join(map(str, party_levels)), " ".join(map(str, box_top)), balls, money])
+
+CATCH_FILE = os.path.join(_LOG_DIR, "catches.csv")
+
+def log_catch(episode, species, level, party_min_level, area_max, balls_used, reason):
+    """One row per caught Pokemon. reason is the scripted rule's reason, or
+    empty for a catch the rule did not start (a manual throw)."""
+    new = not os.path.exists(CATCH_FILE)
+    with open(CATCH_FILE, "a", newline="") as f:
+        w = csv.writer(f)
+        if new:
+            w.writerow(["timestamp", "episode", "species", "level", "party_min_level",
+                        "area_max", "balls_used", "reason"])
+        w.writerow([datetime.now().strftime("%Y-%m-%d %H:%M:%S"), episode, species, level,
+                    party_min_level, area_max, balls_used, reason])
+
 def alert_loss():
     print("[ALERT] Battle lost!")
     try:
@@ -157,15 +183,27 @@ def log_step(
             obs_json
         ])
 
-def log_battle_end(episode, won, total_steps, episode_reward):
+OUTCOME_NAMES = {1: "WIN", 2: "LOSS", 3: "RAN", 7: "CAUGHT", 9: "FORFEIT"}
+
+def outcome_name(outcome):
+    return OUTCOME_NAMES.get(outcome, f"END({outcome})")
+
+def log_battle_end(episode, outcome, total_steps, episode_reward, stats=None):
+    """outcome is the raw gBattleOutcome. Only a loss/forfeit sounds the alert;
+    a catch, a run or a draw is not a loss."""
     timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    result = "WIN" if won else "LOSS"
+    result = outcome_name(outcome)
+    extra = ""
+    if stats:
+        kind = {0: "wild", 1: "trainer"}.get(stats.get("trainer_battle"), "?")
+        extra = (f" | {kind} L{stats.get('lead_level')} vs L{stats.get('enemy_level')} "
+                 f"(gap {stats.get('level_gap'):+d})")
     summary_line = (
-        f"[{timestamp}] === Battle #{episode:03d} Result: {result} | "
+        f"[{timestamp}] === Battle #{episode:03d} Result: {result}{extra} | "
         f"Steps: {total_steps} | Total Reward: {episode_reward:+.2f} ==="
     )
     with open(LOG_FILE, "a") as f:
         f.write(summary_line + "\n" + "-"*80 + "\n")
 
-    if not won:
+    if outcome in (2, 9):
         alert_loss()

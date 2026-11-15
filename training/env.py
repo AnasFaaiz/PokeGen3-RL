@@ -5,7 +5,9 @@ import json
 import numpy as np
 import gymnasium as gym
 from gymnasium import spaces
-from logger import init_csv, log_step, log_battle_end, log_reject, decode_action
+from catch_policy import CatchContext, CatchPolicy
+from exp_tables import box_level
+from logger import init_csv, log_step, log_battle_end, log_reject, log_level_gap, log_catch, decode_action, outcome_name
 
 # --- Load Static Game Data ---
 _DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "games", "emerald", "game_data")
@@ -152,9 +154,19 @@ SWITCH_COST = 3.0            # per voluntary switch (start strong to break the o
 TURN_COST = 0.25             # per decision turn
 KO_BONUS = 5.0               # per enemy faint (+) / own faint (-)
 
+# Catching (outcome 7). Scripted catches happen in reset(), before the agent
+# acts, so this only pays for a Pokemon caught by hand mid-fight. Kept well
+# below WIN_REWARD. BALL_COST is charged per ball used during the fight.
+OUTCOME_CAUGHT = 7
+CATCH_BONUS = 10.0
+BALL_COST = 1.0
+
 TURN_TIMEOUT_S = 60.0        # one turn, including animations; a hang past this truncates
 POLL_S = 0.05
 MAX_CONSECUTIVE_REJECTS = 10
+BOX_CACHE_BATTLES = 10       # refresh the PC snapshot at most this often (and after a catch)
+SCRIPTED_CATCH = True       # scripted catch rule on; set False to turn it off
+ROSTER_LOG_EVERY = 25        # battles between party-vs-PC level snapshots
 
 # --- Overworld navigation (scripted, never learned) ---
 # Between battles the bridge walks the player back to wild grass, and to a
@@ -204,6 +216,10 @@ class PokemonBattleEnv(gym.Env):
         self.prev_p_team = None
         self.prev_e_team = None
         self.prev_p_alive = None
+        self.battle_start = {"lead_level": 0, "enemy_level": 0, "trainer": -1, "balls": None}
+        self.catch_policy = CatchPolicy(enabled=SCRIPTED_CATCH)
+        self.box_cache = None            # (levels, species set) of the PC, refreshed lazily
+        self.box_cache_episode = 0
         self.prev_e_alive = None
         self.last_party_raw = [0] * 96
         self.last_active_slot = 0
@@ -316,6 +332,9 @@ class PokemonBattleEnv(gym.Env):
 
         return {
             "obs": obs,
+            "e_species": b1_raw[18],
+            "e_level": b1_raw[12],
+            "p_level": b0_raw[12],
             "p_hp": b0_raw[0],
             "e_hp": b1_raw[0],
             "battle_over": bool(battle_over),
@@ -386,23 +405,147 @@ class PokemonBattleEnv(gym.Env):
         self.last_trapped = False
         self.consecutive_rejects = 0
 
-        phase, _ = self._status()
-        if phase not in READY_PHASES:
-            # Not mid-battle: walk the player to the next encounter, healing
-            # first if the party can't take another fight.
-            self._navigate_to_next_battle()
+        while True:
+            phase, _ = self._status()
+            if phase not in READY_PHASES:
+                # Not mid-battle: walk the player to the next encounter, healing
+                # first if the party can't take another fight.
+                self._navigate_to_next_battle()
 
-        phase, _ = self._status()
-        if phase not in READY_PHASES:
-            print("Waiting for the next battle...")
-        # Blocks until a battle is on and the game is asking for an action.
-        self._wait_for_phase(READY_PHASES, timeout=None)
+            phase, _ = self._status()
+            if phase not in READY_PHASES:
+                print("Waiting for the next battle...")
+            # Blocks until a battle is on and the game is asking for an action.
+            self._wait_for_phase(READY_PHASES, timeout=None)
 
-        st = self._get_state()
+            st = self._get_state()
+            self._record_battle_start(st["obs"])
+            # Scripted catching happens here, before the agent's first move, so
+            # no action the policy chose is ever replaced. If the battle ends
+            # during it (caught, or it fled), loop to the next encounter.
+            ended, st = self._catch_before_fight(st)
+            if not ended:
+                break
         self.prev_p_team, self.prev_e_team = st["p_team"], st["e_team"]
         self.prev_p_alive, self.prev_e_alive = st["p_alive"], st["e_alive"]
         self.last_obs = st["obs"]
         return st["obs"], {}
+
+    def _get_box(self, force=False):
+        """(levels, species set) of every PC mon, cached across battles; None if unreadable."""
+        stale = self.episode - self.box_cache_episode >= BOX_CACHE_BATTLES
+        if self.box_cache is None or stale or force:
+            try:
+                line = self._request("BOX")
+                if not line.startswith("BOX:") or line.startswith("BOX:ERR"):
+                    return None
+                levels, species = [], set()
+                for ent in filter(None, line[4:].split(",")):
+                    _, sp, exp = ent.split(":")
+                    levels.append(box_level(int(sp), int(exp)))
+                    species.add(int(sp))
+                self.box_cache, self.box_cache_episode = (levels, species), self.episode
+            except (OSError, ValueError):
+                return None
+        return self.box_cache
+
+    def _catch_before_fight(self, st):
+        """Run the catch rule at the start of a wild battle. Returns
+        (battle_ended, state). The battle ends here if a ball catches the
+        Pokemon or the Pokemon flees."""
+        pol = self.catch_policy
+        inv = self._read_inventory()
+        if not pol.enabled or not inv:
+            return False, st
+        trainer = inv["trainer"] == "1"
+        map_key = inv.get("map", "?")
+        if not trainer and st["e_level"] > 0:
+            pol.observe_area(map_key, st["e_level"])
+        start_balls = self._ball_total(inv)
+        while True:
+            party = [int(x) for x in inv["lv"].split(",") if x]
+            area_max = pol.area_max(map_key)
+            box = self._get_box() if pol.overleveled(party, area_max) else (None, set())
+            ctx = CatchContext(
+                enemy_species=st["e_species"], enemy_level=st["e_level"], party_levels=party,
+                box_levels=box[0] if box else None, box_species=box[1] if box else set(),
+                area_max=area_max, trainer=trainer, balls=self._ball_total(inv) or 0)
+            if not pol.decide(ctx):
+                break
+            reply = self._request("THROW")
+            if reply != "ACK":
+                print(f"[catch] throw rejected: {reply}")
+                pol.record_throw(ok=False)
+                break
+            print(f"[catch] throwing at L{ctx.enemy_level} (ball {pol.thrown + 1}, "
+                  f"area max L{area_max}, party min L{min(party)})")
+            phase, result = self._wait_for_phase(READY_PHASES | END_PHASES, self.turn_timeout)
+            pol.record_throw(ok=(result != "FAILED"))
+            if phase is None:
+                break
+            st = self._get_state()
+            if phase in END_PHASES or st["battle_over"]:
+                self._finish_catch_battle(st, ctx, start_balls)
+                return True, st
+            if phase == "FORCED_SWITCH":
+                break
+            inv = self._read_inventory()
+            if not inv:
+                break
+        # The agent is not charged for HP lost or balls spent during scripted throws.
+        self.battle_start["balls"] = self._ball_total(self._read_inventory())
+        return False, st
+
+    def _finish_catch_battle(self, st, ctx, start_balls):
+        used = None
+        end = self._ball_total(self._read_inventory())
+        if start_balls is not None and end is not None:
+            used = max(0, start_balls - end)
+        if st["outcome"] == OUTCOME_CAUGHT:
+            self.box_cache = None   # the new mon changes the box
+            log_catch(self.episode, SPECIES_ID_TO_NAME.get(ctx.enemy_species, ctx.enemy_species),
+                      ctx.enemy_level, min(ctx.party_levels) if ctx.party_levels else 0,
+                      ctx.area_max, used, self.catch_policy.last_reason)
+            print(f"[catch] caught L{ctx.enemy_level} {SPECIES_ID_TO_NAME.get(ctx.enemy_species, '?')}")
+        else:
+            print(f"[catch] battle ended during throws ({outcome_name(st['outcome'])})")
+
+    def _read_inventory(self):
+        """Decode the bridge's INVENTORY reply into a dict, or None."""
+        try:
+            line = self._request("INVENTORY")
+            if not line.startswith("INV:") or line.startswith("INV:ERR"):
+                return None
+            return dict(kv.split("=", 1) for kv in line[4:].split(";"))
+        except (OSError, ValueError):
+            return None
+
+    def _record_battle_start(self, obs):
+        """Remember the lead/enemy levels this battle began with, and every
+        ROSTER_LOG_EVERY battles snapshot party vs PC levels. Logging only:
+        nothing here touches the observation or reward."""
+        inv = self._read_inventory()
+        self.battle_start = {
+            "lead_level": int(round(obs[35] * 100.0)),
+            "enemy_level": int(round(obs[82] * 100.0)),
+            "trainer": int(inv["trainer"]) if inv else -1,
+            "balls": self._ball_total(inv),
+        }
+        self.catch_policy.start_battle()
+        if inv and self.episode % ROSTER_LOG_EVERY == 1:
+            try:
+                box = self._request("BOX")
+                top = []
+                if box.startswith("BOX:") and not box.startswith("BOX:ERR"):
+                    lv = []
+                    for ent in filter(None, box[4:].split(",")):
+                        _, sp, exp = ent.split(":")
+                        lv.append(box_level(int(sp), int(exp)))
+                    top = sorted(lv, reverse=True)[:5]
+                log_level_gap(self.episode, inv["lv"].split(",") if inv["lv"] else [],
+                              top, inv["balls"], inv["money"])
+            except (OSError, ValueError):
+                pass
 
     def _party_hp(self):
         """(current HP, max HP, conscious count) across the party."""
@@ -508,7 +651,16 @@ class PokemonBattleEnv(gym.Env):
             return WIN_REWARD
         if outcome in (OUTCOME_LOST, OUTCOME_FORFEITED):
             return LOSS_REWARD
-        return 0.0   # ran away, caught, etc.
+        if outcome == OUTCOME_CAUGHT:
+            return CATCH_BONUS
+        return 0.0   # ran away, etc.
+
+    @staticmethod
+    def _ball_total(inv):
+        """Total balls in the bag from an INVENTORY dict ("id:qty,id:qty"), or None."""
+        if not inv:
+            return None
+        return sum(int(b.split(":")[1]) for b in inv["balls"].split(",") if b)
 
     def step(self, action):
         # The previous step left the game at a decision point, but make sure.
@@ -564,7 +716,6 @@ class PokemonBattleEnv(gym.Env):
                 if len(legal):
                     action = int(legal[0])
         self.consecutive_rejects = 0
-
         # Wait until the game asks for the next decision or the battle ends.
         # BUSY (bridge pressing keys) and WAITING (animations/text) are skipped.
         phase, result = self._wait_for_phase(READY_PHASES | END_PHASES, self.turn_timeout)
@@ -579,8 +730,17 @@ class PokemonBattleEnv(gym.Env):
         dealt = self.prev_e_team - st["e_team"]
         taken = self.prev_p_team - st["p_team"]
         reward = DAMAGE_REWARD_SCALE * (dealt - taken)
+        balls_thrown = 0
         if terminated:
             reward += self._outcome_bonus(st["outcome"])
+            # Charge for balls used this battle (also counts manual throws).
+            start, end = self.battle_start.get("balls"), self._ball_total(self._read_inventory())
+            if start is not None and end is not None:
+                balls_thrown = max(0, start - end)
+                reward -= BALL_COST * balls_thrown
+            if st["outcome"] == OUTCOME_CAUGHT:
+                log_catch(self.episode, SPECIES_ID_TO_NAME.get(before["e_species"], before["e_species"]),
+                          before["e_level"], before["p_level"], None, balls_thrown, "manual")
 
         # Faint bonus/penalty (alive-count change; switching never changes it).
         reward += KO_BONUS * max(0, self.prev_e_alive - st["e_alive"])
@@ -631,7 +791,7 @@ class PokemonBattleEnv(gym.Env):
         eff = (obs[13 + (action % 4)] * 4.0) if is_attack_action else 1.0
         legal = int(np.sum(self.action_masks()))
         if terminated:
-            outcome_txt = {OUTCOME_WON: " | WIN"}.get(st["outcome"], " | LOSS" if player_lost else " | END")
+            outcome_txt = f" | {outcome_name(st['outcome'])}"
         else:
             outcome_txt = ""
         failed_txt = " | ACTION FAILED" if action_failed else ""
@@ -660,9 +820,6 @@ class PokemonBattleEnv(gym.Env):
         action_meta = {"desc": action_desc, "legal_count": legal, "prob": getattr(self, "current_action_prob", 0.0)}
 
         log_step(self.episode, self.step_count, action, reward, terminated, player_lost, obs_dict, action_meta, obs=obs)
-        if terminated:
-            log_battle_end(self.episode, st["outcome"] == OUTCOME_WON, self.step_count, self.total_reward)
-
         self.step_count += 1
         info = {"player_lost": player_lost, "outcome": st["outcome"], "action_failed": action_failed}
         if terminated:
@@ -673,7 +830,15 @@ class PokemonBattleEnv(gym.Env):
                 "moves": self.move_count,
                 "turns": self.step_count,
                 "return": self.total_reward,
+                "lead_level": self.battle_start["lead_level"],
+                "enemy_level": self.battle_start["enemy_level"],
+                "level_gap": self.battle_start["lead_level"] - self.battle_start["enemy_level"],
+                "trainer_battle": self.battle_start["trainer"],
+                "balls_thrown": balls_thrown,
+                "caught": int(st["outcome"] == OUTCOME_CAUGHT),
             }
+            log_battle_end(self.episode, st["outcome"], self.step_count - 1, self.total_reward,
+                           info["battle_stats"])
         return obs, reward, terminated, False, info
 
     def _timeout_return(self, action, obs, action_desc=None):
