@@ -30,6 +30,23 @@ def decode_action(action_idx, move_names=None, party_names=None):
         p_name = party_names[bench_slot - 1] if party_names and (bench_slot - 1) < len(party_names) else f"Slot_{bench_slot}"
         return f"SWITCH -> {p_name}"
 
+REJECT_FILE = os.path.join(_LOG_DIR, "rejects.csv")
+
+def log_reject(episode, step, action, reply, phase, mask, retry, substituted_with=None):
+    """One row per refused ACTION so the missing mask rule can be found.
+    reply is the bridge's REJECT:<reason>; phase is the bridge phase at the
+    time; mask is the 17-bool legal-action mask the policy was given."""
+    new = not os.path.exists(REJECT_FILE)
+    with open(REJECT_FILE, "a", newline="") as f:
+        w = csv.writer(f)
+        if new:
+            w.writerow(["timestamp", "episode", "step", "action", "reply", "phase",
+                        "mask_legal_at_action", "mask", "retry", "substituted_with"])
+        w.writerow([datetime.now().strftime("%Y-%m-%d %H:%M:%S"), episode, step, action, reply,
+                    phase, int(bool(mask[action])) if mask is not None else "",
+                    "".join("1" if m else "0" for m in mask) if mask is not None else "",
+                    retry, "" if substituted_with is None else substituted_with])
+
 def alert_loss():
     print("[ALERT] Battle lost!")
     try:

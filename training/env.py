@@ -5,7 +5,7 @@ import json
 import numpy as np
 import gymnasium as gym
 from gymnasium import spaces
-from logger import init_csv, log_step, log_battle_end, decode_action
+from logger import init_csv, log_step, log_battle_end, log_reject, decode_action
 
 # --- Load Static Game Data ---
 _DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "games", "emerald", "game_data")
@@ -134,9 +134,23 @@ OUTCOME_WON, OUTCOME_LOST, OUTCOME_FORFEITED = 1, 2, 9
 # switching itself never changes the reward: the old reward paid out when
 # you switched a hurt Pokemon for a healthy one, and charged you when the
 # enemy sent out a fresh one.
+#
+# On top of the damage term:
+#  * SWITCH_COST   -- flat price for every *voluntary* switch. Forced switches
+#                     (after a faint) and switches the game refused are free,
+#                     because the agent had no real choice there. A flat cost
+#                     (not "only after N in a row") also taxes the
+#                     switch/attack/switch/attack stalling pattern.
+#  * TURN_COST     -- tiny price per decision turn so stalling of any kind
+#                     (switching, useless moves) is never free.
+#  * KO_BONUS      -- extra credit for fainting an enemy / penalty for losing
+#                     a Pokemon, on top of the HP-fraction damage.
+# Win/loss stays dominant (+-100): a whole fight's shaping is only ~10-30.
 DAMAGE_REWARD_SCALE = 50.0
 WIN_REWARD, LOSS_REWARD = 100.0, -100.0
-STALL_PENALTY = 3.0          # per extra consecutive switch (2nd = -3, 3rd = -6, ...)
+SWITCH_COST = 3.0            # per voluntary switch (start strong to break the old habit; ease to ~2 later)
+TURN_COST = 0.25             # per decision turn
+KO_BONUS = 5.0               # per enemy faint (+) / own faint (-)
 
 TURN_TIMEOUT_S = 60.0        # one turn, including animations; a hang past this truncates
 POLL_S = 0.05
@@ -177,18 +191,20 @@ class PokemonBattleEnv(gym.Env):
         self.episode = 0
         self.step_count = 0
         self.global_step = 0
-        self.total_reward = 0.0
+        self.total_reward = 0.0          # per battle (zeroed in reset)
+        self.session_reward = 0.0        # whole run, for the summary
         self.move_count = 0
-        self.switch_count = 0
+        self.switch_count = 0            # voluntary switches only
+        self.forced_switch_count = 0     # replacements after a faint (not the agent's choice)
+        self.failed_switch_count = 0     # switches the game refused
         self.illegal_count = 0
         self.current_action_prob = 1.0
-        # Consecutive-switch stall tracker: switches in a row with no attack in
-        # between. A single switch is never taxed; only stalling is.
-        self.consecutive_switches = 0
         self.consecutive_rejects = 0
 
         self.prev_p_team = None
         self.prev_e_team = None
+        self.prev_p_alive = None
+        self.prev_e_alive = None
         self.last_party_raw = [0] * 96
         self.last_active_slot = 0
         self.last_awaiting_forced_switch = False
@@ -310,9 +326,22 @@ class PokemonBattleEnv(gym.Env):
             "moves_list": [b0_raw[6], b0_raw[7], b0_raw[8], b0_raw[9]],
             "p_team": sum(hp / mx for hp, mx in p_team_slots if mx > 0),
             "e_team": sum(hp / mx for hp, mx in e_team_slots if mx > 0),
+            "p_alive": sum(1 for hp, mx in p_team_slots if mx > 0 and hp > 0),
+            "e_alive": sum(1 for hp, mx in e_team_slots if mx > 0 and hp > 0),
         }
 
-    def action_masks(self):
+    def action_masks(self, refresh=True):
+        # Rebuild the cached state from the live game first. The mask used to
+        # come from the observation taken at the end of the previous step, so
+        # anything that changed since (forced switch, party reorder, manual
+        # input) made it disagree with what the bridge would accept.
+        if refresh and hasattr(self, 'last_obs'):
+            try:
+                phase, _ = self._status()
+                if phase in READY_PHASES:
+                    self.last_obs = self._get_state()["obs"]
+            except (OSError, ValueError, RuntimeError):
+                pass   # keep the cached state
         if not hasattr(self, 'last_obs'): return np.ones(17, dtype=bool)
         mask = np.zeros(17, dtype=bool)
 
@@ -350,7 +379,9 @@ class PokemonBattleEnv(gym.Env):
         super().reset(seed=seed)
         self.episode += 1
         self.step_count = 0
-        self.consecutive_switches = 0
+        self.total_reward = 0.0
+        self.move_count = self.switch_count = 0          # per-battle stats
+        self.forced_switch_count = self.failed_switch_count = 0
         self.switch_blocked = False
         self.last_trapped = False
         self.consecutive_rejects = 0
@@ -369,6 +400,7 @@ class PokemonBattleEnv(gym.Env):
 
         st = self._get_state()
         self.prev_p_team, self.prev_e_team = st["p_team"], st["e_team"]
+        self.prev_p_alive, self.prev_e_alive = st["p_alive"], st["e_alive"]
         self.last_obs = st["obs"]
         return st["obs"], {}
 
@@ -487,21 +519,50 @@ class PokemonBattleEnv(gym.Env):
             st = self._get_state()
             return st["obs"], 0.0, True, False, {"player_lost": st["player_lost"], "outcome": st["outcome"]}
 
+        forced_switch_turn = (phase == "FORCED_SWITCH")   # replacement after a faint: no real choice
         before = self._get_state()   # also refreshes the slot->Pokemon mapping in Lua
         prev_e1_pp = [round(before["obs"][48 + i] * 40.0) for i in range(4)]
         prev_e1_moves = [round(before["obs"][52 + i] * 355.0) for i in range(4)]
 
-        is_attack_action = action < 12
-        action_desc = decode_action(action, move_names=[MOVE_NAMES.get(m, f"Move_{m}") for m in before["moves_list"]])
-
-        reply = self._request(f"ACTION:{action}")
-        if reply != "ACK":
-            # Mask and bridge disagree (should be rare). Nothing happened in game.
+        # A rejected ACTION means the mask and the game disagree (state moved
+        # under us, e.g. manual keypresses). Never hand that back to SB3 as a
+        # transition: it would be stored as a real (reward 0) step. Retry the
+        # same action once the state settles, then fall back to a legal one;
+        # only give up (truncate) after MAX_CONSECUTIVE_REJECTS.
+        reject_retries = 0
+        while True:
+            is_attack_action = action < 12
+            action_desc = decode_action(action, move_names=[MOVE_NAMES.get(m, f"Move_{m}") for m in before["moves_list"]])
+            reply = self._request(f"ACTION:{action}")
+            if reply == "ACK":
+                break
             self.consecutive_rejects += 1
-            print(f"Bridge rejected ACTION:{action} ({reply})")
-            truncated = self.consecutive_rejects >= MAX_CONSECUTIVE_REJECTS
-            self.last_obs = before["obs"]
-            return before["obs"], 0.0, False, truncated, {"rejected": reply}
+            reject_retries += 1
+            print(f"Bridge rejected ACTION:{action} ({reply}) -- retry {reject_retries}")
+            try:
+                rej_phase, _ = self._status()
+            except Exception:
+                rej_phase = "?"
+            log_reject(self.episode, self.step_count, action, reply, rej_phase,
+                       self.action_masks(refresh=False), reject_retries)
+            if self.consecutive_rejects >= MAX_CONSECUTIVE_REJECTS:
+                self.last_obs = before["obs"]
+                return before["obs"], 0.0, False, True, {"rejected": reply}
+            time.sleep(POLL_S * 4)
+            phase, _ = self._wait_for_phase(READY_PHASES | END_PHASES, self.turn_timeout)
+            if phase is None:
+                return self._timeout_return(action, before["obs"])
+            if phase in END_PHASES:
+                st = self._get_state()
+                return st["obs"], 0.0, True, False, {"player_lost": st["player_lost"], "outcome": st["outcome"]}
+            forced_switch_turn = (phase == "FORCED_SWITCH")
+            before = self._get_state()
+            prev_e1_pp = [round(before["obs"][48 + i] * 40.0) for i in range(4)]
+            prev_e1_moves = [round(before["obs"][52 + i] * 355.0) for i in range(4)]
+            if reject_retries >= 2:   # same action keeps failing: swap in a legal one
+                legal = np.flatnonzero(self.action_masks())
+                if len(legal):
+                    action = int(legal[0])
         self.consecutive_rejects = 0
 
         # Wait until the game asks for the next decision or the battle ends.
@@ -521,21 +582,30 @@ class PokemonBattleEnv(gym.Env):
         if terminated:
             reward += self._outcome_bonus(st["outcome"])
 
+        # Faint bonus/penalty (alive-count change; switching never changes it).
+        reward += KO_BONUS * max(0, self.prev_e_alive - st["e_alive"])
+        reward -= KO_BONUS * max(0, self.prev_p_alive - st["p_alive"])
+
         action_failed = (result == "FAILED")
         if action_failed and not is_attack_action:
             self.switch_blocked = True   # trapped by something we can't see
-        if not action_failed:
-            if is_attack_action:
-                self.consecutive_switches = 0
-            else:
-                self.consecutive_switches += 1
-                if self.consecutive_switches >= 2:
-                    reward -= STALL_PENALTY * (self.consecutive_switches - 1)
+        if not forced_switch_turn:
+            reward -= TURN_COST          # stalling is never free
+            if not is_attack_action and not action_failed:
+                reward -= SWITCH_COST    # voluntary switch
 
         self.prev_p_team, self.prev_e_team = st["p_team"], st["e_team"]
+        self.prev_p_alive, self.prev_e_alive = st["p_alive"], st["e_alive"]
         self.total_reward += reward
-        if is_attack_action: self.move_count += 1
-        else: self.switch_count += 1
+        self.session_reward += reward
+        if is_attack_action:
+            self.move_count += 1
+        elif forced_switch_turn:
+            self.forced_switch_count += 1
+        elif action_failed:
+            self.failed_switch_count += 1
+        else:
+            self.switch_count += 1
         self.global_step += 1
 
         # --- Live feed & logging ---
@@ -594,8 +664,17 @@ class PokemonBattleEnv(gym.Env):
             log_battle_end(self.episode, st["outcome"] == OUTCOME_WON, self.step_count, self.total_reward)
 
         self.step_count += 1
-        return obs, reward, terminated, False, {"player_lost": player_lost, "outcome": st["outcome"],
-                                                  "action_failed": action_failed}
+        info = {"player_lost": player_lost, "outcome": st["outcome"], "action_failed": action_failed}
+        if terminated:
+            info["battle_stats"] = {
+                "voluntary_switches": self.switch_count,
+                "forced_switches": self.forced_switch_count,
+                "failed_switches": self.failed_switch_count,
+                "moves": self.move_count,
+                "turns": self.step_count,
+                "return": self.total_reward,
+            }
+        return obs, reward, terminated, False, info
 
     def _timeout_return(self, action, obs, action_desc=None):
         """The game didn't reach a decision point within turn_timeout. That is a
@@ -620,5 +699,5 @@ class PokemonBattleEnv(gym.Env):
         return obs, 0.0, False, True, {"player_lost": False, "turn_timeout": True}
 
     def close(self):
-        print(f"\n=== Session summary ===\nTotal reward: {self.total_reward:+.1f}")
+        print(f"\n=== Session summary ===\nTotal reward: {self.session_reward:+.1f}")
         self.sock.close()

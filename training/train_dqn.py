@@ -11,6 +11,7 @@ class WinRateCallback(BaseCallback):
     def __init__(self, verbose=0):
         super().__init__(verbose)
         self.battle_results = deque(maxlen=100) # Tracks win/loss for the last 100 battles
+        self.battle_stats = {}                  # name -> deque of last 100 battles' values
 
     def _on_step(self) -> bool:
         # Intercept the 'dones' and 'infos' array from the environment
@@ -22,9 +23,20 @@ class WinRateCallback(BaseCallback):
                 if done:
                     player_lost = infos[i].get("player_lost", False)
                     self.battle_results.append(0.0 if player_lost else 1.0)
+
+        # Per-battle behaviour stats (voluntary switches, turns, ...) from the env
+        if dones is not None and infos is not None:
+            for i, done in enumerate(dones):
+                stats = infos[i].get("battle_stats") if done else None
+                if stats:
+                    for k, v in stats.items():
+                        self.battle_stats.setdefault(k, deque(maxlen=100)).append(v)
         return True
 
     def _on_rollout_end(self) -> None:
+        for k, q in self.battle_stats.items():
+            if q:
+                self.logger.record(f"battle/{k}_mean", float(np.mean(q)))
         # Calculate win rate and push it to the terminal table and TensorBoard
         if len(self.battle_results) > 0:
             win_rate = np.mean(self.battle_results) * 100.0
@@ -73,6 +85,9 @@ if __name__ == "__main__":
     if os.path.exists(f"{model_name}.zip"):
         print(f"Loading existing model '{model_name}.zip'...")
         model = MaskablePPO.load(model_name, env=env)
+        # Fine-tune under the new reward: the saved ent_coef (0.05) keeps the
+        # policy near-uniform, so lower it to let it commit to what pays off.
+        model.ent_coef = 0.01
     else:
         print("Creating a new model...")
         model = MaskablePPO(
