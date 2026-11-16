@@ -142,16 +142,22 @@ OUTCOME_WON, OUTCOME_LOST, OUTCOME_FORFEITED = 1, 2, 9
 #                     (after a faint) and switches the game refused are free,
 #                     because the agent had no real choice there. A flat cost
 #                     (not "only after N in a row") also taxes the
-#                     switch/attack/switch/attack stalling pattern.
-#  * TURN_COST     -- tiny price per decision turn so stalling of any kind
+#                     switch/attack/switch/attack stalling pattern. The cost
+#                     escalates within a battle (3, 4.5, 6, 7.5) and bench
+#                     switches are masked after MAX_VOLUNTARY_SWITCHES, so a
+#                     streak gets expensive and bounded. Always a penalty.
+#  * TURN_COST     -- price per decision turn so stalling of any kind
 #                     (switching, useless moves) is never free.
 #  * KO_BONUS      -- extra credit for fainting an enemy / penalty for losing
 #                     a Pokemon, on top of the HP-fraction damage.
 # Win/loss stays dominant (+-100): a whole fight's shaping is only ~10-30.
 DAMAGE_REWARD_SCALE = 50.0
 WIN_REWARD, LOSS_REWARD = 100.0, -100.0
-SWITCH_COST = 3.0            # per voluntary switch (start strong to break the old habit; ease to ~2 later)
-TURN_COST = 0.25             # per decision turn
+SWITCH_COST = 3.0            # base cost of a voluntary switch (the 1st in a battle)
+SWITCH_ESCALATION = 0.5      # each further switch in the same battle costs +50% of the base more
+MAX_VOLUNTARY_SWITCHES = 4   # hard cap per battle (bench switches are masked after this)
+TURN_COST = 1.0              # per decision turn (a 1-turn kill beats a 3-turn kill)
+WIN_HP_BONUS = 20.0          # extra on a WIN, scaled by the share of team HP kept vs battle start
 KO_BONUS = 5.0               # per enemy faint (+) / own faint (-)
 
 # Catching (outcome 7). Scripted catches happen in reset(), before the agent
@@ -178,10 +184,11 @@ ROSTER_LOG_EVERY = 25        # battles between party-vs-PC level snapshots
 # nowhere near the grass the agent was training in.
 HEAL_HP_FRACTION = 0.35      # heal when the team is below this share of max HP
 HEAL_MIN_CONSCIOUS = 2       # ...or when fewer than this many can still fight
-NAV_TIMEOUT_S = 180.0
+NAV_TIMEOUT_S = 600.0
 NAV_POLL_S = 0.25
-NAV_RETRIES = 3
+NAV_RETRIES = 5
 NAV_RETRY_DELAY_S = 2.0
+NAV_GIVEUP_PAUSE_S = 30.0   # pause between full retry rounds
 OVERWORLD_WAIT_S = 60.0
 
 
@@ -214,6 +221,7 @@ class PokemonBattleEnv(gym.Env):
         self.consecutive_rejects = 0
 
         self.prev_p_team = None
+        self.start_p_team = None
         self.prev_e_team = None
         self.prev_p_alive = None
         self.battle_start = {"lead_level": 0, "enemy_level": 0, "trainer": -1, "balls": None}
@@ -378,6 +386,16 @@ class PokemonBattleEnv(gym.Env):
         out_of_all_pp = np.sum(pp_ratios) <= 0.0
         valid_moves = [(out_of_all_pp or pp_ratios[i] > 0.0) for i in range(4)]
 
+        # A damaging move the enemy is immune to (0.0x) only wastes the turn.
+        # Status moves can still hit, and Hidden Power's type is not known here.
+        for i in range(4):
+            move_id = int(round(self.last_obs[5 + i] * 355.0))
+            is_damaging = MOVE_DAMAGE_CLASS.get(move_id, 0) != 0
+            if is_damaging and move_id != 237 and self.last_obs[13 + i] <= 0.0:
+                valid_moves[i] = False
+        if not any(valid_moves):    # never leave the agent without a move
+            valid_moves = [(out_of_all_pp or pp_ratios[i] > 0.0) for i in range(4)]
+
         e1_hp, p2_hp, e3_hp = self.last_obs[47], self.last_obs[94], self.last_obs[141]
 
         for i in range(4):
@@ -388,6 +406,8 @@ class PokemonBattleEnv(gym.Env):
         # Trapped (Mean Look, Shadow Tag, Ingrain...): the game refuses the
         # switch and the bridge wastes ~3 s in the party menu, so hide them.
         can_switch = not (getattr(self, 'last_trapped', False) or getattr(self, 'switch_blocked', False))
+        if self.switch_count >= MAX_VOLUNTARY_SWITCHES:
+            can_switch = False
         for i in range(1, 6):
             if can_switch and self.last_party_raw[i * 8] > 0: mask[11 + i] = True    # Bench switches (slot 0 = active)
 
@@ -427,6 +447,7 @@ class PokemonBattleEnv(gym.Env):
             ended, st = self._catch_before_fight(st)
             if not ended:
                 break
+        self.start_p_team = st["p_team"]
         self.prev_p_team, self.prev_e_team = st["p_team"], st["e_team"]
         self.prev_p_alive, self.prev_e_alive = st["p_alive"], st["e_alive"]
         self.last_obs = st["obs"]
@@ -624,36 +645,44 @@ class PokemonBattleEnv(gym.Env):
     def _navigate_to_next_battle(self):
         """Walk to encounter tiles (grass or cave; healing first if needed) and block until a battle
         starts. Failures are not fatal: the player may be mid-cutscene (a
-        whiteout replays the Center scene), so retry a few times, then fall
-        back to waiting for a battle however it starts."""
-        for attempt in range(1, NAV_RETRIES + 1):
-            if not self._wait_for_overworld():
-                return
+        whiteout replays the Center scene), so retry a few times. If every
+        attempt fails, pause briefly (a battle may still start on its own) and
+        run the whole retry round again, so training never stalls for good."""
+        while True:
+            for attempt in range(1, NAV_RETRIES + 1):
+                if not self._wait_for_overworld():
+                    return
 
-            try:
-                goal = "HEAL" if self._needs_healing() else "HUNT"
-            except (OSError, ValueError):
-                goal = "HUNT"
+                try:
+                    goal = "HEAL" if self._needs_healing() else "HUNT"
+                except (OSError, ValueError):
+                    goal = "HUNT"
 
-            reply = self._request(f"NAV:{goal}")
-            if reply != "ACK":
-                print(f"[nav] {goal} rejected: {reply} (attempt {attempt}/{NAV_RETRIES})")
+                reply = self._request(f"NAV:{goal}")
+                if reply != "ACK":
+                    print(f"[nav] {goal} rejected: {reply} (attempt {attempt}/{NAV_RETRIES})")
+                    time.sleep(NAV_RETRY_DELAY_S)
+                    continue
+
+                if goal == "HEAL":
+                    print("[nav] party is low -- heading to the Pokemon Center")
+
+                outcome = self._watch_nav()
+                if outcome in ("battle", "idle"):
+                    return
+                if outcome == "timeout":
+                    print("[nav] timed out -- continuing without it")
+                    return
+                print(f"[nav] attempt {attempt}/{NAV_RETRIES} failed")
                 time.sleep(NAV_RETRY_DELAY_S)
-                continue
 
-            if goal == "HEAL":
-                print("[nav] party is low -- heading to the Pokemon Center")
-
-            outcome = self._watch_nav()
-            if outcome in ("battle", "idle"):
-                return
-            if outcome == "timeout":
-                print("[nav] timed out -- continuing without it")
-                return
-            print(f"[nav] attempt {attempt}/{NAV_RETRIES} failed")
-            time.sleep(NAV_RETRY_DELAY_S)
-
-        print("[nav] giving up -- waiting for a battle to start on its own")
+            print(f"[nav] all {NAV_RETRIES} attempts failed -- pausing {NAV_GIVEUP_PAUSE_S:.0f}s, then retrying")
+            deadline = time.monotonic() + NAV_GIVEUP_PAUSE_S
+            while time.monotonic() < deadline:
+                phase, _ = self._status()
+                if phase in READY_PHASES:
+                    return
+                time.sleep(NAV_POLL_S)
 
     def _outcome_bonus(self, outcome):
         if outcome == OUTCOME_WON:
@@ -742,6 +771,8 @@ class PokemonBattleEnv(gym.Env):
         balls_thrown = 0
         if terminated:
             reward += self._outcome_bonus(st["outcome"])
+            if st["outcome"] == OUTCOME_WON and self.start_p_team:
+                reward += WIN_HP_BONUS * min(1.0, st["p_team"] / self.start_p_team)
             # Charge for balls used this battle (also counts manual throws).
             start, end = self.battle_start.get("balls"), self._ball_total(self._read_inventory())
             if start is not None and end is not None:
@@ -761,7 +792,8 @@ class PokemonBattleEnv(gym.Env):
         if not forced_switch_turn:
             reward -= TURN_COST          # stalling is never free
             if not is_attack_action and not action_failed:
-                reward -= SWITCH_COST    # voluntary switch
+                # voluntary switch; switch_count = switches already made this battle
+                reward -= SWITCH_COST * (1.0 + SWITCH_ESCALATION * self.switch_count)
 
         self.prev_p_team, self.prev_e_team = st["p_team"], st["e_team"]
         self.prev_p_alive, self.prev_e_alive = st["p_alive"], st["e_alive"]

@@ -237,7 +237,7 @@ def log_step(
             obs_json
         ])
 
-OUTCOME_NAMES = {1: "WIN", 2: "LOSS", 3: "RAN", 7: "CAUGHT", 9: "FORFEIT"}
+OUTCOME_NAMES = {1: "WIN", 2: "LOSS", 3: "RAN", 4: "RAN", 5: "TELEPORT", 6: "FLED", 7: "CAUGHT", 9: "FORFEIT", 10: "ENEMY_TELEPORT"}
 
 def outcome_name(outcome):
     return OUTCOME_NAMES.get(outcome, f"END({outcome})")

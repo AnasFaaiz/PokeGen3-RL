@@ -37,7 +37,7 @@ local STEP_MAX_FRAMES = 90
 local TASK_MAX_FRAMES = 60 * 90
 local TALK_TAP_PERIOD = 14
 local MAX_REPLANS = 40
-local WANDER_MAX_FRAMES = 60 * 60
+local WANDER_MAX_FRAMES = 60 * 300
 -- How far the player may stray from the grass tile it last stood on before
 -- that patch is given up and a fresh one is looked for.
 local WANDER_ANCHOR_RANGE = 8
