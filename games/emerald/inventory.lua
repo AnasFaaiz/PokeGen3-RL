@@ -1,5 +1,5 @@
 return function(D)
-local CONFIG, emu = D.CONFIG, D.emu
+local CONFIG = D.CONFIG -- use the global `emu` (re-resolved each call) so a core reload cannot leave a stale handle
 local partySlotBase, battleOutcome, readCb2, controllerFn, sameFn, block_orders = D.partySlotBase, D.battleOutcome, D.readCb2, D.controllerFn, D.sameFn, D.block_orders
 local function validEwram(p)
 	return p >= 0x02000000 and p < 0x02040000

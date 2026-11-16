@@ -202,7 +202,6 @@ local function decryptPartySlot(base)
 end
 local Inv = dofile(string.gsub(GAME_CONFIG_FILE, "emerald_config%.lua$", "inventory.lua"))({
 	CONFIG = CONFIG,
-	emu = emu,
 	partySlotBase = partySlotBase,
 	battleOutcome = battleOutcome,
 	readCb2 = readCb2,
