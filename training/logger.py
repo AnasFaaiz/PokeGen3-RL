@@ -15,7 +15,7 @@ TARGET_NAMES = ["Enemy Left", "Enemy Right", "Partner"]
 
 def decode_action(action_idx, move_names=None, party_names=None):
     """
-    Decodes discrete action 0-16 into a human-readable action description.
+    Decodes discrete action 0-17 into a human-readable action description.
     move_names: list of up to 4 move strings for P1 [m1, m2, m3, m4]
     party_names: list of bench Pokemon names for slots 1-5
     """
@@ -25,6 +25,8 @@ def decode_action(action_idx, move_names=None, party_names=None):
         m_name = move_names[move_slot] if move_names and move_slot < len(move_names) else f"Move_{move_slot+1}"
         t_name = TARGET_NAMES[target_slot] if target_slot < len(TARGET_NAMES) else f"Target_{target_slot}"
         return f"{m_name} -> {t_name}"
+    elif action_idx == 17:
+        return "THROW BALL"
     else:
         bench_slot = action_idx - 11
         p_name = party_names[bench_slot - 1] if party_names and (bench_slot - 1) < len(party_names) else f"Slot_{bench_slot}"
@@ -35,7 +37,7 @@ REJECT_FILE = os.path.join(_LOG_DIR, "rejects.csv")
 def log_reject(episode, step, action, reply, phase, mask, retry, substituted_with=None):
     """One row per refused ACTION so the missing mask rule can be found.
     reply is the bridge's REJECT:<reason>; phase is the bridge phase at the
-    time; mask is the 17-bool legal-action mask the policy was given."""
+    time; mask is the 18-bool legal-action mask the policy was given."""
     new = not os.path.exists(REJECT_FILE)
     with open(REJECT_FILE, "a", newline="") as f:
         w = csv.writer(f)
@@ -72,6 +74,19 @@ def log_catch(episode, species, level, party_min_level, area_max, balls_used, re
                         "area_max", "balls_used", "reason"])
         w.writerow([datetime.now().strftime("%Y-%m-%d %H:%M:%S"), episode, species, level,
                     party_min_level, area_max, balls_used, reason])
+
+SWAP_FILE = os.path.join(_LOG_DIR, "swaps.csv")
+
+def log_swap(episode, map_key, area_max, party_slot, out_level, in_species, in_level, reply):
+    """One row per PC swap attempt."""
+    new = not os.path.exists(SWAP_FILE)
+    with open(SWAP_FILE, "a", newline="") as f:
+        w = csv.writer(f)
+        if new:
+            w.writerow(["timestamp", "episode", "map", "area_max", "party_slot", "out_level",
+                        "in_species", "in_level", "reply"])
+        w.writerow([datetime.now().strftime("%Y-%m-%d %H:%M:%S"), episode, map_key, area_max,
+                    party_slot, out_level, in_species, in_level, reply])
 
 def alert_loss():
     print("[ALERT] Battle lost!")
@@ -196,7 +211,7 @@ def log_step(
 
     action_desc = action_meta.get("desc", f"Action_{action}")
     action_prob = action_meta.get("prob", 0.0)
-    legal_count = action_meta.get("legal_count", 17)
+    legal_count = action_meta.get("legal_count", 18)
 
     # Serialize the full observation (if provided) for post-hoc policy
     # distillation (see distill_policy.py). Kept as its own column so
@@ -217,7 +232,7 @@ def log_step(
         f"Prob: {action_prob*100:5.1f}% | "
         f"Eff: {eff:3.1f}x | "
         f"P1: {p1_hp:5.1f}% | E1: {e1_hp:5.1f}% | "
-        f"Legal: {legal_count:02d}/17 | "
+        f"Legal: {legal_count:02d}/18 | "
         f"Rew: {reward:+6.1f}"
     )
 

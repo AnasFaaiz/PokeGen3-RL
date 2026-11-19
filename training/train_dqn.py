@@ -74,7 +74,7 @@ if __name__ == "__main__":
     # folder training is launched from.
     model_name = os.path.join(
         os.path.dirname(os.path.abspath(__file__)), "..", "checkpoints", "current",
-        "pokemon_ppo_masked_v7_expanded")
+        "pokemon_ppo_masked_v8")
 
     # 2. Setup the automated milestone backups (numbered, accumulating --
     #    saved exactly when the brain updates, i.e. every n_steps=2048)
@@ -93,9 +93,8 @@ if __name__ == "__main__":
     # 4. Load weights or start fresh
     if os.path.exists(f"{model_name}.zip"):
         print(f"Loading existing model '{model_name}.zip'...")
-        model = MaskablePPO.load(model_name, env=env)
+        model = MaskablePPO.load(model_name, env=env, tensorboard_log="./ppo_tensorboard/")
         # Fine-tune under the new reward: the saved ent_coef (0.05) keeps the
-        # policy near-uniform, so lower it to let it commit to what pays off.
         model.ent_coef = 0.01
     else:
         print("Creating a new model...")
@@ -108,6 +107,7 @@ if __name__ == "__main__":
             batch_size=512,
             n_steps=2048,
             gamma=0.995,          # Focuses on long-term wins
+            vf_coef=1.0,
             verbose=1,
             tensorboard_log="./ppo_tensorboard/"
         )
@@ -117,7 +117,7 @@ if __name__ == "__main__":
     # 5. Run the massive training loop with all callbacks active
     model.learn(
         total_timesteps=500_000,
-        tb_log_name="run_v7",
+        tb_log_name="run_v8",
         callback=[checkpoint_callback, win_rate_callback, safety_checkpoint],
         reset_num_timesteps=False
     )

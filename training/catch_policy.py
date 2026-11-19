@@ -94,7 +94,8 @@ class CatchPolicy:
         seen = self._areas.get(map_key)
         if not seen or len(seen) < AREA_MIN_OBS:
             return None
-        return max(seen)
+        # 90th percentile, so one rare high-level encounter doesn't inflate the area's level.
+        return sorted(seen)[int(0.9 * (len(seen) - 1))]
 
     def overleveled(self, party_levels, area_max):
         return bool(party_levels) and area_max is not None and min(party_levels) >= area_max + self.gap_to_swap
@@ -138,7 +139,7 @@ if __name__ == "__main__":
     p = CatchPolicy()
     for lv in [5, 6, 7, 5, 8, 6, 7, 5, 6, 7]:
         p.observe_area("0.16", lv)
-    assert p.area_max("0.16") == 8 and p.area_max("9.9") is None
+    assert p.area_max("0.16") == 7 and p.area_max("9.9") is None
     base = dict(enemy_species=288, enemy_level=6, party_levels=[22, 21, 20], box_levels=[40, 35],
                 box_species={25}, area_max=8, trainer=False, balls=10)
     assert p.decide(CatchContext(**base)) and p.last_reason == "low-level stock"
