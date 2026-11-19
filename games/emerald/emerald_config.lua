@@ -295,6 +295,13 @@ M.INV = {
 	BATTLE_TYPE_TRAINER_BIT = 0x0008,
 	OUTCOME_CAUGHT = 7,
 
+	-- Species table in ROM (struct SpeciesInfo, 28 bytes each). The address is the usual Emerald (US)
+	-- gBaseStats; unverified for this ROM, so the SPECIES command is read-only and validates what it reads.
+	SPECIES_INFO_ADDR = 0x083203CC,
+	SPECIES_INFO_SIZE = 28,
+	SPECIES_COUNT = 412,
+	SPECIES_GROWTH_OFFSET = 19,
+
 	-- Bag-from-battle (from pokeemerald.sym; verify live before use).
 	-- struct BagPosition (0x1C): exitCallback u32 @0, location u8 @4,
 	-- pocket u8 @5, pocketSwitchArrowPos u16 @6, cursorPosition[5] u16 @8,

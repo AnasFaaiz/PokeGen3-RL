@@ -57,6 +57,8 @@ BANNER = """commands:
   THROW[:itemId]      throw a ball (default Poke Ball) in a wild single battle; poll STATUS after
   BAG                 bag pocket/cursor, current callback and controller fn (read-only)
   BOX                 every occupied PC slot with species and derived level (read-only)
+  BOXMON:<b.s>        raw fields of one PC mon (species, exp, EVs, IVs); PARTYMON:<n> for a party slot
+  SWAP:...            exchange a party slot with a PC mon (see swap_test.py for the arguments)
   watch               poll NAV:STATUS until it settles
   quit
 """

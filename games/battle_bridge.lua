@@ -208,6 +208,7 @@ local Inv = dofile(string.gsub(GAME_CONFIG_FILE, "emerald_config%.lua$", "invent
 	controllerFn = controllerFn,
 	sameFn = sameFn,
 	block_orders = block_orders,
+	isInBattle = isInBattle,
 })
 local inventoryLine, boxLine, bagLine, dexLine, ballSlots =
 	Inv.inventoryLine, Inv.boxLine, Inv.bagLine, Inv.dexLine, Inv.ballSlots
@@ -305,12 +306,14 @@ function getState()
 	local order, mem = buildReportedOrder()
 	reportedPids = order
 	local p_party = {}
+	local p_levels = {} -- same (active-first) slot order as p_party; appended after the enemy party
 	for k = 1, 6 do
 		local slot = nil
 		local idx = memIndexOf(order[k], mem)
 		if idx then
 			slot = decryptPartySlot(partySlotBase(idx))
 		end
+		p_levels[k] = slot and emu:read8(partySlotBase(idx) + CONFIG.INV.PARTY_LEVEL_OFFSET) or 0
 		if slot then
 			p_party[#p_party + 1] = slot.hp
 			p_party[#p_party + 1] = slot.maxhp
@@ -355,6 +358,9 @@ function getState()
 		out[#out + 1] = v
 	end
 	for _, v in ipairs(e_party) do
+		out[#out + 1] = v
+	end
+	for _, v in ipairs(p_levels) do
 		out[#out + 1] = v
 	end
 	out[#out + 1] = weatherCategory()
@@ -1066,6 +1072,18 @@ local function handleMainLine(line)
 		return
 	elseif line == "BOX" then
 		client:send(boxLine() .. "\n")
+		return
+	elseif string.match(line, "^BOXMON:") then
+		client:send(Inv.boxMonLine(string.match(line, "^BOXMON:(.+)$")) .. "\n")
+		return
+	elseif string.match(line, "^SPECIES:%d+$") then
+		client:send(Inv.speciesLine(tonumber(string.match(line, "^SPECIES:(%d+)"))) .. "\n")
+		return
+	elseif string.match(line, "^PARTYMON:%d+$") then
+		client:send(Inv.partyMonLine(tonumber(string.match(line, "^PARTYMON:(%d+)"))) .. "\n")
+		return
+	elseif string.match(line, "^SWAP:") then
+		client:send(Inv.handleSwap(line) .. "\n")
 		return
 	elseif string.match(line, "^THROW") then
 		client:send(handleThrow(tonumber(string.match(line, "^THROW:(%d+)"))) .. "\n")
