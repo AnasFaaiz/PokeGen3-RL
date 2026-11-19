@@ -79,8 +79,17 @@ def species_names():
     return {int(k): v for k, v in d.items()}
 
 
+# species id -> growth rate read from the running ROM (see rom_info.py). Wins over the reference
+# files, which are not guaranteed to match the ROM being played.
+ROM_GROWTH = {}
+
+
+def growth_rate(species):
+    return ROM_GROWTH.get(species, species_growth().get(species, 0))
+
+
 def box_level(species, exp):
-    return level_from_exp(species_growth().get(species, 0), exp)
+    return level_from_exp(growth_rate(species), exp)
 
 
 if __name__ == "__main__":
