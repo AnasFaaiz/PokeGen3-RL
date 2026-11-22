@@ -6,12 +6,18 @@ import math
 import numpy as np
 import gymnasium as gym
 from gymnasium import spaces
-from catch_policy import CatchContext, CatchPolicy, is_owned, parse_owned
-from exp_tables import box_level
+from catch_policy import CatchContext, CatchPolicy, is_owned, parse_owned, CANDIDATE_MARGIN
+from exp_tables import box_level, exp_at_level, level_from_exp, growth_rate
 from mon_stats import parse_boxmon, compute_stats
+import mon_stats
+import damage_calc as dc
+import trainer_info
+import move_policy as mpol
+import mon_struct
+from move_tags import tags as move_tags
 import rom_info
 from swap_policy import SwapPolicy, BoxEntry
-from logger import init_csv, log_step, log_battle_end, log_reject, log_level_gap, log_catch, log_battle_row, log_throw, log_swap, decode_action, outcome_name
+from logger import log_move, log_profile, init_csv, log_step, log_battle_end, log_reject, log_level_gap, log_catch, log_battle_row, log_throw, log_swap, decode_action, outcome_name
 
 # --- Load Static Game Data ---
 _DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "games", "emerald", "game_data")
@@ -29,6 +35,8 @@ with open(os.path.join(_DATA_DIR, "species_id_to_name.json")) as f:
     SPECIES_ID_TO_NAME = {int(k): v for k, v in json.load(f).items()}
 with open(os.path.join(_DATA_DIR, "species_data.json")) as f:
     SPECIES_DATA = json.load(f)
+
+_SPECIES_NAME_TO_ID = {name: sid for sid, name in SPECIES_ID_TO_NAME.items()}
 
 TYPE_NAME_TO_ID = {
     "NORMAL": 0, "FIGHTING": 1, "FLYING": 2, "POISON": 3, "GROUND": 4,
@@ -94,6 +102,13 @@ TYPE_CHART = {
     }
     for atk, defenders in _raw_type_chart.items()
 }
+# Move types in emerald_moves.json skip the "???" slot (Fire=9 ... Dark=16), while the battler/species
+# types and TYPE_CHART use the game's numbering (Fire=10 ... Dark=17). Without this remap every move of
+# type Fire..Dark was looked up as the wrong attacking type (e.g. Water Gun vs Fire came out 0.5x).
+# POKE_LEGACY_MOVE_TYPES=1 restores the old behaviour, to evaluate a checkpoint trained on it.
+LEGACY_MOVE_TYPES = os.environ.get("POKE_LEGACY_MOVE_TYPES") == "1"
+if not LEGACY_MOVE_TYPES:
+    MOVE_TYPES = {k: (t if t <= 8 else t + 1) for k, t in MOVE_TYPES.items()}
 TYPE_CHART.setdefault(7, {})[8] = 0.5
 TYPE_CHART.setdefault(17, {})[8] = 0.5
 
@@ -105,17 +120,32 @@ def get_effectiveness(move_type, defender_type1, defender_type2):
         mult2 = 1.0
     return mult1 * mult2
 
+def _move_types_effs(moves, t1, t2):
+    """(types, effectiveness) lists for four move ids against a target of types t1/t2. An empty or unknown
+    move gets type 0 and effectiveness 0; the old default type 17 is Dark in the game numbering, so an empty
+    slot used to look like a Dark move (POKE_LEGACY_MOVE_TYPES=1 keeps that, to reproduce v8's inputs)."""
+    types, effs = [], []
+    for m in moves:
+        if LEGACY_MOVE_TYPES:
+            t = MOVE_TYPES.get(m, 17)
+            types.append(t)
+            effs.append(get_effectiveness(t, t1, t2))
+        elif m in MOVE_TYPES:
+            types.append(MOVE_TYPES[m])
+            effs.append(get_effectiveness(MOVE_TYPES[m], t1, t2))
+        else:
+            types.append(0)
+            effs.append(0.0)
+    return types, effs
+
+
 def _parse_bench_slot(hp, maxhp, species, item, m1, m2, m3, m4, enemy_t1, enemy_t2):
     """Same treatment _parse_battler() gives active battlers, applied to one
     bench slot. No status/buffs/PP -- those don't apply/aren't sent for a
     benched Pokemon. Returns 19 features: hp_ratio, species, item,
     4 move types, 4 move effectiveness (vs current enemy), 4 move power,
     4 move accuracy."""
-    m1_t, m2_t, m3_t, m4_t = (MOVE_TYPES.get(m, 17) for m in (m1, m2, m3, m4))
-    m1_eff = get_effectiveness(m1_t, enemy_t1, enemy_t2)
-    m2_eff = get_effectiveness(m2_t, enemy_t1, enemy_t2)
-    m3_eff = get_effectiveness(m3_t, enemy_t1, enemy_t2)
-    m4_eff = get_effectiveness(m4_t, enemy_t1, enemy_t2)
+    (m1_t, m2_t, m3_t, m4_t), (m1_eff, m2_eff, m3_eff, m4_eff) = _move_types_effs((m1, m2, m3, m4), enemy_t1, enemy_t2)
 
     return [
         hp / max(maxhp, 1), species / 412.0, item / 376.0,
@@ -156,11 +186,17 @@ OUTCOME_WON, OUTCOME_LOST, OUTCOME_FORFEITED = 1, 2, 9
 #                     a Pokemon, on top of the HP-fraction damage.
 # Win/loss stays dominant (+-100): a whole fight's shaping is only ~10-30.
 DAMAGE_REWARD_SCALE = 50.0
-WIN_REWARD, LOSS_REWARD = 100.0, -100.0
+# POKE_WIN_REWARD overrides the win bonus (e.g. 60) for a reward experiment; the default keeps v8-comparable runs valid.
+WIN_REWARD, LOSS_REWARD = float(os.environ.get("POKE_WIN_REWARD", 100.0)), -100.0
 SWITCH_COST = 3.0            # base cost of a voluntary switch (the 1st in a battle)
 SWITCH_ESCALATION = 0.5      # each further switch in the same battle costs +50% of the base more
 MAX_VOLUNTARY_SWITCHES = 4   # hard cap per battle (bench switches are masked after this)
 TURN_COST = 1.0              # per decision turn (a 1-turn kill beats a 3-turn kill)
+# Difficulty-scaled HP terms (Phase 3): in an easy fight (big level gap) the HP lost and kept
+# say little about play quality, so scale them by 1/(1+gap/DIFF_SCALE_GAP). Off by default so
+# it can be switched on as its own run and compared by winrate_by_gap/le5.
+DIFFICULTY_SCALED_HP = os.environ.get("POKE_DIFF_HP") == "1"
+DIFF_SCALE_GAP = 10.0
 WIN_HP_BONUS = 20.0          # extra on a WIN, scaled by the share of team HP kept vs battle start
 KO_BONUS = 5.0               # per enemy faint (+) / own faint (-)
 
@@ -168,6 +204,15 @@ KO_BONUS = 5.0               # per enemy faint (+) / own faint (-)
 # acts, so this only pays for a Pokemon caught by hand mid-fight. Kept well
 # below WIN_REWARD. BALL_COST is charged per ball used during the fight.
 OUTCOME_CAUGHT = 7
+# Player-initiated escapes (4 = ran, 5 = the player's Teleport). 6 (wild mon fled) and 10 (wild mon teleported) are
+# the enemy leaving, which the agent did not choose, so they are neither penalised nor counted as escapes.
+PLAYER_ESCAPE_OUTCOMES = (4, 5)
+# Fleeing used to cost nothing, so on the hardest matchups (teleport rate 9% at gap <= 0 vs 0.6% at gap > 20) the model
+# left instead of learning to win, and every win-rate metric ignored it. At 40 a flee returns about -60: better than a
+# loss (about -274) but worse than fighting anything it expects to win more than about half the time.
+# POKE_FLEE_PENALTY=0 restores the old free flee (for a clean A/B against v8).
+FLEE_PENALTY = float(os.environ.get("POKE_FLEE_PENALTY", 40.0))
+EGG_SPECIES = 412            # the game's egg species id: no growth data, never a real battler
 CATCH_BONUS = 10.0
 NEW_SPECIES_BONUS = 15.0     # extra when the caught species was not in the Pokedex yet
 # What a catch is worth. A useful catch (a training candidate: at least CANDIDATE_GAP levels
@@ -180,7 +225,13 @@ CANDIDATE_GAP = 12
 STOCK_WANTED = 6
 STOCK_FULL_FACTOR = 0.25
 LOW_HP_CATCH_BONUS = 10.0    # catch landed with the enemy under 50% HP (Gen 3 catch rate rises as HP drops)
-BALL_COST = 1.0
+# Balls cannot be rebought (money is 0) and a window threw 10-19 of ~40 in 40 minutes, mostly at species the PC already holds
+# (a catch that pays nothing). So: a ball costs 5 (it was 1), a throw at a species the PC already holds is not offered, and the
+# last BALL_RESERVE balls are kept for species the Pokedex has not seen. POKE_BALL_COST / POKE_BALL_RESERVE override the numbers;
+# POKE_MASK_DUP_THROWS=0 turns the duplicate mask off.
+BALL_COST = float(os.environ.get("POKE_BALL_COST", 5.0))
+BALL_RESERVE = int(os.environ.get("POKE_BALL_RESERVE", 8))
+MASK_DUP_THROWS = os.environ.get("POKE_MASK_DUP_THROWS", "1") != "0"
 MAX_BALLS_PER_BATTLE = 4     # throw action is masked after this many balls in one battle
 
 # Spreading XP: the lead outgrows everything while the bench stays low, and wild
@@ -188,14 +239,41 @@ MAX_BALLS_PER_BATTLE = 4     # throw action is masked after this many balls in o
 # level on an L30 Pokemon is worth ~3x a level on an L88 one. A switch to a lower-level
 # bench member is free while the lead is SWITCH_FREE_GAP+ levels above the enemy.
 LEVEL_REWARD = 100.0
+# Variance baseline: the return of a typical win grows with the level gap (about 86 at gap 0,
+# 130 at gap 8, 142 at gap 14, measured from battles.csv). That difference is fixed when the
+# battle starts, so the agent can't influence it, yet it is most of the spread in returns and
+# drowns the part the agent does control (HP lost, turns used). Subtracting it, once, at the
+# terminal step leaves the optimal policy unchanged (it depends only on the battle's start)
+# and lets the critic explain the rest. Only the reward the learner sees is shifted; logged
+# returns stay comparable with the old runs.
+BASELINE_BASE, BASELINE_PER_LEVEL, BASELINE_GAP_CAP, BASELINE_REF = 88.0, 5.0, 11, 130.0
 REWARD_SCALE = 0.01          # returns of +-100 -> +-1, so the critic's loss isn't dominated by outcome bonuses
 SWITCH_FREE_GAP = 15
 
 THROW_ACTION = 17            # model-chosen "throw a ball" (wild battles only)
-N_ACTIONS = 18               # 0-11 moves, 12-16 bench switches, 17 throw
+# POKE_MOVE_TEACH=1 adds four actions that let the agent pick a move to teach (see _teach_step): off by default, so
+# the action space stays the 18 v8 knows. Teaching needs the observation block below, so it is off with POKE_LEGACY_OBS.
+MOVE_TEACH = os.environ.get("POKE_MOVE_TEACH") == "1" and os.environ.get("POKE_LEGACY_OBS") != "1"
+TEACH_BASE, TEACH_ACTIONS = 18, 4
+TEACH_FEATURES = 44 if MOVE_TEACH else 0
+MAX_TEACH_PER_BATTLE = 2
+TEACH_QUEUE_MAX = 12          # teach actions are masked while this many requests wait for the overworld
+TEACH_FAIL_PENALTY = 1.0      # paid with the next battle's first step when an edit was refused or failed to verify
+TEACH_BREAKER = 3             # consecutive failed edits after which teaching is switched off for the run
+TEACH_SHAPING = float(os.environ.get("POKE_TEACH_SHAPING", 4.0))   # reward for a teach: shaping * clip(delta / 50, -1, 1)
+N_ACTIONS = 18 + (TEACH_ACTIONS if MOVE_TEACH else 0)   # 0-11 moves, 12-16 bench switches, 17 throw, 18-21 teach
 BASE_OBS_DIM = 417
 EXTRA_FEATURES = 14          # appended after the original 417 so expand_model-style surgery works
-OBS_DIM = BASE_OBS_DIM + EXTRA_FEATURES
+# POKE_LEGACY_OBS=1 drops the block, giving the 431-value observation older checkpoints (v8) expect.
+LEGACY_OBS = os.environ.get("POKE_LEGACY_OBS") == "1"
+EXTRA2_FEATURES = 0 if LEGACY_OBS else 60   # damage/speed/stat features (see _combat_features), appended after EXTRA_FEATURES
+# Opponent-team block: is_trainer, known_team, party size, remaining, max level, double, rematch, ace gap.
+EXTRA3_FEATURES = 0 if LEGACY_OBS else 8
+# POKE_FRAME_STACK=1 appends the previous turn's combat features and last action (one turn of memory);
+# off by default, so the observation is unchanged unless the flag is set.
+FRAME_STACK = (os.environ.get("POKE_FRAME_STACK") == "1") and not LEGACY_OBS
+STACK_FEATURES = (EXTRA2_FEATURES + 1) if FRAME_STACK else 0
+OBS_DIM = BASE_OBS_DIM + EXTRA_FEATURES + EXTRA2_FEATURES + EXTRA3_FEATURES + STACK_FEATURES + TEACH_FEATURES
 
 TURN_TIMEOUT_S = 60.0        # one turn, including animations; a hang past this truncates
 POLL_S = 0.05
@@ -215,7 +293,7 @@ ROSTER_LOG_EVERY = 25        # battles between party-vs-PC level snapshots
 # Healing before a wipe rather than after is worth the detour -- a whiteout
 # costs money and drops the player at the last heal point, which may be
 # nowhere near the grass the agent was training in.
-HEAL_HP_FRACTION = 0.35      # heal when the team is below this share of max HP
+HEAL_HP_FRACTION = 0.2       # heal when the team is below this share of max HP (low = fights sometimes start hurt)
 HEAL_MIN_CONSCIOUS = 2       # ...or when fewer than this many can still fight
 NAV_TIMEOUT_S = 600.0
 NAV_POLL_S = 0.25
@@ -284,12 +362,21 @@ class PokemonBattleEnv(gym.Env):
         self.last_trapped = False
         self.switch_blocked = False   # a switch was refused this battle
         self.party_levels = [0] * 6   # reported slot order (active first); refreshed from the bridge
+        self.faint_count = 0
+        self.diff_scale = 1.0
+        self.progress_start = None    # fractional party levels at battle start (None: bridge has no px)
         self.level_sum_start = None   # sum(ln(level)) over the party at battle start
         self.balls_left = 0
         self.balls_thrown_now = 0     # balls thrown by the agent in this battle
         self.enemy_species = 0
         self.enemy_owned = None       # Pokedex says the enemy species is already caught
         self.is_wild = False
+        self._init_teach_state()
+        self.is_trainer = False
+        self.trainer_id = -1          # opponent trainer id (-1: wild or unknown, see trainer_info)
+        self._stack_prev = [0.0] * EXTRA2_FEATURES   # previous turn's combat features (FRAME_STACK)
+        self._stack_cur = [0.0] * EXTRA2_FEATURES
+        self._last_action_norm = 0.0
         self.box_low_stock = 0        # PC Pokemon that are low enough to be training candidates
         self.last_throw_e_hp = 1.0    # enemy HP share when the last ball was thrown
 
@@ -320,6 +407,10 @@ class PokemonBattleEnv(gym.Env):
         for k, c, t in rows[:12]:
             print(f"[profile]   {k:<22} {c:>6} calls  {t:>7.1f}s  {100 * t / wall:>5.1f}%  "
                   f"{1000 * t / max(c, 1):>7.1f} ms/call")
+        try:
+            log_profile(self.episode, n, wall, {k: [c, round(t, 2)] for k, (c, t) in self._prof.items() if k != "episode_wall"})
+        except OSError:
+            pass                                   # a full disk must not stop training
         self._prof = {}
 
     def _status(self):
@@ -351,11 +442,8 @@ class PokemonBattleEnv(gym.Env):
         tormented = 1.0 if (s2 & STATUS2_TORMENT) != 0 else 0.0
 
         _, _, base_total = get_species_info(spc)
-        m1_t, m2_t, m3_t, m4_t = (MOVE_TYPES.get(m, 17) for m in (m1, m2, m3, m4))
-        m1_eff = get_effectiveness(m1_t, target_type1, target_type2)
-        m2_eff = get_effectiveness(m2_t, target_type1, target_type2)
-        m3_eff = get_effectiveness(m3_t, target_type1, target_type2)
-        m4_eff = get_effectiveness(m4_t, target_type1, target_type2)
+        (m1_t, m2_t, m3_t, m4_t), (m1_eff, m2_eff, m3_eff, m4_eff) = _move_types_effs(
+            (m1, m2, m3, m4), target_type1, target_type2)
 
         return [
             hp / max(maxhp, 1), pp1 / 40.0, pp2 / 40.0, pp3 / 40.0, pp4 / 40.0,
@@ -395,6 +483,290 @@ class PokemonBattleEnv(gym.Env):
             min(self.box_low_stock, STOCK_WANTED) / STOCK_WANTED,
             min(max(((sum(alive_lv) / len(alive_lv)) if alive_lv else 0) - enemy_level, 0), 100) / 100.0,
         ]
+
+    def _move_damage(self, att, att_stats, dfn, dfn_stats, move, att_stage=True, dfn_cur_hp=None):
+        """Average HP damage of `move` from battler `att` on `dfn` (raw battler lists), 0 if
+        unusable. Stages apply only when `att_stage` (a bench mon has none)."""
+        if not move or att_stats is None or dfn_stats is None:
+            return 0.0
+        mtype = MOVE_TYPES.get(move, 0)
+        phys = mtype in dc.PHYSICAL_TYPES
+        atk, dfs = (att_stats[1], dfn_stats[2]) if phys else (att_stats[4], dfn_stats[5])
+        a_stage = (att[15] - 6) if (att_stage and phys) else 0
+        d_stage = (dfn[16] - 6) if phys else 0
+        eff = get_effectiveness(mtype, dfn[10], dfn[11])
+        stab = mtype in (att[10], att[11])
+        hp = dfn[0] if dfn_cur_hp is None else dfn_cur_hp
+        return dc.expected_damage(move, MOVE_POWER.get(move, 0), mtype, att[12], atk, dfs,
+                                  a_stage, d_stage, stab, eff, hp, dfn[1], dfn[20])
+
+    def _combat_features(self, b0, b1, p_party_raw):
+        """Memoised on the raw state: _get_state runs ~3 times per turn and mostly sees the same battle."""
+        key = (tuple(b0), tuple(b1), tuple(p_party_raw), tuple(self.party_levels), len(mon_stats.ROM_BASE))
+        memo = getattr(self, "_combat_memo", None)
+        if memo is not None and memo[0] == key:
+            return list(memo[1])
+        f = self._combat_features_uncached(b0, b1, p_party_raw)
+        self._combat_memo = (key, f)
+        return list(f)
+
+    def _combat_features_uncached(self, b0, b1, p_party_raw):
+        """EXTRA2_FEATURES values the agent otherwise had to infer: expected damage of each of
+        its moves on the enemy and whether it KOs, who moves first, the enemy's best hit on it,
+        both sides' estimated stats, and per-bench-slot type and best damage. Estimates only
+        (neutral IV/EV); see damage_calc.py. All values are clipped to [0, 1]."""
+        clip = lambda x: float(min(max(x, 0.0), 1.0))
+        s0, s1 = dc.estimate_stats(b0[18], b0[12]), dc.estimate_stats(b1[18], b1[12])
+        e_hp = max(b1[0], 1)
+        own_moves, en_moves = b0[6:10], b1[6:10]
+        dmg = [self._move_damage(b0, s0, b1, s1, m) for m in own_moves]
+        f = [clip(d / e_hp / 2.0) for d in dmg]                                   # 4: damage / enemy HP (cap 2x)
+        f += [1.0 if (b1[0] > 0 and d >= b1[0]) else 0.0 for d in dmg]             # 4: KO flag
+        if s0 and s1:
+            sp0 = s0[3] * dc.stage_mult(b0[17] - 6) * (0.25 if b0[13] & STATUS1_PARALYSIS else 1.0)
+            sp1 = s1[3] * dc.stage_mult(b1[17] - 6) * (0.25 if b1[13] & STATUS1_PARALYSIS else 1.0)
+            f += [1.0 if sp0 > sp1 else 0.0, clip(sp0 / max(sp0 + sp1, 1.0))]     # 2: outspeeds, speed share
+        else:
+            f += [0.0, 0.5]
+        en_best = max((self._move_damage(b1, s1, b0, s0, m) for m in en_moves), default=0.0)
+        f += [clip(en_best / max(b0[0], 1) / 2.0), 1.0 if (b0[0] > 0 and en_best >= b0[0]) else 0.0]   # 2
+        for s in (s0, s1):                                                         # 10: atk def spa spd spe, /400
+            f += [clip(v / 400.0) for v in ((s[1], s[2], s[4], s[5], s[3]) if s else (0,) * 5)]
+        for i in range(6):                                                         # 18: bench type1, type2, best dmg
+            php, pmax, spc, _item, m1, m2, m3, m4 = p_party_raw[i * 8:(i + 1) * 8]
+            lvl = self.party_levels[i] if i < len(self.party_levels) else 0
+            if php <= 0 or pmax <= 0 or spc == 0 or lvl <= 0:
+                f += [0.0, 0.0, 0.0]
+                continue
+            t1, t2 = get_species_types(spc)
+            slot = [php, pmax, 0, 0, 0, 0, 0, 0, 0, 0, t1, t2, lvl, 0, 0, 6, 6, 6, spc, 0, 0]
+            st = dc.estimate_stats(spc, lvl)
+            best = max((self._move_damage(slot, st, b1, s1, m, att_stage=False) for m in (m1, m2, m3, m4)), default=0.0)
+            f += [t1 / 17.0, t2 / 17.0, clip(best / e_hp / 2.0)]
+        for m in own_moves:                                                        # 4: priority, normalised
+            f.append(clip((MOVE_PRIORITY.get(m, 0) + 7) / 12.0))
+        for m in own_moves:                                                        # 4: pure status move
+            fixed = m in dc.FIXED_DAMAGE or m in dc.LEVEL_DAMAGE or m in dc.OHKO_MOVES or m in dc.HALF_HP_MOVES
+            f.append(1.0 if (m and MOVE_POWER.get(m, 0) <= 0 and not fixed) else 0.0)
+        for m in own_moves:                                                        # 12: heal, status, setup per move
+            f += move_tags(m)
+        return f
+
+    # ------------------------------------------------------------- move teaching (POKE_MOVE_TEACH)
+    # A teach action is chosen at the first decision of a battle, uses no game turn and only QUEUES a request keyed by
+    # the mon's personality value; the edit is written between battles, in the overworld, where the game allows it.
+    def _init_teach_state(self):
+        self.teach_queue = []              # requests waiting for the overworld
+        self.teach_applied = 0
+        self.teach_disabled = False        # set by the circuit breaker after TEACH_BREAKER failed edits in a row
+        self.teach_fail_streak = 0
+        self._pending_shaping = 0.0        # teach reward earned by applied edits, paid on the next battle's first step
+        self.teach_paid_battle = 0.0       # shaping paid during the current battle (for battle_stats)
+        self._teach_plan_cache = {}
+        self._reset_teach_window()
+
+    def _reset_teach_window(self):
+        self.teach_paid_battle = 0.0
+        self.teach_open = False
+        self.teach_used = 0
+        self.teach_focus = None
+        self.teach_known = [0, 0, 0, 0]
+        self.teach_cands = []
+
+    def _read_roster(self):
+        """Every party mon's moves and PP via MONMOVES (read-only, so fine mid-battle). Unreadable slots are skipped."""
+        roster = []
+        for slot in range(6):
+            try:
+                line = self._request(f"MONMOVES:{slot}")
+            except OSError:
+                break
+            if line.startswith("MONMOVES:ERR:bad_slot"):
+                break                      # past the end of the party
+            mon = mpol.parse_monmoves(line)
+            if mon:
+                mon["slot"] = slot
+                roster.append(mon)
+        return roster
+
+    def _teach_plan(self, mon, known):
+        key = (mon["species"], mon["level"], tuple(known))
+        if key not in self._teach_plan_cache:
+            if len(self._teach_plan_cache) > 512:
+                self._teach_plan_cache.clear()
+            self._teach_plan_cache[key] = mpol.plan_teach(
+                {"species": mon["species"], "level": mon["level"]}, list(known), k=TEACH_ACTIONS)
+        return self._teach_plan_cache[key]
+
+    def _open_teach_window(self):
+        """Pick the party mon with the biggest worthwhile gain and offer its best candidates. False if none."""
+        self._reset_teach_window()
+        if self.teach_disabled:
+            return False
+        try:
+            roster = self._read_roster()
+        except (OSError, ValueError):
+            return False
+        best = None
+        for mon in roster:
+            if not mon["ok"] or mon["species"] <= 0 or mon["species"] == EGG_SPECIES or mon["level"] <= 0:
+                continue
+            plan = self._teach_plan(mon, mon["moves"])
+            if plan and (best is None or plan[0]["delta"] > best[1][0]["delta"]):
+                best = (mon, plan)
+        if best is None:
+            return False
+        self.teach_focus, self.teach_known, self.teach_cands = best[0], list(best[0]["moves"]), best[1]
+        self.teach_open = True
+        return True
+
+    def _teach_features(self):
+        """TEACH_FEATURES values: window open, focus level, its physical share, the value of each known move, and per
+        candidate [value, gain, power, accuracy, STAB, type, physical, utility, value of the move it replaces]."""
+        f = [0.0] * TEACH_FEATURES
+        mon = self.teach_focus
+        if not (self.teach_open and mon):
+            return f
+        clip = lambda x: float(min(max(x, 0.0), 1.0))
+        info = {"species": mon["species"], "level": mon["level"], "types": mpol.species_types(mon["species"])}
+        stats = dc.estimate_stats(mon["species"], mon["level"])
+
+        def value(m):
+            if not m:
+                return 0.0
+            return mpol.damage_value(m, info) if mpol.is_damaging(m) else mpol.ROLE_VALUE[mpol.role(m)]
+
+        f[0] = 1.0
+        f[1] = clip(mon["level"] / 100.0)
+        f[2] = clip(stats[1] / max(stats[1] + stats[4], 1)) if stats else 0.5
+        for i, m in enumerate(self.teach_known):
+            f[3 + i] = clip(value(m) / 100.0)
+        for k, c in enumerate(self.teach_cands[:TEACH_ACTIONS]):
+            mi = mpol.move_info(c["move"])
+            base = 7 + 9 * k
+            f[base:base + 9] = [
+                clip(c["value"] / 100.0), clip(c["delta"] / 100.0), clip(mi["power"] / 250.0), clip(mi["acc"] / 100.0),
+                1.0 if mi["type"] in info["types"] else 0.0, clip(mi["type"] / 17.0),
+                1.0 if (mpol.is_damaging(c["move"]) and mi["type"] in dc.PHYSICAL_TYPES) else 0.0,
+                0.0 if mpol.is_damaging(c["move"]) else 1.0, clip(value(c["replaced"]) / 100.0)]
+        f[43] = clip((MAX_TEACH_PER_BATTLE - self.teach_used) / MAX_TEACH_PER_BATTLE)
+        return f
+
+    def _teach_step(self, rank):
+        """Teach action `rank`: queue the edit and pay the shaping reward. No game input, no turn cost, never terminal."""
+        if not (self.teach_open and rank < len(self.teach_cands) and self.teach_used < MAX_TEACH_PER_BATTLE
+                and len(self.teach_queue) < TEACH_QUEUE_MAX):
+            info = {"player_lost": False, "outcome": 0, "action_failed": True}
+            return self.last_obs, -1.0 * REWARD_SCALE, False, False, info       # masked in normal play
+        cand = self.teach_cands[rank]
+        mon = self.teach_focus
+        self.teach_queue.append({"pid": mon["pid"], "slot": cand["slot"], "species": mon["species"],
+                                 "level": mon["level"], "known_before": list(self.teach_known),
+                                 "move": cand["move"], "replaced": cand["replaced"], "delta": cand["delta"]})
+        self.teach_known = mpol.apply_teach(self.teach_known, cand["slot"], cand["move"])
+        self.teach_used += 1
+        self.teach_cands = self._teach_plan(mon, self.teach_known) if self.teach_used < MAX_TEACH_PER_BATTLE else []
+        # No reward here: the edit may still be refused or skipped when it is written, and paying up front would let a
+        # broken edit path be farmed forever. The shaping is paid after a verified edit (see _apply_teach_queue).
+        obs = self._get_state()["obs"]
+        self.last_obs = obs
+        return obs, 0.0, False, False, {"player_lost": False, "outcome": 0, "action_failed": False}
+
+    def _take_shaping(self):
+        """Teach reward earned by edits applied before this battle, paid once (on the first real step) and kept out of
+        the logged return so runs with and without teaching stay comparable."""
+        if not (MOVE_TEACH and self._pending_shaping):
+            return 0.0
+        paid, self._pending_shaping = self._pending_shaping, 0.0
+        self.teach_paid_battle += paid
+        return paid
+
+    def _apply_teach_queue(self):
+        """Write queued move edits between battles. Matches each request to its mon by personality value (the party
+        may have been reordered), re-checks the moves are still what the plan saw, and lets the Lua side refuse or
+        roll back anything that does not verify."""
+        if not (MOVE_TEACH and self.teach_queue):
+            return
+        if not self._wait_for_overworld():
+            return                          # still in battle screens: try again next time
+        queue, self.teach_queue = self.teach_queue, []
+        try:
+            roster = {m["pid"]: m for m in self._read_roster()}
+        except (OSError, ValueError):
+            self.teach_queue = queue
+            return
+        for req in queue:
+            mon = roster.get(req["pid"])
+            name = lambda m: (mpol.move_info(m) or {}).get("name", m) if m else "(empty)"
+            sp = SPECIES_ID_TO_NAME.get(req["species"], req["species"])
+            slot, delta = req["slot"], req["delta"]
+            failed, reply = False, None
+            if mon is None:
+                reply = "SKIP:mon_gone"                       # swapped out of the party: nothing wrong with the edit path
+            elif not mon["ok"]:
+                reply, failed = "SKIP:bad_checksum", True     # the struct layout does not match what we decrypted
+            elif req["move"] in mon["moves"]:
+                reply = "SKIP:already_known"
+            elif list(mon["moves"]) != list(req["known_before"]):
+                # The moves changed since the plan (a level-up learned one in the battle): re-plan on the current set
+                # and only apply if the move is still clearly worth it.
+                info = {"species": mon["species"], "level": mon["level"]}
+                rep = mpol.best_replacement(mon["moves"], req["move"],
+                                            {**info, "types": mpol.species_types(mon["species"])})
+                if rep is None or rep[1] < mpol.MIN_DELTA:
+                    reply = "SKIP:no_longer_worth_it"
+                else:
+                    slot, delta = rep
+            if reply is None:
+                new = mpol.apply_teach(mon["moves"], slot, req["move"])
+                pp = list(mon["pp"])
+                bonuses = mon_struct.clear_bonus(mon["bonuses"], slot)       # a replaced slot loses its PP Ups
+                pp[slot] = mon_struct.max_pp(mpol.base_pp(req["move"]), bonuses, slot)
+                try:
+                    reply = self._request(f"SETMOVES:{mon['slot']}:{mon['pid']}:" + ":".join(map(str, new + pp + [bonuses])))
+                except OSError as e:
+                    reply = f"ERR:{e}"
+                if reply == "SETMOVES:OK":
+                    mon["moves"], mon["pp"], mon["bonuses"] = new, pp, bonuses
+                    self.teach_applied += 1
+                    self.teach_fail_streak = 0
+                    self._pending_shaping += TEACH_SHAPING * float(np.clip(delta / 50.0, -1.0, 1.0))
+                else:
+                    failed = True
+            if failed:
+                self.teach_fail_streak += 1
+                self._pending_shaping -= TEACH_FAIL_PENALTY
+                if self.teach_fail_streak >= TEACH_BREAKER and not self.teach_disabled:
+                    self.teach_disabled = True
+                    print(f"[teach] {TEACH_BREAKER} failed edits in a row (last: {reply}): teaching switched off for this run. "
+                          "Check MONMOVES (checksum_ok) and SETMOVES ... dry in the live checklist.")
+            log_move(self.episode, slot, sp, req["level"], name(req["replaced"]), name(req["move"]),
+                     delta, "levelup", reply)
+            print(f"[teach] {sp} L{req['level']}: {name(req['replaced'])} -> {name(req['move'])} "
+                  f"(+{delta:.1f}): {reply}")
+
+    def _trainer_features(self, e_party_raw, lead_level):
+        """EXTRA3_FEATURES values about the opponent's team: is it a trainer, do we know the team
+        (id read and in the decomp table), party size, how many of its mons are still up, its
+        top level, double battle, rematch, and whether its top level is well above our lead.
+        A wild battle gives zeros; an unknown trainer id still reports what GET_STATE shows."""
+        clip = lambda x: float(min(max(x, 0.0), 1.0))
+        if not self.is_trainer:
+            return [0.0] * EXTRA3_FEATURES
+        info = trainer_info.get(self.trainer_id)
+        # The table is vanilla Emerald. A ROM hack (this game is a Kaizo hack) changes the teams, so the table only counts
+        # when the team the game actually shows is the one it lists; otherwise the trainer is treated as unknown.
+        seen_species = sorted(e_party_raw[i * 8] for i in range(6) if e_party_raw[i * 8] > 0)
+        if info and sorted(_SPECIES_NAME_TO_ID.get(m["species"].replace("SPECIES_", "", 1), -1) for m in info["party"]) != seen_species:
+            info = None
+        alive = sum(1 for i in range(6) if e_party_raw[i * 8 + 2] > 0)
+        seen = len(seen_species)
+        size = len(info["party"]) if info else seen
+        top = trainer_info.max_level(self.trainer_id) if info else 0
+        return [1.0, 1.0 if info else 0.0, clip(size / 6.0), clip(alive / 6.0), clip(top / 100.0),
+                1.0 if trainer_info.is_double(self.trainer_id) else 0.0,
+                1.0 if trainer_info.is_rematch(self.trainer_id) else 0.0,
+                1.0 if info and top - lead_level >= 5 else 0.0]
 
     def _get_state(self):
         raw = [int(x) for x in self._request("GET_STATE").split(",")]
@@ -440,13 +812,22 @@ class PokemonBattleEnv(gym.Env):
             self.party_levels = [int(x) for x in party_raw[96:102]]
         extras = self._extra_features(b0_raw[12], b1_raw[12])
 
+        combat = [] if LEGACY_OBS else self._combat_features(b0_raw, b1_raw, p_party_raw)
+        trainer = [] if LEGACY_OBS else self._trainer_features(e_party_raw, b0_raw[12])
+        stack = []
+        if FRAME_STACK:
+            self._stack_cur = combat
+            stack = list(self._stack_prev) + [self._last_action_norm]
+        teach = self._teach_features() if MOVE_TEACH else []
         obs_list = (b0_features + b1_features + b2_features + b3_features
-                    + [weather / 4.0] + p_bench_features + e_bench_features + extras)
+                    + [weather / 4.0] + p_bench_features + e_bench_features + extras
+                    + combat + trainer + stack + teach)
         obs = np.array(obs_list, dtype=np.float32)
 
         return {
             "obs": obs,
             "e_species": b1_raw[18],
+            "p_species": b0_raw[18],
             "e_level": b1_raw[12],
             "p_level": b0_raw[12],
             "p_hp": b0_raw[0],
@@ -518,9 +899,13 @@ class PokemonBattleEnv(gym.Env):
 
         # Throw a ball: wild battles only, balls in the bag, capped per battle.
         if (self.is_wild and self.balls_left > 0 and self.balls_thrown_now < MAX_BALLS_PER_BATTLE
-                and e1_hp > 0.0):
+                and e1_hp > 0.0 and self._throw_worthwhile()):
             mask[THROW_ACTION] = True
 
+        if (MOVE_TEACH and getattr(self, "teach_open", False) and self.teach_used < MAX_TEACH_PER_BATTLE
+                and len(self.teach_queue) < TEACH_QUEUE_MAX):
+            for k in range(min(len(self.teach_cands), TEACH_ACTIONS)):
+                mask[TEACH_BASE + k] = True       # a teach costs no game turn; it is offered before the first move
         if not np.any(mask): mask[0] = True  # Failsafe
         return mask
 
@@ -537,6 +922,13 @@ class PokemonBattleEnv(gym.Env):
                 self._prof_report()
         self.step_count = 0
         self.total_reward = 0.0
+        self.faint_count = 0                             # own faints this battle
+        self._reset_teach_window()
+        self.is_trainer = False
+        self.trainer_id = -1
+        self._stack_prev = [0.0] * EXTRA2_FEATURES
+        self._stack_cur = [0.0] * EXTRA2_FEATURES
+        self._last_action_norm = 0.0
         self.move_count = self.switch_count = 0          # per-battle stats
         self.forced_switch_count = self.failed_switch_count = 0
         self.switch_blocked = False
@@ -546,6 +938,7 @@ class PokemonBattleEnv(gym.Env):
         while True:
             phase, _ = self._status()
             if phase not in READY_PHASES:
+                self._apply_teach_queue()          # move edits queued by teach actions (overworld only)
                 t_sw = time.perf_counter()
                 self._maybe_swap()
                 self._prof_add("swap_check", time.perf_counter() - t_sw)
@@ -565,6 +958,8 @@ class PokemonBattleEnv(gym.Env):
 
             st = self._get_state()
             self._record_battle_start(st["obs"])
+            self.battle_start["lead_species"] = SPECIES_ID_TO_NAME.get(st["p_species"], st["p_species"])
+            self.battle_start["enemy_species"] = SPECIES_ID_TO_NAME.get(st["e_species"], st["e_species"])
             st = self._get_state()   # rebuild so the extra features reflect this battle
             # Scripted catching happens here, before the agent's first move, so
             # no action the policy chose is ever replaced. If the battle ends
@@ -575,6 +970,8 @@ class PokemonBattleEnv(gym.Env):
         self.start_p_team = st["p_team"]
         self.prev_p_team, self.prev_e_team = st["p_team"], st["e_team"]
         self.prev_p_alive, self.prev_e_alive = st["p_alive"], st["e_alive"]
+        if MOVE_TEACH and self._open_teach_window():
+            st = self._get_state()           # rebuild so the observation carries the open teach window
         self.last_obs = st["obs"]
         return st["obs"], {}
 
@@ -681,7 +1078,7 @@ class PokemonBattleEnv(gym.Env):
         while True:
             party = [int(x) for x in inv["lv"].split(",") if x]
             area_max = pol.area_max(map_key)
-            box = self._get_box() if pol.overleveled(party, area_max) else (None, set())
+            box = self._get_box() if (pol.stock_driven or pol.overleveled(party, area_max)) else (None, set())
             ctx = CatchContext(
                 enemy_species=st["e_species"], enemy_level=st["e_level"], party_levels=party,
                 box_levels=box[0] if box else None, box_species=box[1] if box else set(),
@@ -755,11 +1152,33 @@ class PokemonBattleEnv(gym.Env):
         alive = [x for x in self.party_levels if x > 0]
         return sum(alive) / len(alive) if alive else 0.0
 
+    def _candidate_ceiling(self):
+        """Highest level that still counts as a training candidate (stock for the swap rule). With the
+        area's level known this is the band swap candidates are drawn from (area max + CANDIDATE_MARGIN);
+        before that it is the old rule, CANDIDATE_GAP below the party average."""
+        area = getattr(self, "area_max_now", None)
+        if area is not None:
+            return area + CANDIDATE_MARGIN
+        return self._party_avg() - CANDIDATE_GAP
+
+    def _throw_worthwhile(self):
+        """False for a throw that cannot pay: the PC already holds this species, or only the reserve balls are left and the
+        species is not new to the Pokedex. Unknown information (box not read yet, Pokedex unknown) never blocks a throw."""
+        if not MASK_DUP_THROWS:
+            return True
+        new_species = getattr(self, "enemy_owned", None) is False
+        box = getattr(self, "box_cache", None)
+        if box and getattr(self, "enemy_species", 0) in box[1] and not new_species:
+            return False
+        if self.balls_left <= BALL_RESERVE and not new_species:
+            return False
+        return True
+
     def _catch_value(self):
         """Reward for a successful catch: big for a training candidate while the PC
         stock is short, small otherwise, plus bonuses for a new species and a low-HP catch."""
         enemy_level = self.battle_start["enemy_level"]
-        useful = enemy_level <= self._party_avg() - CANDIDATE_GAP
+        useful = enemy_level <= self._candidate_ceiling()
         value = CATCH_USEFUL if useful else CATCH_PLAIN
         if useful and self.box_low_stock >= STOCK_WANTED:
             value *= STOCK_FULL_FACTOR
@@ -772,6 +1191,44 @@ class PokemonBattleEnv(gym.Env):
         if self.last_throw_e_hp < 0.5:
             value += LOW_HP_CATCH_BONUS
         return value
+
+    @staticmethod
+    def _frac_level(species, exp):
+        """Level plus progress to the next one, from the mon's experience points."""
+        rate = growth_rate(species)
+        lvl = level_from_exp(rate, exp)
+        if lvl >= 100:
+            return 100.0
+        lo, hi = exp_at_level(rate, lvl), exp_at_level(rate, lvl + 1)
+        return lvl + (exp - lo) / max(hi - lo, 1)
+
+    def _party_progress(self, inv):
+        """Fractional level of each party mon from the INVENTORY `px` field, or None when
+        the bridge predates it or the field doesn't line up with `lv` (the reward then falls
+        back to whole levels). An egg or unreadable slot keeps its whole level."""
+        px = (inv or {}).get("px")
+        if not px or not inv.get("lv"):
+            return None
+        try:
+            lv = [int(x) for x in inv["lv"].split(",") if x]
+            pairs = [tuple(int(v) for v in e.split(":")) for e in px.split(",") if e]
+            if len(pairs) != len(lv):
+                return None
+            real = [sp for sp, _ in pairs if sp not in (0, EGG_SPECIES)]
+            if real:
+                rom_info.ensure(self._request, real)
+            return [float(l) if sp in (0, EGG_SPECIES) else self._frac_level(sp, xp)
+                    for (sp, xp), l in zip(pairs, lv)]
+        except (ValueError, OSError):
+            return None
+
+    def _difficulty_shift(self):
+        """Per-battle constant subtracted from the learner's terminal reward (see BASELINE_*)."""
+        bs = self.battle_start
+        if not self.is_wild or not bs:
+            return 0.0
+        gap = min(max(bs["lead_level"] - bs["enemy_level"], 0), BASELINE_GAP_CAP)
+        return BASELINE_BASE + BASELINE_PER_LEVEL * gap - BASELINE_REF
 
     @staticmethod
     def _log_level_sum(levels):
@@ -792,13 +1249,22 @@ class PokemonBattleEnv(gym.Env):
             "balls": self._ball_total(inv),
         }
         self.catch_policy.start_battle()
+        gap0 = max(0, self.battle_start["lead_level"] - self.battle_start["enemy_level"])
+        wild0 = bool(inv) and inv["trainer"] == "0"
+        self.diff_scale = 1.0 / (1.0 + gap0 / DIFF_SCALE_GAP) if (DIFFICULTY_SCALED_HP and wild0) else 1.0
 
         # Per-battle state the observation, throw mask and rewards use.
         self.is_wild = bool(inv) and inv["trainer"] == "0"
+        self.map_now = inv.get("map", "") if inv else ""
+        self.area_max_now = self.catch_policy.area_max(inv.get("map", "?")) if inv else None
+        self.is_trainer = bool(inv) and inv["trainer"] == "1"
+        self.trainer_id = trainer_info.read_trainer_id(self._request) if self.is_trainer else -1
         self.balls_left = self._ball_total(inv) or 0
         self.balls_thrown_now = 0
         lv = [int(x) for x in inv["lv"].split(",") if x] if inv else []
-        self.level_sum_start = self._log_level_sum(lv) if lv else None
+        prog = self._party_progress(inv)
+        self.progress_start = prog
+        self.level_sum_start = self._log_level_sum(prog if prog else lv) if lv else None
         self.level_start = lv
         if lv and not any(self.party_levels):
             self.party_levels = (lv + [0] * 6)[:6]   # older bridge: game order, not reported order
@@ -806,10 +1272,15 @@ class PokemonBattleEnv(gym.Env):
         if self.is_wild:
             box = self._get_box()
             if box:
-                limit = self._party_avg() - CANDIDATE_GAP
+                limit = self._candidate_ceiling()
                 self.box_low_stock = sum(1 for l in box[0] if l <= limit)
         species = int(round(obs[90] * 412.0))
         self.enemy_species = species
+        if species > 0:      # ROM base stats for the damage/speed features (cached after the first sight of a species)
+            try:
+                rom_info.ensure(self._request, [species])
+            except (OSError, ValueError):
+                pass
         try:
             self.enemy_owned = is_owned(parse_owned(self._request("DEX")), species) if self.is_wild else None
         except (OSError, ValueError):
@@ -945,7 +1416,9 @@ class PokemonBattleEnv(gym.Env):
             return LOSS_REWARD
         if outcome == OUTCOME_CAUGHT:
             return 0.0   # paid by _catch_value, which knows the level and PC stock
-        return 0.0   # ran away, etc.
+        if outcome in PLAYER_ESCAPE_OUTCOMES and self.is_wild:
+            return -FLEE_PENALTY
+        return 0.0   # the wild mon left, a draw, etc.
 
     @staticmethod
     def _ball_total(inv):
@@ -955,6 +1428,12 @@ class PokemonBattleEnv(gym.Env):
         return sum(int(b.split(":")[1]) for b in inv["balls"].split(",") if b)
 
     def step(self, action):
+        if MOVE_TEACH and action >= TEACH_BASE:
+            return self._teach_step(int(action) - TEACH_BASE)
+        self.teach_open = False                       # any real move closes the teaching window for this battle
+        if FRAME_STACK:   # what the agent saw last turn becomes the memory appended to this turn's view
+            self._stack_prev = list(self._stack_cur)
+            self._last_action_norm = float(action) / max(N_ACTIONS - 1, 1)
         # The previous step left the game at a decision point, but make sure.
         phase, _ = self._wait_for_phase(READY_PHASES | END_PHASES, self.turn_timeout)
         if phase is None:
@@ -1026,14 +1505,14 @@ class PokemonBattleEnv(gym.Env):
         # Reward: share of team HP dealt minus share taken (see constants).
         dealt = self.prev_e_team - st["e_team"]
         taken = self.prev_p_team - st["p_team"]
-        reward = DAMAGE_REWARD_SCALE * (dealt - taken)
+        reward = DAMAGE_REWARD_SCALE * (dealt - taken * self.diff_scale)
         balls_thrown = 0
         level_gain = 0.0
         new_species = 0
         if terminated:
             reward += self._outcome_bonus(st["outcome"])
             if st["outcome"] == OUTCOME_WON and self.start_p_team:
-                reward += WIN_HP_BONUS * min(1.0, st["p_team"] / self.start_p_team)
+                reward += WIN_HP_BONUS * self.diff_scale * min(1.0, st["p_team"] / self.start_p_team)
             # Charge for balls used this battle (also counts manual throws).
             inv_end = self._read_inventory()
             start, end = self.battle_start.get("balls"), self._ball_total(inv_end)
@@ -1043,8 +1522,13 @@ class PokemonBattleEnv(gym.Env):
             # Party growth this battle, log-scaled so levels on weak members pay more.
             if inv_end and self.level_sum_start is not None:
                 lv_end = [int(x) for x in inv_end["lv"].split(",") if x]
-                if lv_end:
-                    level_gain = self._log_level_sum(lv_end) - self.level_sum_start
+                prog_end = self._party_progress(inv_end)
+                # A different party size means a mon joined or left (catch, swap): nothing to compare.
+                if lv_end and len(lv_end) == len(self.level_start):
+                    # Fractional levels (experience) when both ends have them, else whole levels.
+                    use_frac = bool(prog_end) and bool(self.progress_start)
+                    level_gain = self._log_level_sum(prog_end if use_frac else lv_end) - (
+                        self.level_sum_start if use_frac or not self.progress_start else self._log_level_sum(self.level_start))
                     reward += LEVEL_REWARD * level_gain
                     if level_gain:   # a level-up (or a swap/faint changing the party): show the inputs
                         print(f"[level] party {self.level_start} -> {lv_end}: "
@@ -1058,7 +1542,9 @@ class PokemonBattleEnv(gym.Env):
 
         # Faint bonus/penalty (alive-count change; switching never changes it).
         reward += KO_BONUS * max(0, self.prev_e_alive - st["e_alive"])
-        reward -= KO_BONUS * max(0, self.prev_p_alive - st["p_alive"])
+        lost_now = max(0, self.prev_p_alive - st["p_alive"])
+        self.faint_count += lost_now
+        reward -= KO_BONUS * lost_now
 
         action_failed = (result == "FAILED")
         if action_failed and not is_attack_action and not is_throw:
@@ -1165,6 +1651,18 @@ class PokemonBattleEnv(gym.Env):
                 "scripted_balls": self.scripted_balls,
                 "scripted_caught": self.scripted_caught,
                 "swaps": self.swaps,
+                "faints": self.faint_count,
+                **({"teach_count": self.teach_used,
+                    "teach_reward": self.teach_paid_battle + self._pending_shaping} if MOVE_TEACH else {}),
+                "trainer_id": self.trainer_id,
+                "lead_species": self.battle_start.get("lead_species", ""),
+                "enemy_species": self.battle_start.get("enemy_species", ""),
+                "map": getattr(self, "map_now", ""),
+                "area_max": "" if getattr(self, "area_max_now", None) is None else self.area_max_now,
+                "hp_left_pct": 100.0 * st["p_team"] / self.start_p_team if self.start_p_team else 0.0,
+                "start_hp_pct": 100.0 * self.start_p_team / max(len(self.level_start), 1) if self.start_p_team else 0.0,
+                "teleported": int(st["outcome"] in PLAYER_ESCAPE_OUTCOMES),
+                "shift": self._difficulty_shift(),
             }
             self.scripted_balls = self.scripted_caught = 0
             self.swaps = 0
@@ -1173,7 +1671,9 @@ class PokemonBattleEnv(gym.Env):
             log_battle_row(self.episode, st["outcome"], self.step_count, self.total_reward,
                            info["battle_stats"])
         # The PPO critic sees REWARD_SCALE * reward; everything logged/printed stays unscaled.
-        return obs, reward * REWARD_SCALE, terminated, False, info
+        shaping_paid = self._take_shaping()
+        learn_reward = reward - (self._difficulty_shift() if terminated else 0.0) + shaping_paid
+        return obs, learn_reward * REWARD_SCALE, terminated, False, info
 
     def _timeout_return(self, action, obs, action_desc=None):
         """The game didn't reach a decision point within turn_timeout. That is a

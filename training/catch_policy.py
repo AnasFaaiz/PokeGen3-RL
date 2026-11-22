@@ -68,6 +68,10 @@ class CatchPolicy:
     gap_to_swap: int = GAP_TO_SWAP
     candidate_margin: int = CANDIDATE_MARGIN
     candidates_wanted: int = CANDIDATES_WANTED
+    # Catch whenever the box is short of low-level stock, not only while the whole party is far above the
+    # area. The swap rule now keeps every slot close to the area level, so "party overleveled by gap_to_swap"
+    # would never hold and the box would never be refilled. False restores the old rule.
+    stock_driven: bool = True
     max_balls_per_mon: int = MAX_BALLS_PER_MON
     enabled: bool = True
     thrown: int = 0
@@ -118,7 +122,7 @@ class CatchPolicy:
             return no("unknown enemy")
         if ctx.area_max is None:
             return no("area level unknown")
-        if not self.overleveled(ctx.party_levels, ctx.area_max):
+        if not self.stock_driven and not self.overleveled(ctx.party_levels, ctx.area_max):
             return no("party not overleveled")
         if ctx.box_levels is None:
             return no("box unknown")
@@ -143,8 +147,12 @@ if __name__ == "__main__":
     base = dict(enemy_species=288, enemy_level=6, party_levels=[22, 21, 20], box_levels=[40, 35],
                 box_species={25}, area_max=8, trainer=False, balls=10)
     assert p.decide(CatchContext(**base)) and p.last_reason == "low-level stock"
-    assert not p.decide(CatchContext(**{**base, "party_levels": [22, 15, 20]}))      # 15 < 8 + 12
-    assert p.last_reason == "party not overleveled"
+    # Stock-driven (default): a party near the area level still catches while the box is short of low levels.
+    assert p.decide(CatchContext(**{**base, "party_levels": [22, 15, 10]}))
+    old = CatchPolicy(stock_driven=False)                                              # the original rule
+    assert not old.decide(CatchContext(**{**base, "party_levels": [22, 15, 20]}))      # 15 < 8 + 12
+    assert old.last_reason == "party not overleveled"
+    assert old.decide(CatchContext(**base))
     assert not p.decide(CatchContext(**{**base, "box_levels": [5, 6, 7, 8, 9, 10]}))  # enough stock
     assert p.last_reason == "box has enough low levels"
     assert not p.decide(CatchContext(**{**base, "enemy_level": 20}))
