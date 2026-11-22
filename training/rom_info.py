@@ -25,6 +25,7 @@ def ensure(request, species_ids):
     returns the reply line. Returns the number of species the ROM could not supply."""
     global _warned
     missing = 0
+    changed = False
     for sid in set(species_ids):
         if sid in exp_tables.ROM_GROWTH or sid <= 0:
             continue
@@ -34,6 +35,10 @@ def ensure(request, species_ids):
             continue
         exp_tables.ROM_GROWTH[sid] = info["growth"]
         mon_stats.ROM_BASE[sid] = info["base"]
+        changed = True
+    if changed:
+        import damage_calc          # cached stat estimates may have used the reference table
+        damage_calc.clear_caches()
     if missing and not _warned:
         _warned = True
         print(f"[rom] SPECIES unavailable for {missing} species; using reference tables "

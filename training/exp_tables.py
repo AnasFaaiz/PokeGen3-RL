@@ -6,6 +6,7 @@ standard Gen 3 ones (pret's gExperienceTables, levels 1-100).
 """
 import json
 import re
+from bisect import bisect_right
 from functools import lru_cache
 from pathlib import Path
 
@@ -45,7 +46,18 @@ def exp_at_level(rate, n):
     raise ValueError(rate)
 
 
+@lru_cache(maxsize=None)
+def _thresholds(rate):
+    """exp needed for levels 2..100 under `rate` (non-decreasing, checked in the __main__ test)."""
+    return tuple(exp_at_level(rate, n) for n in range(2, 101))
+
+
 def level_from_exp(rate, exp):
+    return 1 + bisect_right(_thresholds(rate), exp)
+
+
+def _level_from_exp_slow(rate, exp):
+    """The original linear scan, kept as the reference the bisect version is tested against."""
     lvl = 1
     for n in range(2, 101):
         if exp >= exp_at_level(rate, n):
@@ -93,6 +105,15 @@ def box_level(species, exp):
 
 
 if __name__ == "__main__":
+    # bisect version == the original scan, for every rate, at every threshold edge and between them.
+    for r in range(6):
+        t = _thresholds(r)
+        assert all(a <= b for a, b in zip(t, t[1:])), r
+        edges = {0, 1} | {x + d for x in t for d in (-1, 0, 1)} | {2_000_000}
+        for e in sorted(edges):
+            assert level_from_exp(r, max(e, 0)) == _level_from_exp_slow(r, max(e, 0)), (r, e)
+        for e in range(0, 1_300_000, 997):
+            assert level_from_exp(r, e) == _level_from_exp_slow(r, e), (r, e)
     # Sanity: known Gen 3 totals at level 100.
     assert exp_at_level(0, 100) == 1_000_000
     assert exp_at_level(4, 100) == 800_000
