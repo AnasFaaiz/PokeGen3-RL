@@ -4,6 +4,49 @@ import json
 import subprocess
 from datetime import datetime
 
+# Identifies this process in every log row (and in logs/runs.csv), so rows from different runs or settings can
+# be told apart. train_dqn.py / run_eval.py call set_run() with a readable name; the default is the start time.
+RUN_ID = datetime.now().strftime("%Y%m%d_%H%M%S")
+
+
+def set_run(name):
+    global RUN_ID
+    RUN_ID = f"{datetime.now().strftime('%Y%m%d_%H%M%S')}_{name}" if name else RUN_ID
+    return RUN_ID
+
+ENV_TAG = ""      # "e2" in a worker of a multi-env run; prefixed to the human-readable log lines
+
+
+def set_env(run_id, tag):
+    """Used by training workers: a unique run id per env (so rows from different windows can be told apart) and a tag."""
+    global RUN_ID, ENV_TAG
+    RUN_ID, ENV_TAG = run_id, tag
+
+# Size limits: the per-step CSV stores a 400+ value observation per row and grows by hundreds of MB.
+BIG_CSV_BYTES = int(float(os.environ.get("POKE_LOG_CSV_MAX_MB", 200)) * 1024 * 1024)
+BIG_TXT_BYTES = int(float(os.environ.get("POKE_LOG_TXT_MAX_MB", 20)) * 1024 * 1024)
+LOG_OBS_EVERY = max(int(os.environ.get("POKE_LOG_OBS_EVERY", 1)), 1)   # keep the observation on every Nth step only
+KEEP_OLD_LOGS = 2
+_write_count = 0
+_obs_count = 0
+
+
+def _rotate_if_big(path, limit, keep=KEEP_OLD_LOGS):
+    """path -> path.1 -> path.2 ... when it passes `limit` bytes; the oldest beyond `keep` is deleted."""
+    try:
+        if os.path.getsize(path) < limit:
+            return False
+    except OSError:
+        return False
+    for i in range(keep, 0, -1):
+        src = path if i == 1 else f"{path}.{i - 1}"
+        dst = f"{path}.{i}"
+        if os.path.exists(src):
+            if i == keep and os.path.exists(dst):
+                os.remove(dst)
+            os.rename(src, dst)
+    return True
+
 _LOG_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "logs")
 os.makedirs(_LOG_DIR, exist_ok=True)
 
@@ -51,42 +94,33 @@ def log_reject(episode, step, action, reply, phase, mask, retry, substituted_wit
 
 LEVEL_GAP_FILE = os.path.join(_LOG_DIR, "level_gap.csv")
 
+LEVEL_GAP_HEADER = ["timestamp", "run", "episode", "party_levels", "box_top5_levels", "balls", "money"]
+CATCH_HEADER = ["timestamp", "run", "episode", "species", "level", "party_min_level", "area_max", "balls_used", "reason"]
+SWAP_HEADER = ["timestamp", "run", "episode", "map", "area_max", "party_slot", "out_level", "in_species", "in_level", "reply"]
+
+
 def log_level_gap(episode, party_levels, box_top, balls, money):
     """Periodic roster snapshot: party levels vs the strongest PC mons."""
-    new = not os.path.exists(LEVEL_GAP_FILE)
-    with open(LEVEL_GAP_FILE, "a", newline="") as f:
-        w = csv.writer(f)
-        if new:
-            w.writerow(["timestamp", "episode", "party_levels", "box_top5_levels", "balls", "money"])
-        w.writerow([datetime.now().strftime("%Y-%m-%d %H:%M:%S"), episode,
-                    " ".join(map(str, party_levels)), " ".join(map(str, box_top)), balls, money])
+    _append_row(LEVEL_GAP_FILE, LEVEL_GAP_HEADER,
+                [datetime.now().strftime("%Y-%m-%d %H:%M:%S"), RUN_ID, episode,
+                 " ".join(map(str, party_levels)), " ".join(map(str, box_top)), balls, money])
 
 CATCH_FILE = os.path.join(_LOG_DIR, "catches.csv")
 
 def log_catch(episode, species, level, party_min_level, area_max, balls_used, reason):
     """One row per caught Pokemon. reason is the scripted rule's reason, or
     empty for a catch the rule did not start (a manual throw)."""
-    new = not os.path.exists(CATCH_FILE)
-    with open(CATCH_FILE, "a", newline="") as f:
-        w = csv.writer(f)
-        if new:
-            w.writerow(["timestamp", "episode", "species", "level", "party_min_level",
-                        "area_max", "balls_used", "reason"])
-        w.writerow([datetime.now().strftime("%Y-%m-%d %H:%M:%S"), episode, species, level,
-                    party_min_level, area_max, balls_used, reason])
+    _append_row(CATCH_FILE, CATCH_HEADER,
+                [datetime.now().strftime("%Y-%m-%d %H:%M:%S"), RUN_ID, episode, species, level,
+                 party_min_level, area_max, balls_used, reason])
 
 SWAP_FILE = os.path.join(_LOG_DIR, "swaps.csv")
 
 def log_swap(episode, map_key, area_max, party_slot, out_level, in_species, in_level, reply):
     """One row per PC swap attempt."""
-    new = not os.path.exists(SWAP_FILE)
-    with open(SWAP_FILE, "a", newline="") as f:
-        w = csv.writer(f)
-        if new:
-            w.writerow(["timestamp", "episode", "map", "area_max", "party_slot", "out_level",
-                        "in_species", "in_level", "reply"])
-        w.writerow([datetime.now().strftime("%Y-%m-%d %H:%M:%S"), episode, map_key, area_max,
-                    party_slot, out_level, in_species, in_level, reply])
+    _append_row(SWAP_FILE, SWAP_HEADER,
+                [datetime.now().strftime("%Y-%m-%d %H:%M:%S"), RUN_ID, episode, map_key, area_max,
+                 party_slot, out_level, in_species, in_level, reply])
 
 def alert_loss():
     print("[ALERT] Battle lost!")
@@ -109,7 +143,8 @@ BATTLES_FILE = os.path.join(_LOG_DIR, "battles.csv")
 BATTLES_HEADER = [
     "timestamp", "episode", "outcome", "trainer_battle", "lead_level", "enemy_level", "level_gap",
     "steps", "return", "moves", "voluntary_switches", "forced_switches", "failed_switches",
-    "balls_thrown", "caught",
+    "balls_thrown", "caught", "hp_left_pct", "faints", "start_hp_pct", "trainer_id",
+    "run", "lead_species", "enemy_species", "map", "area_max",
 ]
 THROWS_FILE = os.path.join(_LOG_DIR, "throws.csv")
 THROWS_HEADER = [
@@ -119,12 +154,31 @@ THROWS_HEADER = [
 
 
 def _append_row(path, header, row):
+    if os.path.exists(path):
+        _rotate_if_old_header(path, header)
     new = not os.path.exists(path)
     with open(path, "a", newline="") as f:
         w = csv.writer(f)
         if new:
             w.writerow(header)
         w.writerow(row)
+
+
+def _rotate_if_old_header(path, header):
+    """Move a file with an older header aside so schemas never mix (checked once per process)."""
+    if path in _checked:
+        return
+    _checked.add(path)
+    with open(path, "r", encoding="utf-8", errors="replace") as f:
+        first = f.readline().strip().split(",")
+    if first != header:
+        stamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        base, ext = os.path.splitext(os.path.basename(path))
+        os.rename(path, os.path.join(os.path.dirname(path), f"{base}_oldschema_{stamp}{ext}"))
+        print(f"[logger] {os.path.basename(path)} had an older header; moved aside")
+
+
+_checked = set()
 
 
 def init_csv():
@@ -151,6 +205,10 @@ def log_battle_row(episode, outcome, steps, total_return, stats):
         stats.get("level_gap"), steps, round(total_return, 2), stats.get("moves"),
         stats.get("voluntary_switches"), stats.get("forced_switches"), stats.get("failed_switches"),
         stats.get("balls_thrown"), stats.get("caught"),
+        round(stats.get("hp_left_pct", 0.0), 1), stats.get("faints"),
+        round(stats.get("start_hp_pct", 0.0), 1), stats.get("trainer_id", -1),
+        RUN_ID, stats.get("lead_species", ""), stats.get("enemy_species", ""), stats.get("map", ""),
+        stats.get("area_max", ""),
     ])
 
 
@@ -216,18 +274,21 @@ def log_step(
     # Serialize the full observation (if provided) for post-hoc policy
     # distillation (see distill_policy.py). Kept as its own column so
     # every other column/row shape stays unchanged for existing readers.
-    if obs is not None:
+    global _write_count, _obs_count
+    obs_json = ""
+    _obs_count += 1
+    if obs is not None and (_obs_count - 1) % LOG_OBS_EVERY == 0:
         try:
             obs_list = obs.tolist() if hasattr(obs, "tolist") else list(obs)
-            obs_json = json.dumps(obs_list)
+            # 4 decimals and no spaces: about a third of the size of full-precision floats, still plenty for
+            # distillation (the observation is scaled to [0, 1]).
+            obs_json = json.dumps([round(float(x), 4) for x in obs_list], separators=(",", ":"))
         except Exception:
             obs_json = ""
-    else:
-        obs_json = ""
 
     # 1. Clean, human-readable terminal/log file string
     log_line = (
-        f"[{timestamp}] Ep {episode:03d} | Step {step:02d} | "
+        f"[{timestamp}]{' [' + ENV_TAG + ']' if ENV_TAG else ''} Ep {episode:03d} | Step {step:02d} | "
         f"{action_desc.ljust(26)} | "
         f"Prob: {action_prob*100:5.1f}% | "
         f"Eff: {eff:3.1f}x | "
@@ -236,10 +297,18 @@ def log_step(
         f"Rew: {reward:+6.1f}"
     )
 
+    _write_count += 1
+    if _write_count % 200 == 0 and not ENV_TAG:   # size check now and then; workers skip it (several processes rotating one
+                                                  # file would race), prepare_logs() rotates oversized files at start-up
+        _rotate_if_big(LOG_FILE, BIG_TXT_BYTES)
+        if _rotate_if_big(CSV_FILE, BIG_CSV_BYTES):
+            init_csv()                     # the rotated file is gone: start a fresh one with its header
     with open(LOG_FILE, "a") as f:
         f.write(log_line + "\n")
 
     # 2. Structured CSV entry for pandas/seaborn post-training analysis
+    if not os.path.exists(CSV_FILE):
+        init_csv()
     with open(CSV_FILE, "a", newline="") as f:
         writer = csv.writer(f)
         writer.writerow([
@@ -252,7 +321,10 @@ def log_step(
             obs_json
         ])
 
-OUTCOME_NAMES = {1: "WIN", 2: "LOSS", 3: "RAN", 4: "RAN", 5: "TELEPORT", 6: "FLED", 7: "CAUGHT", 9: "FORFEIT", 10: "ENEMY_TELEPORT"}
+# gBattleOutcome: 3 is a draw, 4 the player ran, 5 the player's Teleport, 6 the wild mon fled, 8 no Safari Balls left,
+# 10 the wild mon teleported.
+OUTCOME_NAMES = {1: "WIN", 2: "LOSS", 3: "DRAW", 4: "RAN", 5: "TELEPORT", 6: "FLED", 7: "CAUGHT",
+                 8: "NO_SAFARI_BALLS", 9: "FORFEIT", 10: "ENEMY_TELEPORT"}
 
 def outcome_name(outcome):
     return OUTCOME_NAMES.get(outcome, f"END({outcome})")
@@ -276,3 +348,57 @@ def log_battle_end(episode, outcome, total_steps, episode_reward, stats=None):
 
     if outcome in (2, 9):
         alert_loss()
+
+
+RUNS_FILE = os.path.join(_LOG_DIR, "runs.csv")
+RUNS_HEADER = ["timestamp", "run", "script", "obs_dim", "n_actions", "model_loaded", "git", "flags"]
+MOVES_FILE = os.path.join(_LOG_DIR, "moves.csv")
+MOVES_HEADER = ["timestamp", "run", "episode", "slot", "species", "level", "out_move", "in_move",
+                "delta_score", "source", "reply"]
+
+
+def _git_short():
+    try:
+        out = subprocess.run(["git", "rev-parse", "--short", "HEAD"], capture_output=True, text=True,
+                             cwd=os.path.dirname(os.path.abspath(__file__)), timeout=5)
+        return out.stdout.strip() if out.returncode == 0 else ""
+    except (OSError, subprocess.SubprocessError):
+        return ""
+
+
+def log_run_start(script, obs_dim, n_actions, model_loaded=""):
+    """One row per process start: which code and settings produced the rows that follow (they carry RUN_ID)."""
+    flags = " ".join(f"{k}={v}" for k, v in sorted(os.environ.items()) if k.startswith("POKE_"))
+    _append_row(RUNS_FILE, RUNS_HEADER, [datetime.now().strftime("%Y-%m-%d %H:%M:%S"), RUN_ID, script,
+                                         obs_dim, n_actions, model_loaded, _git_short(), flags])
+
+
+PROFILE_FILE = os.path.join(_LOG_DIR, "profile.csv")
+PROFILE_HEADER = ["timestamp", "run", "episode", "battles", "wall_s", "breakdown_json"]
+
+
+def log_profile(episode, battles, wall_s, breakdown):
+    """One row per timing report: wall seconds for `battles` battles and {category: [calls, seconds]}. The terminal
+    table disappears with the terminal; this keeps it, so the share of time spent walking, waiting and in bridge
+    commands can be compared across runs (see log_report.py)."""
+    _append_row(PROFILE_FILE, PROFILE_HEADER, [datetime.now().strftime("%Y-%m-%d %H:%M:%S"), RUN_ID, episode, battles,
+                                              round(wall_s, 1), json.dumps(breakdown, separators=(",", ":"))])
+
+
+def log_move(episode, slot, species, level, out_move, in_move, delta_score, source, reply):
+    """One row per move-teaching attempt (applied, refused or dry run)."""
+    _append_row(MOVES_FILE, MOVES_HEADER, [datetime.now().strftime("%Y-%m-%d %H:%M:%S"), RUN_ID, episode, slot,
+                                           species, level, out_move, in_move, round(float(delta_score), 1),
+                                           source, reply])
+
+
+def prepare_logs():
+    """Create every log file with the current header, moving old-header files aside. Call once from the main process
+    BEFORE starting worker processes, so workers only ever append (two workers creating the same file would race)."""
+    _rotate_if_big(LOG_FILE, BIG_TXT_BYTES)
+    _rotate_if_big(CSV_FILE, BIG_CSV_BYTES)
+    init_csv()
+    for path, header in ((BATTLES_FILE, BATTLES_HEADER), (SWAP_FILE, SWAP_HEADER), (CATCH_FILE, CATCH_HEADER),
+                         (LEVEL_GAP_FILE, LEVEL_GAP_HEADER), (RUNS_FILE, RUNS_HEADER), (MOVES_FILE, MOVES_HEADER), (PROFILE_FILE, PROFILE_HEADER)):
+        if os.path.exists(path):
+            _rotate_if_old_header(path, header)
