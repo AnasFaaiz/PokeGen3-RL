@@ -13,7 +13,14 @@ import socket
 import sys
 import time
 
-from exp_tables import box_level, species_names
+from exp_tables import box_level, species_names, exp_at_level, level_from_exp, growth_rate
+
+
+def _frac(sp, xp):
+    rate = growth_rate(sp)
+    lvl = level_from_exp(rate, xp)
+    lo, hi = exp_at_level(rate, lvl), exp_at_level(rate, lvl + 1)
+    return lvl if lvl >= 100 else lvl + (xp - lo) / max(hi - lo, 1)
 
 BALL_NAMES = {1: "Master", 2: "Ultra", 3: "Great", 4: "Poke", 5: "Safari", 6: "Net",
               7: "Dive", 8: "Nest", 9: "Repeat", 10: "Timer", 11: "Luxury", 12: "Premier"}
@@ -27,9 +34,15 @@ def pretty(line):
             f"{BALL_NAMES.get(int(i), i)} x{q}"
             for i, q in (b.split(":") for b in f["balls"].split(",") if b)
         ) or "none"
+        names = species_names()
+        prog = ", ".join(
+            f"{names.get(int(sp), sp)} Lv{_frac(int(sp), int(xp)):.2f}"
+            for sp, xp in (e.split(":") for e in f.get("px", "").split(",") if e)
+        ) or "n/a (bridge without px)"
         return (f"money={f['money']}  balls: {balls}\n"
                 f"party size={f['party']} levels=[{f['lv']}]  "
-                f"outcome={f['outcome']} trainer_battle={f['trainer']}")
+                f"outcome={f['outcome']} trainer_battle={f['trainer']}\n"
+                f"party progress: {prog}")
     if line.startswith("BOX:") and not line.startswith("BOX:ERR"):
         names = species_names()
         rows = []
@@ -54,6 +67,9 @@ BANNER = """commands:
   STATUS              battle phase
   GET_STATE           the raw observation vector
   INVENTORY           money, ball counts, party levels, last battle outcome (read-only)
+  TRAINER             opponent trainer id (TRAINER:ERR:no_address until the RAM address is set in the config)
+  TRAINERSCAN:<id>    EWRAM u16 cells equal to <id>: run in a trainer fight to find TRAINER_OPPONENT_ADDR
+  TRAINERFLAGS:<id>   1 if that trainer is already defeated (flag layout unverified)
   THROW[:itemId]      throw a ball (default Poke Ball) in a wild single battle; poll STATUS after
   BAG                 bag pocket/cursor, current callback and controller fn (read-only)
   BOX                 every occupied PC slot with species and derived level (read-only)

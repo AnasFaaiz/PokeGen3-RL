@@ -14,3 +14,6 @@ analysis/
 *.sav
 *.ss*
 archive/
+
+# per-window ROM/save copies for parallel training (never commit a ROM)
+instances/

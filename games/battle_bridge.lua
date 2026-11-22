@@ -2,8 +2,10 @@ local GAME_CONFIG_FILE = "/home/kazuto/Documents/Projects/PokeGen3-RL/games/emer
 local CONFIG = dofile(GAME_CONFIG_FILE)
 local NAV_FILE = string.gsub(GAME_CONFIG_FILE, "emerald_config%.lua$", "overworld_nav.lua")
 local Nav = dofile(NAV_FILE)
-local MAIN_PORT = 8888
+local MAIN_PORT = 8888 -- first port tried; with several windows open each takes the next free one (+2)
 local PROBE_PORT = 8889
+local MAX_INSTANCES = 16
+local Ports = dofile(string.gsub(GAME_CONFIG_FILE, "emerald/emerald_config%.lua$", "bridge_ports.lua"))
 local LOG_CALLBACK2_CHANGES = true
 local KEY = C.GBA_KEY
 local ALL_KEYS = 0x3FF
@@ -978,7 +980,18 @@ local function handleProbeLine(line)
 	end
 end
 local function startServers()
-	server = socket.bind(nil, MAIN_PORT)
+	local s, port = Ports.bindFirst(socket.bind, MAIN_PORT, 2, MAX_INSTANCES)
+	if not s then
+		console:log(
+			string.format(
+				"No free bridge port from %d to %d: is another window already using them all?",
+				MAIN_PORT,
+				MAIN_PORT + 2 * (MAX_INSTANCES - 1)
+			)
+		)
+		return
+	end
+	server, MAIN_PORT, PROBE_PORT = s, port, port + 1
 	server:listen()
 	probeServer = socket.bind(nil, PROBE_PORT)
 	if probeServer then
@@ -1088,6 +1101,21 @@ local function handleMainLine(line)
 	elseif string.match(line, "^THROW") then
 		client:send(handleThrow(tonumber(string.match(line, "^THROW:(%d+)"))) .. "\n")
 		return
+	elseif string.match(line, "^MONMOVES:%d+$") then
+		client:send(Inv.monMovesLine(tonumber(string.match(line, "^MONMOVES:(%d+)"))) .. "\n")
+		return
+	elseif string.match(line, "^SETMOVES:") then
+		client:send(Inv.setMovesLine(line) .. "\n")
+		return
+	elseif line == "TRAINER" then
+		client:send(Inv.trainerLine() .. "\n")
+		return
+	elseif string.match(line, "^TRAINERSCAN:%d+$") then
+		client:send(Inv.trainerScanLine(tonumber(string.match(line, "^TRAINERSCAN:(%d+)"))) .. "\n")
+		return
+	elseif string.match(line, "^TRAINERFLAGS:%d+$") then
+		client:send(Inv.trainerFlagLine(tonumber(string.match(line, "^TRAINERFLAGS:(%d+)"))) .. "\n")
+		return
 	elseif line == "DEX" then
 		client:send(dexLine() .. "\n")
 		return
@@ -1106,6 +1134,9 @@ local function handleMainLine(line)
 	end
 end
 local function serviceSockets()
+	if not server then
+		return -- no free port was found at start-up (see startServers)
+	end
 	if not client then
 		local c = server:accept()
 		if c then
