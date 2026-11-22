@@ -27,9 +27,27 @@ local function inventoryLine()
 	for i = 0, math.min(count, 6) - 1 do
 		lv[#lv + 1] = emu:read8(partySlotBase(i) + I.PARTY_LEVEL_OFFSET)
 	end
+	-- species:exp per party slot (decrypted like a box mon), so the trainer can pay for
+	-- fractional level progress instead of only whole level-ups.
+	local px = {}
+	for i = 0, math.min(count, 6) - 1 do
+		local base = partySlotBase(i)
+		local pid = emu:read32(base)
+		if pid == 0 then
+			px[#px + 1] = "0:0"   -- empty/unreadable slot: the trainer keeps its whole level
+		else
+			local pkey = pid ~ emu:read32(base + 4)
+			local order = block_orders[(pid % 24) + 1]
+			local g = base + 0x20
+			for j = 1, 4 do
+				if order[j] == 0 then g = base + 0x20 + (j - 1) * 12 end
+			end
+			px[#px + 1] = string.format("%d:%d", (emu:read32(g) ~ pkey) & 0xFFFF, emu:read32(g + 4) ~ pkey)
+		end
+	end
 	local btf = emu:read32(CONFIG.BATTLE_TYPE_FLAGS_ADDR)
 	return string.format(
-		"INV:money=%d;balls=%s;party=%d;lv=%s;outcome=%d;trainer=%d;map=%d.%d",
+		"INV:money=%d;balls=%s;party=%d;lv=%s;outcome=%d;trainer=%d;map=%d.%d;px=%s",
 		money,
 		table.concat(balls, ","),
 		count,
@@ -37,7 +55,8 @@ local function inventoryLine()
 		battleOutcome(),
 		(btf & I.BATTLE_TYPE_TRAINER_BIT) ~= 0 and 1 or 0,
 		emu:read8(sb1 + 4),
-		emu:read8(sb1 + 5)
+		emu:read8(sb1 + 5),
+		table.concat(px, ",")
 	)
 end
 local function boxLine()
@@ -236,5 +255,178 @@ local function ballSlots()
 	end
 	return slots, total
 end
-return {validEwram = validEwram, inventoryLine = inventoryLine, boxLine = boxLine, boxMonLine = boxMonLine, speciesLine = speciesLine, partyMonLine = function(slot) return monLine(partySlotBase(slot)) end, handleSwap = handleSwap, dexLine = dexLine, bagLine = bagLine, ballSlots = ballSlots}
+-- TRAINER -> TRAINER:<opponent trainer id>, or TRAINER:ERR:<why>. Needs INV.TRAINER_OPPONENT_ADDR (unverified, nil
+-- until found live), so until then it reports no_address and the trainer id stays unknown.
+local function trainerLine()
+	local addr = CONFIG.INV.TRAINER_OPPONENT_ADDR
+	if not addr then
+		return "TRAINER:ERR:no_address"
+	end
+	return string.format("TRAINER:%d", emu:read16(addr))
+end
+
+-- TRAINERSCAN:<value> -> TRAINERSCAN:<addr>,<addr>,... (aligned EWRAM u16 cells equal to value, at most 40).
+-- Read-only helper to find TRAINER_OPPONENT_ADDR: run it during a trainer fight with that trainer's id,
+-- then again during a different trainer's fight, and keep the address that matched both times.
+local function trainerScanLine(value)
+	if not value or value < 0 or value > 0xFFFF then
+		return "TRAINERSCAN:ERR:bad_value"
+	end
+	local hits = {}
+	for a = 0x02000000, 0x0203FFFE, 2 do
+		if emu:read16(a) == value then
+			hits[#hits + 1] = string.format("0x%08X", a)
+			if #hits >= 40 then
+				break
+			end
+		end
+	end
+	return "TRAINERSCAN:" .. table.concat(hits, ",")
+end
+
+-- TRAINERFLAGS:<id> -> TRAINERFLAGS:<id>:<0|1> (1 = already defeated). UNVERIFIED flag layout (see config).
+local function trainerFlagLine(id)
+	local I = CONFIG.INV
+	local sb1 = emu:read32(CONFIG.OW.SAVEBLOCK1_PTR)
+	if not validEwram(sb1) then
+		return "TRAINERFLAGS:ERR:bad_saveblock_ptr"
+	end
+	if not id or id < 1 or id >= I.MAX_TRAINERS_COUNT then
+		return "TRAINERFLAGS:ERR:bad_id"
+	end
+	local flag = I.TRAINER_FLAGS_START + id
+	local byte = emu:read8(sb1 + I.SB1_FLAGS_OFFSET + (flag >> 3))
+	return string.format("TRAINERFLAGS:%d:%d", id, (byte >> (flag & 7)) & 1)
+end
+-- ---------------------------------------------------------------- move teaching (UNVERIFIED live)
+-- A mon's moves live in its Attacks substruct (moves u16 x4, PP u8 x4), encrypted with key = pid ^ otId and covered by a
+-- checksum at +0x1C (sum of the 24 u16 words of the decrypted 48 data bytes). This mirrors training/mon_struct.py.
+local function monBlocks(base)
+	local pid = emu:read32(base)
+	if pid == 0 then
+		return nil
+	end
+	local key = pid ~ emu:read32(base + 4)
+	local order = block_orders[(pid % 24) + 1]
+	local addr, words = {}, {}
+	for i = 1, 4 do
+		local t = order[i]
+		local a = base + 0x20 + (i - 1) * 12
+		addr[t] = a
+		words[t] = { emu:read32(a) ~ key, emu:read32(a + 4) ~ key, emu:read32(a + 8) ~ key }
+	end
+	return pid, key, addr, words
+end
+local function blocksChecksum(words)
+	local sum = 0
+	for t = 0, 3 do
+		for j = 1, 3 do
+			local w = words[t][j]
+			sum = sum + (w & 0xFFFF) + (w >> 16)
+		end
+	end
+	return sum & 0xFFFF
+end
+-- MONMOVES:<slot> -> MONMOVES:<pid>:<species>:<level>:<m1>,<m2>,<m3>,<m4>:<pp1>,..,<pp4>:<ppBonuses>:<checksum_ok 0|1>
+local function monMovesLine(slot)
+	local I = CONFIG.INV
+	local count = emu:read8(I.PARTY_COUNT_ADDR)
+	if not slot or slot < 0 or slot >= count then
+		return "MONMOVES:ERR:bad_slot"
+	end
+	local base = partySlotBase(slot)
+	local pid, _, _, w = monBlocks(base)
+	if not pid then
+		return "MONMOVES:ERR:empty"
+	end
+	local g, a = w[0], w[1]
+	local ok = (emu:read16(base + 0x1C) == blocksChecksum(w)) and 1 or 0
+	return string.format("MONMOVES:%d:%d:%d:%d,%d,%d,%d:%d,%d,%d,%d:%d:%d", pid, g[1] & 0xFFFF,
+		emu:read8(base + I.PARTY_LEVEL_OFFSET), a[1] & 0xFFFF, a[1] >> 16, a[2] & 0xFFFF, a[2] >> 16,
+		a[3] & 255, (a[3] >> 8) & 255, (a[3] >> 16) & 255, a[3] >> 24, g[3] & 255, ok)
+end
+-- SETMOVES:<slot>:<pid>:<m1>:<m2>:<m3>:<m4>:<pp1>:<pp2>:<pp3>:<pp4>[:<ppBonuses>][:dry]
+-- The optional ppBonuses byte replaces the Growth substruct's PP-Up bits (the game clears a slot's bits when a move there
+-- is replaced); without it they are left alone.
+-- Overworld only. Refuses when the pid at that slot differs (the party was reordered), when the stored checksum was
+-- already wrong, or when any value is out of range. After writing it re-reads the struct and puts the original words
+-- back if anything does not match. "dry" runs every check and writes nothing.
+local function setMovesLine(line)
+	local I = CONFIG.INV
+	if isInBattle() then
+		return "SETMOVES:ERR:in_battle"
+	end
+	local t = {}
+	for tok in string.gmatch(line, "[^:]+") do
+		t[#t + 1] = tok
+	end
+	local dry = t[#t] == "dry"
+	local bonus = tonumber(t[12])
+	local slot, pid = tonumber(t[2]), tonumber(t[3])
+	local mv, pp = {}, {}
+	for i = 1, 4 do
+		mv[i], pp[i] = tonumber(t[3 + i]), tonumber(t[7 + i])
+	end
+	if not (slot and pid and #t >= 11) then
+		return "SETMOVES:ERR:bad_args"
+	end
+	for i = 1, 4 do
+		if not (mv[i] and pp[i] and mv[i] >= 0 and mv[i] < 355 and pp[i] >= 0 and pp[i] <= 255) then
+			return "SETMOVES:ERR:bad_args"
+		end
+	end
+	local count = emu:read8(I.PARTY_COUNT_ADDR)
+	if slot < 0 or slot >= count then
+		return "SETMOVES:ERR:bad_slot"
+	end
+	local base = partySlotBase(slot)
+	local cur, key, addr, w = monBlocks(base)
+	if not cur then
+		return "SETMOVES:ERR:empty"
+	end
+	if cur ~= pid then
+		return "SETMOVES:ERR:pid_mismatch"
+	end
+	if emu:read16(base + 0x1C) ~= blocksChecksum(w) then
+		return "SETMOVES:ERR:bad_checksum"
+	end
+	if bonus and (bonus < 0 or bonus > 255) then
+		return "SETMOVES:ERR:bad_args"
+	end
+	local old = { w[1][1], w[1][2], w[1][3] }
+	local oldGrowth3 = w[0][3]
+	local oldSum = emu:read16(base + 0x1C)
+	local a = { mv[1] | (mv[2] << 16), mv[3] | (mv[4] << 16), pp[1] | (pp[2] << 8) | (pp[3] << 16) | (pp[4] << 24) }
+	w[1] = a
+	if bonus then
+		w[0][3] = (oldGrowth3 & ~0xFF) | bonus
+	end
+	local newSum = blocksChecksum(w)
+	if dry then
+		return "SETMOVES:DRY:ok"
+	end
+	for j = 1, 3 do
+		emu:write32(addr[1] + (j - 1) * 4, a[j] ~ key)
+	end
+	if bonus then
+		emu:write32(addr[0] + 8, w[0][3] ~ key)
+	end
+	emu:write16(base + 0x1C, newSum)
+	local _, _, _, w2 = monBlocks(base)
+	local good = w2 and emu:read16(base + 0x1C) == blocksChecksum(w2)
+	for j = 1, 3 do
+		good = good and w2[1][j] == a[j]
+	end
+	good = good and w2[0][3] == w[0][3]
+	if not good then
+		for j = 1, 3 do
+			emu:write32(addr[1] + (j - 1) * 4, old[j] ~ key)
+		end
+		emu:write32(addr[0] + 8, oldGrowth3 ~ key)
+		emu:write16(base + 0x1C, oldSum)
+		return "SETMOVES:ERR:verify_failed"
+	end
+	return "SETMOVES:OK"
+end
+return {monMovesLine = monMovesLine, setMovesLine = setMovesLine, trainerLine = trainerLine, trainerScanLine = trainerScanLine, trainerFlagLine = trainerFlagLine, validEwram = validEwram, inventoryLine = inventoryLine, boxLine = boxLine, boxMonLine = boxMonLine, speciesLine = speciesLine, partyMonLine = function(slot) return monLine(partySlotBase(slot)) end, handleSwap = handleSwap, dexLine = dexLine, bagLine = bagLine, ballSlots = ballSlots}
 end

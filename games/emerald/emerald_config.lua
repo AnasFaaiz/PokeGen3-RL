@@ -293,6 +293,21 @@ M.INV = {
 	BOX_COUNT = 14,
 	BOX_SLOTS = 30,
 	BATTLE_TYPE_TRAINER_BIT = 0x0008,
+
+	-- Trainer identification (read-only). UNVERIFIED: none of these were checked against the running ROM.
+	-- gTrainerBattleOpponent_A (u16, the opponent's trainer id) is a RAM symbol only the built .sym file
+	-- has, so it is nil until found live: fight a trainer whose id is known (games/emerald/game_data/
+	-- trainers.json), send TRAINERSCAN:<id> from bridge_cli, and put the address that holds it here.
+	TRAINER_OPPONENT_ADDR = nil,
+	-- Trainer "defeated" flags: flag id = TRAINER_FLAGS_START + trainer id (constants/flags.h), in the
+	-- SaveBlock1 flags bitfield (pret: struct SaveBlock1.flags at +0x1270, one bit per flag).
+	TRAINER_FLAGS_START = 0x500,
+	SB1_FLAGS_OFFSET = 0x1270,
+	MAX_TRAINERS_COUNT = 864,
+
+	-- Move teaching (MONMOVES / SETMOVES in inventory.lua). UNVERIFIED live: the substruct layout comes from pret
+	-- (Attacks substruct: moves u16 x4, PP u8 x4; checksum u16 at +0x1C). Check MONMOVES reports checksum_ok=1 for every
+	-- party slot, then SETMOVES ... dry on one mon, before letting the trainer write.
 	OUTCOME_CAUGHT = 7,
 
 	-- Species table in ROM (struct SpeciesInfo, 28 bytes each). The address is the usual Emerald (US)
