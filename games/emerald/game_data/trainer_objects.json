@@ -1,0 +1,5792 @@
+{
+ "0.17": [
+  {
+   "x": 33,
+   "y": 14,
+   "sight": 3,
+   "script": "Route102_EventScript_Calvin",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route102",
+   "id": 318
+  },
+  {
+   "x": 25,
+   "y": 15,
+   "sight": 2,
+   "script": "Route102_EventScript_Rick",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route102",
+   "id": 615
+  },
+  {
+   "x": 8,
+   "y": 7,
+   "sight": 3,
+   "script": "Route102_EventScript_Tiana",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route102",
+   "id": 603
+  },
+  {
+   "x": 19,
+   "y": 4,
+   "sight": 3,
+   "script": "Route102_EventScript_Allen",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route102",
+   "id": 333
+  }
+ ],
+ "0.18": [
+  {
+   "x": 71,
+   "y": 11,
+   "sight": 3,
+   "script": "Route103_EventScript_Daisy",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route103",
+   "id": 36
+  },
+  {
+   "x": 65,
+   "y": 12,
+   "sight": 1,
+   "script": "Route103_EventScript_Liv",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route103",
+   "id": 481
+  },
+  {
+   "x": 64,
+   "y": 12,
+   "sight": 1,
+   "script": "Route103_EventScript_Amy",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route103",
+   "id": 481
+  },
+  {
+   "x": 50,
+   "y": 8,
+   "sight": 3,
+   "script": "Route103_EventScript_Andrew",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route103",
+   "id": 336
+  },
+  {
+   "x": 56,
+   "y": 13,
+   "sight": 5,
+   "script": "Route103_EventScript_Miguel",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route103",
+   "id": 293
+  },
+  {
+   "x": 67,
+   "y": 5,
+   "sight": 2,
+   "script": "Route103_EventScript_Rhett",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route103",
+   "id": 703
+  },
+  {
+   "x": 67,
+   "y": 9,
+   "sight": 2,
+   "script": "Route103_EventScript_Marcos",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route103",
+   "id": 702
+  },
+  {
+   "x": 36,
+   "y": 6,
+   "sight": 5,
+   "script": "Route103_EventScript_Isabelle",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route103",
+   "id": 736
+  },
+  {
+   "x": 36,
+   "y": 13,
+   "sight": 5,
+   "script": "Route103_EventScript_Pete",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route103",
+   "id": 735
+  }
+ ],
+ "0.19": [
+  {
+   "x": 31,
+   "y": 24,
+   "sight": 7,
+   "script": "Route104_EventScript_Haley",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route104",
+   "id": 604
+  },
+  {
+   "x": 29,
+   "y": 8,
+   "sight": 0,
+   "script": "Route104_EventScript_Ivan",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route104",
+   "id": 337
+  },
+  {
+   "x": 27,
+   "y": 15,
+   "sight": 1,
+   "script": "Route104_EventScript_Gina",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route104",
+   "id": 483
+  },
+  {
+   "x": 28,
+   "y": 15,
+   "sight": 1,
+   "script": "Route104_EventScript_Mia",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route104",
+   "id": 483
+  },
+  {
+   "x": 21,
+   "y": 25,
+   "sight": 3,
+   "script": "Route104_EventScript_Winston",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route104",
+   "id": 136
+  },
+  {
+   "x": 11,
+   "y": 44,
+   "sight": 3,
+   "script": "Route104_EventScript_Cindy",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route104",
+   "id": 114
+  },
+  {
+   "x": 18,
+   "y": 67,
+   "sight": 2,
+   "script": "Route104_EventScript_Billy",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route104",
+   "id": 319
+  },
+  {
+   "x": 15,
+   "y": 59,
+   "sight": 0,
+   "script": "Route104_EventScript_Darian",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route104",
+   "id": 696
+  }
+ ],
+ "0.20": [
+  {
+   "x": 19,
+   "y": 60,
+   "sight": 6,
+   "script": "Route105_EventScript_Luis",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route105",
+   "id": 151
+  },
+  {
+   "x": 27,
+   "y": 36,
+   "sight": 3,
+   "script": "Route105_EventScript_Dominik",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route105",
+   "id": 152
+  },
+  {
+   "x": 8,
+   "y": 45,
+   "sight": 3,
+   "script": "Route105_EventScript_Beverly",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route105",
+   "id": 441
+  },
+  {
+   "x": 19,
+   "y": 9,
+   "sight": 3,
+   "script": "Route105_EventScript_Imani",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route105",
+   "id": 442
+  },
+  {
+   "x": 17,
+   "y": 48,
+   "sight": 3,
+   "script": "Route105_EventScript_Foster",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route105",
+   "id": 46
+  },
+  {
+   "x": 4,
+   "y": 54,
+   "sight": 2,
+   "script": "Route105_EventScript_Josue",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route105",
+   "id": 738
+  },
+  {
+   "x": 4,
+   "y": 58,
+   "sight": 4,
+   "script": "Route105_EventScript_Andres",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route105",
+   "id": 737
+  }
+ ],
+ "0.21": [
+  {
+   "x": 18,
+   "y": 5,
+   "sight": 3,
+   "script": "Route106_EventScript_Douglas",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route106",
+   "id": 153
+  },
+  {
+   "x": 29,
+   "y": 10,
+   "sight": 3,
+   "script": "Route106_EventScript_Kyla",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route106",
+   "id": 443
+  },
+  {
+   "x": 51,
+   "y": 14,
+   "sight": 4,
+   "script": "Route106_EventScript_Elliot",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route106",
+   "id": 339
+  },
+  {
+   "x": 65,
+   "y": 14,
+   "sight": 3,
+   "script": "Route106_EventScript_Ned",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route106",
+   "id": 340
+  }
+ ],
+ "0.22": [
+  {
+   "x": 41,
+   "y": 10,
+   "sight": 3,
+   "script": "Route107_EventScript_Darrin",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route107",
+   "id": 154
+  },
+  {
+   "x": 23,
+   "y": 11,
+   "sight": 2,
+   "script": "Route107_EventScript_Tony",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route107",
+   "id": 155
+  },
+  {
+   "x": 16,
+   "y": 7,
+   "sight": 5,
+   "script": "Route107_EventScript_Denise",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route107",
+   "id": 444
+  },
+  {
+   "x": 50,
+   "y": 11,
+   "sight": 5,
+   "script": "Route107_EventScript_Beth",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route107",
+   "id": 445
+  },
+  {
+   "x": 33,
+   "y": 4,
+   "sight": 1,
+   "script": "Route107_EventScript_Lisa",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route107",
+   "id": 692
+  },
+  {
+   "x": 32,
+   "y": 4,
+   "sight": 1,
+   "script": "Route107_EventScript_Ray",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route107",
+   "id": 692
+  },
+  {
+   "x": 50,
+   "y": 5,
+   "sight": 5,
+   "script": "Route107_EventScript_Camron",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route107",
+   "id": 739
+  }
+ ],
+ "0.23": [
+  {
+   "x": 52,
+   "y": 13,
+   "sight": 3,
+   "script": "Route108_EventScript_Jerome",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route108",
+   "id": 156
+  },
+  {
+   "x": 35,
+   "y": 12,
+   "sight": 3,
+   "script": "Route108_EventScript_Tara",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route108",
+   "id": 446
+  },
+  {
+   "x": 13,
+   "y": 13,
+   "sight": 3,
+   "script": "Route108_EventScript_Matthew",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route108",
+   "id": 157
+  },
+  {
+   "x": 8,
+   "y": 7,
+   "sight": 3,
+   "script": "Route108_EventScript_Missy",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route108",
+   "id": 447
+  },
+  {
+   "x": 41,
+   "y": 5,
+   "sight": 1,
+   "script": "Route108_EventScript_Carolina",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route108",
+   "id": 741
+  },
+  {
+   "x": 43,
+   "y": 5,
+   "sight": 1,
+   "script": "Route108_EventScript_Cory",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route108",
+   "id": 740
+  }
+ ],
+ "0.24": [
+  {
+   "x": 12,
+   "y": 36,
+   "sight": 5,
+   "script": "Route109_EventScript_David",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route109",
+   "id": 158
+  },
+  {
+   "x": 25,
+   "y": 39,
+   "sight": 5,
+   "script": "Route109_EventScript_Alice",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route109",
+   "id": 448
+  },
+  {
+   "x": 15,
+   "y": 17,
+   "sight": 1,
+   "script": "Route109_EventScript_Huey",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route109",
+   "id": 490
+  },
+  {
+   "x": 24,
+   "y": 13,
+   "sight": 6,
+   "script": "Route109_EventScript_Edmond",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route109",
+   "id": 491
+  },
+  {
+   "x": 19,
+   "y": 10,
+   "sight": 3,
+   "script": "Route109_EventScript_Ricky",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route109",
+   "id": 64
+  },
+  {
+   "x": 22,
+   "y": 7,
+   "sight": 4,
+   "script": "Route109_EventScript_Lola",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route109",
+   "id": 57
+  },
+  {
+   "x": 29,
+   "y": 32,
+   "sight": 3,
+   "script": "Route109_EventScript_Gwen",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route109",
+   "id": 59
+  },
+  {
+   "x": 28,
+   "y": 31,
+   "sight": 3,
+   "script": "Route109_EventScript_Austina",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route109",
+   "id": 58
+  },
+  {
+   "x": 21,
+   "y": 56,
+   "sight": 3,
+   "script": "Route109_EventScript_Carter",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route109",
+   "id": 345
+  },
+  {
+   "x": 8,
+   "y": 41,
+   "sight": 1,
+   "script": "Route109_EventScript_Mel",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route109",
+   "id": 680
+  },
+  {
+   "x": 9,
+   "y": 41,
+   "sight": 1,
+   "script": "Route109_EventScript_Paul",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route109",
+   "id": 680
+  },
+  {
+   "x": 17,
+   "y": 13,
+   "sight": 6,
+   "script": "Route109_EventScript_Hailey",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route109",
+   "id": 697
+  },
+  {
+   "x": 27,
+   "y": 7,
+   "sight": 4,
+   "script": "Route109_EventScript_Chandler",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route109",
+   "id": 698
+  },
+  {
+   "x": 17,
+   "y": 56,
+   "sight": 3,
+   "script": "Route109_EventScript_Elijah",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route109",
+   "id": 742
+  }
+ ],
+ "0.25": [
+  {
+   "x": 16,
+   "y": 73,
+   "sight": 3,
+   "script": "Route110_EventScript_Jasmine",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route110",
+   "id": 359
+  },
+  {
+   "x": 19,
+   "y": 31,
+   "sight": 3,
+   "script": "Route110_EventScript_Anthony",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route110",
+   "id": 352
+  },
+  {
+   "x": 30,
+   "y": 31,
+   "sight": 4,
+   "script": "Route110_EventScript_Abigail",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route110",
+   "id": 358
+  },
+  {
+   "x": 16,
+   "y": 55,
+   "sight": 3,
+   "script": "Route110_EventScript_Benjamin",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route110",
+   "id": 353
+  },
+  {
+   "x": 3,
+   "y": 39,
+   "sight": 6,
+   "script": "Route110_EventScript_Edward",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route110",
+   "id": 232
+  },
+  {
+   "x": 33,
+   "y": 15,
+   "sight": 1,
+   "script": "Route110_EventScript_Jaclyn",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route110",
+   "id": 243
+  },
+  {
+   "x": 34,
+   "y": 40,
+   "sight": 4,
+   "script": "Route110_EventScript_Edwin",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route110",
+   "id": 512
+  },
+  {
+   "x": 10,
+   "y": 19,
+   "sight": 1,
+   "script": "Route110_EventScript_Dale",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route110",
+   "id": 341
+  },
+  {
+   "x": 21,
+   "y": 78,
+   "sight": 2,
+   "script": "Route110_EventScript_Jacob",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route110",
+   "id": 351
+  },
+  {
+   "x": 33,
+   "y": 69,
+   "sight": 3,
+   "script": "Route110_EventScript_Timmy",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route110",
+   "id": 334
+  },
+  {
+   "x": 10,
+   "y": 76,
+   "sight": 2,
+   "script": "Route110_EventScript_Isabel",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route110",
+   "id": 302
+  },
+  {
+   "x": 7,
+   "y": 76,
+   "sight": 2,
+   "script": "Route110_EventScript_Kaleb",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route110",
+   "id": 699
+  },
+  {
+   "x": 10,
+   "y": 39,
+   "sight": 6,
+   "script": "Route110_EventScript_Alyssa",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route110",
+   "id": 701
+  },
+  {
+   "x": 36,
+   "y": 40,
+   "sight": 3,
+   "script": "Route110_EventScript_Joseph",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route110",
+   "id": 700
+  }
+ ],
+ "0.26": [
+  {
+   "x": 28,
+   "y": 51,
+   "sight": 3,
+   "script": "Route111_EventScript_Heidi",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route111",
+   "id": 469
+  },
+  {
+   "x": 29,
+   "y": 37,
+   "sight": 3,
+   "script": "Route111_EventScript_Drew",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route111",
+   "id": 211
+  },
+  {
+   "x": 27,
+   "y": 69,
+   "sight": 2,
+   "script": "Route111_EventScript_Dusty",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route111",
+   "id": 44
+  },
+  {
+   "x": 21,
+   "y": 47,
+   "sight": 4,
+   "script": "Route111_EventScript_Beau",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route111",
+   "id": 212
+  },
+  {
+   "x": 32,
+   "y": 66,
+   "sight": 3,
+   "script": "Route111_EventScript_Becky",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route111",
+   "id": 470
+  },
+  {
+   "x": 10,
+   "y": 82,
+   "sight": 2,
+   "script": "Route111_EventScript_Irene",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route111",
+   "id": 476
+  },
+  {
+   "x": 11,
+   "y": 71,
+   "sight": 3,
+   "script": "Route111_EventScript_Travis",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route111",
+   "id": 218
+  },
+  {
+   "x": 32,
+   "y": 29,
+   "sight": 2,
+   "script": "Route111_EventScript_Daisuke",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route111",
+   "id": 189
+  },
+  {
+   "x": 11,
+   "y": 11,
+   "sight": 4,
+   "script": "Route111_EventScript_Brooke",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route111",
+   "id": 94
+  },
+  {
+   "x": 9,
+   "y": 27,
+   "sight": 3,
+   "script": "Route111_EventScript_Wilton",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route111",
+   "id": 78
+  },
+  {
+   "x": 26,
+   "y": 132,
+   "sight": 5,
+   "script": "Route111_EventScript_Tyron",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route111",
+   "id": 704
+  },
+  {
+   "x": 20,
+   "y": 132,
+   "sight": 5,
+   "script": "Route111_EventScript_Celina",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route111",
+   "id": 705
+  },
+  {
+   "x": 19,
+   "y": 121,
+   "sight": 2,
+   "script": "Route111_EventScript_Bianca",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route111",
+   "id": 706
+  },
+  {
+   "x": 16,
+   "y": 119,
+   "sight": 3,
+   "script": "Route111_EventScript_Hayden",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route111",
+   "id": 707
+  },
+  {
+   "x": 29,
+   "y": 77,
+   "sight": 7,
+   "script": "Route111_EventScript_Bryan",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route111",
+   "id": 744
+  },
+  {
+   "x": 22,
+   "y": 77,
+   "sight": 6,
+   "script": "Route111_EventScript_Celia",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route111",
+   "id": 743
+  },
+  {
+   "x": 37,
+   "y": 77,
+   "sight": 7,
+   "script": "Route111_EventScript_Branden",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route111",
+   "id": 745
+  }
+ ],
+ "0.27": [
+  {
+   "x": 24,
+   "y": 34,
+   "sight": 2,
+   "script": "Route112_EventScript_Brice",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route112",
+   "id": 626
+  },
+  {
+   "x": 29,
+   "y": 49,
+   "sight": 3,
+   "script": "Route112_EventScript_Larry",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route112",
+   "id": 213
+  },
+  {
+   "x": 22,
+   "y": 46,
+   "sight": 3,
+   "script": "Route112_EventScript_Carol",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route112",
+   "id": 471
+  },
+  {
+   "x": 15,
+   "y": 40,
+   "sight": 3,
+   "script": "Route112_EventScript_Trent",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route112",
+   "id": 627
+  },
+  {
+   "x": 31,
+   "y": 7,
+   "sight": 3,
+   "script": "Route112_EventScript_Bryant",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route112",
+   "id": 746
+  },
+  {
+   "x": 31,
+   "y": 11,
+   "sight": 3,
+   "script": "Route112_EventScript_Shayla",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route112",
+   "id": 747
+  }
+ ],
+ "0.28": [
+  {
+   "x": 62,
+   "y": 8,
+   "sight": 3,
+   "script": "Route113_EventScript_Jaylen",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route113",
+   "id": 326
+  },
+  {
+   "x": 21,
+   "y": 11,
+   "sight": 3,
+   "script": "Route113_EventScript_Dillon",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route113",
+   "id": 327
+  },
+  {
+   "x": 51,
+   "y": 11,
+   "sight": 2,
+   "script": "Route113_EventScript_Madeline",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route113",
+   "id": 434
+  },
+  {
+   "x": 29,
+   "y": 6,
+   "sight": 1,
+   "script": "Route113_EventScript_Lao",
+   "type": "TRAINER_TYPE_BURIED",
+   "flag": "0",
+   "map": "Route113",
+   "id": 419
+  },
+  {
+   "x": 71,
+   "y": 2,
+   "sight": 1,
+   "script": "Route113_EventScript_Lung",
+   "type": "TRAINER_TYPE_BURIED",
+   "flag": "0",
+   "map": "Route113",
+   "id": 420
+  },
+  {
+   "x": 45,
+   "y": 6,
+   "sight": 1,
+   "script": "Route113_EventScript_Tori",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route113",
+   "id": 677
+  },
+  {
+   "x": 46,
+   "y": 6,
+   "sight": 1,
+   "script": "Route113_EventScript_Tia",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route113",
+   "id": 677
+  },
+  {
+   "x": 75,
+   "y": 3,
+   "sight": 4,
+   "script": "Route113_EventScript_Wyatt",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route113",
+   "id": 711
+  },
+  {
+   "x": 71,
+   "y": 4,
+   "sight": 1,
+   "script": "Route113_EventScript_Lawrence",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route113",
+   "id": 710
+  },
+  {
+   "x": 7,
+   "y": 6,
+   "sight": 6,
+   "script": "Route113_EventScript_Sophie",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route113",
+   "id": 708
+  },
+  {
+   "x": 7,
+   "y": 13,
+   "sight": 6,
+   "script": "Route113_EventScript_Coby",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route113",
+   "id": 709
+  }
+ ],
+ "0.29": [
+  {
+   "x": 15,
+   "y": 65,
+   "sight": 6,
+   "script": "Route114_EventScript_Lenny",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route114",
+   "id": 628
+  },
+  {
+   "x": 30,
+   "y": 72,
+   "sight": 4,
+   "script": "Route114_EventScript_Lucas",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route114",
+   "id": 629
+  },
+  {
+   "x": 22,
+   "y": 50,
+   "sight": 3,
+   "script": "Route114_EventScript_Shane",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route114",
+   "id": 214
+  },
+  {
+   "x": 19,
+   "y": 35,
+   "sight": 3,
+   "script": "Route114_EventScript_Nancy",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route114",
+   "id": 472
+  },
+  {
+   "x": 20,
+   "y": 56,
+   "sight": 3,
+   "script": "Route114_EventScript_Steve",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route114",
+   "id": 143
+  },
+  {
+   "x": 25,
+   "y": 6,
+   "sight": 0,
+   "script": "Route114_EventScript_Nolan",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route114",
+   "id": 342
+  },
+  {
+   "x": 19,
+   "y": 26,
+   "sight": 0,
+   "script": "Route114_EventScript_Claude",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route114",
+   "id": 338
+  },
+  {
+   "x": 30,
+   "y": 58,
+   "sight": 3,
+   "script": "Route114_EventScript_Bernie",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route114",
+   "id": 206
+  },
+  {
+   "x": 24,
+   "y": 44,
+   "sight": 1,
+   "script": "Route114_EventScript_Ivy",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route114",
+   "id": 679
+  },
+  {
+   "x": 23,
+   "y": 44,
+   "sight": 1,
+   "script": "Route114_EventScript_Tyra",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route114",
+   "id": 679
+  },
+  {
+   "x": 28,
+   "y": 20,
+   "sight": 3,
+   "script": "Route114_EventScript_Charlotte",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route114",
+   "id": 714
+  },
+  {
+   "x": 26,
+   "y": 72,
+   "sight": 4,
+   "script": "Route114_EventScript_Angelina",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route114",
+   "id": 712
+  },
+  {
+   "x": 28,
+   "y": 16,
+   "sight": 3,
+   "script": "Route114_EventScript_Kai",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route114",
+   "id": 713
+  }
+ ],
+ "0.30": [
+  {
+   "x": 5,
+   "y": 15,
+   "sight": 6,
+   "script": "Route115_EventScript_Timothy",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route115",
+   "id": 307
+  },
+  {
+   "x": 27,
+   "y": 53,
+   "sight": 4,
+   "script": "Route115_EventScript_Nob",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route115",
+   "id": 183
+  },
+  {
+   "x": 15,
+   "y": 50,
+   "sight": 3,
+   "script": "Route115_EventScript_Cyndy",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route115",
+   "id": 427
+  },
+  {
+   "x": 19,
+   "y": 15,
+   "sight": 2,
+   "script": "Route115_EventScript_Koichi",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route115",
+   "id": 182
+  },
+  {
+   "x": 24,
+   "y": 62,
+   "sight": 4,
+   "script": "Route115_EventScript_Hector",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route115",
+   "id": 513
+  },
+  {
+   "x": 10,
+   "y": 15,
+   "sight": 2,
+   "script": "Route115_EventScript_Kyra",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route115",
+   "id": 748
+  },
+  {
+   "x": 11,
+   "y": 12,
+   "sight": 3,
+   "script": "Route115_EventScript_Jaiden",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route115",
+   "id": 749
+  },
+  {
+   "x": 15,
+   "y": 7,
+   "sight": 4,
+   "script": "Route115_EventScript_Helene",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route115",
+   "id": 751
+  },
+  {
+   "x": 10,
+   "y": 7,
+   "sight": 4,
+   "script": "Route115_EventScript_Alix",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route115",
+   "id": 750
+  },
+  {
+   "x": 28,
+   "y": 62,
+   "sight": 4,
+   "script": "Route115_EventScript_Marlene",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route115",
+   "id": 752
+  }
+ ],
+ "0.31": [
+  {
+   "x": 12,
+   "y": 7,
+   "sight": 3,
+   "script": "Route116_EventScript_Joey",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route116",
+   "id": 322
+  },
+  {
+   "x": 13,
+   "y": 17,
+   "sight": 2,
+   "script": "Route116_EventScript_Jose",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route116",
+   "id": 617
+  },
+  {
+   "x": 36,
+   "y": 17,
+   "sight": 3,
+   "script": "Route116_EventScript_Clark",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route116",
+   "id": 631
+  },
+  {
+   "x": 26,
+   "y": 6,
+   "sight": 2,
+   "script": "Route116_EventScript_Janice",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route116",
+   "id": 605
+  },
+  {
+   "x": 22,
+   "y": 16,
+   "sight": 3,
+   "script": "Route116_EventScript_Karen",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route116",
+   "id": 280
+  },
+  {
+   "x": 28,
+   "y": 8,
+   "sight": 4,
+   "script": "Route116_EventScript_Jerry",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route116",
+   "id": 273
+  },
+  {
+   "x": 33,
+   "y": 8,
+   "sight": 1,
+   "script": "Route116_EventScript_Sarah",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route116",
+   "id": 695
+  },
+  {
+   "x": 33,
+   "y": 5,
+   "sight": 2,
+   "script": "Route116_EventScript_Dawson",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route116",
+   "id": 694
+  },
+  {
+   "x": 36,
+   "y": 13,
+   "sight": 5,
+   "script": "Route116_EventScript_Johnson",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route116",
+   "id": 754
+  },
+  {
+   "x": 42,
+   "y": 13,
+   "sight": 5,
+   "script": "Route116_EventScript_Devan",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route116",
+   "id": 753
+  }
+ ],
+ "0.32": [
+  {
+   "x": 38,
+   "y": 16,
+   "sight": 4,
+   "script": "Route117_EventScript_Dylan",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route117",
+   "id": 364
+  },
+  {
+   "x": 8,
+   "y": 10,
+   "sight": 3,
+   "script": "Route117_EventScript_Lydia",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route117",
+   "id": 545
+  },
+  {
+   "x": 33,
+   "y": 11,
+   "sight": 4,
+   "script": "Route117_EventScript_Isaac",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route117",
+   "id": 538
+  },
+  {
+   "x": 26,
+   "y": 13,
+   "sight": 5,
+   "script": "Route117_EventScript_Maria",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route117",
+   "id": 369
+  },
+  {
+   "x": 17,
+   "y": 12,
+   "sight": 4,
+   "script": "Route117_EventScript_Derek",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route117",
+   "id": 227
+  },
+  {
+   "x": 43,
+   "y": 6,
+   "sight": 1,
+   "script": "Route117_EventScript_Meg",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route117",
+   "id": 287
+  },
+  {
+   "x": 42,
+   "y": 6,
+   "sight": 1,
+   "script": "Route117_EventScript_Anna",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route117",
+   "id": 287
+  },
+  {
+   "x": 15,
+   "y": 4,
+   "sight": 4,
+   "script": "Route117_EventScript_Brandi",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route117",
+   "id": 756
+  },
+  {
+   "x": 21,
+   "y": 4,
+   "sight": 4,
+   "script": "Route117_EventScript_Aisha",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route117",
+   "id": 757
+  },
+  {
+   "x": 16,
+   "y": 4,
+   "sight": 4,
+   "script": "Route117_EventScript_Melina",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route117",
+   "id": 755
+  }
+ ],
+ "0.33": [
+  {
+   "x": 64,
+   "y": 10,
+   "sight": 3,
+   "script": "Route118_EventScript_Perry",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route118",
+   "id": 398
+  },
+  {
+   "x": 7,
+   "y": 12,
+   "sight": 4,
+   "script": "Route118_EventScript_Rose",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route118",
+   "id": 37
+  },
+  {
+   "x": 14,
+   "y": 14,
+   "sight": 0,
+   "script": "Route118_EventScript_Wade",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route118",
+   "id": 344
+  },
+  {
+   "x": 56,
+   "y": 7,
+   "sight": 3,
+   "script": "Route118_EventScript_Chester",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route118",
+   "id": 408
+  },
+  {
+   "x": 39,
+   "y": 15,
+   "sight": 2,
+   "script": "Route118_EventScript_Barny",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route118",
+   "id": 343
+  },
+  {
+   "x": 17,
+   "y": 11,
+   "sight": 3,
+   "script": "Route118_EventScript_Dalton",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route118",
+   "id": 196
+  },
+  {
+   "x": 7,
+   "y": 7,
+   "sight": 4,
+   "script": "Route118_EventScript_Deandre",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route118",
+   "id": 715
+  }
+ ],
+ "0.34": [
+  {
+   "x": 12,
+   "y": 123,
+   "sight": 1,
+   "script": "Route119_EventScript_Greg",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route119",
+   "id": 619
+  },
+  {
+   "x": 26,
+   "y": 123,
+   "sight": 1,
+   "script": "Route119_EventScript_Taylor",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route119",
+   "id": 225
+  },
+  {
+   "x": 5,
+   "y": 125,
+   "sight": 1,
+   "script": "Route119_EventScript_Donald",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route119",
+   "id": 224
+  },
+  {
+   "x": 7,
+   "y": 74,
+   "sight": 3,
+   "script": "Route119_EventScript_Jackson",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route119",
+   "id": 552
+  },
+  {
+   "x": 28,
+   "y": 116,
+   "sight": 1,
+   "script": "Route119_EventScript_Brent",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route119",
+   "id": 223
+  },
+  {
+   "x": 35,
+   "y": 83,
+   "sight": 2,
+   "script": "Route119_EventScript_Catherine",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route119",
+   "id": 559
+  },
+  {
+   "x": 34,
+   "y": 122,
+   "sight": 1,
+   "script": "Route119_EventScript_Doug",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route119",
+   "id": 618
+  },
+  {
+   "x": 17,
+   "y": 128,
+   "sight": 1,
+   "script": "Route119_EventScript_Kent",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route119",
+   "id": 620
+  },
+  {
+   "x": 28,
+   "y": 14,
+   "sight": 1,
+   "script": "Route119_EventScript_Yasu",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route119",
+   "id": 415
+  },
+  {
+   "x": 19,
+   "y": 49,
+   "sight": 3,
+   "script": "Route119_EventScript_Takashi",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route119",
+   "id": 416
+  },
+  {
+   "x": 10,
+   "y": 50,
+   "sight": 3,
+   "script": "Route119_EventScript_Hugh",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route119",
+   "id": 399
+  },
+  {
+   "x": 8,
+   "y": 63,
+   "sight": 5,
+   "script": "Route119_EventScript_Phil",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route119",
+   "id": 400
+  },
+  {
+   "x": 29,
+   "y": 6,
+   "sight": 3,
+   "script": "Route119_EventScript_Hideo",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route119",
+   "id": 651
+  },
+  {
+   "x": 13,
+   "y": 104,
+   "sight": 0,
+   "script": "Route119_EventScript_Chris",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route119",
+   "id": 693
+  },
+  {
+   "x": 8,
+   "y": 68,
+   "sight": 5,
+   "script": "Route119_EventScript_Rachel",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route119",
+   "id": 761
+  },
+  {
+   "x": 16,
+   "y": 52,
+   "sight": 3,
+   "script": "Route119_EventScript_Dayton",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route119",
+   "id": 760
+  },
+  {
+   "x": 32,
+   "y": 15,
+   "sight": 4,
+   "script": "Route119_EventScript_Fabian",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route119",
+   "id": 759
+  }
+ ],
+ "0.35": [
+  {
+   "x": 5,
+   "y": 22,
+   "sight": 3,
+   "script": "Route120_EventScript_Colin",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route120",
+   "id": 405
+  },
+  {
+   "x": 32,
+   "y": 14,
+   "sight": 3,
+   "script": "Route120_EventScript_Robert",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route120",
+   "id": 406
+  },
+  {
+   "x": 27,
+   "y": 51,
+   "sight": 7,
+   "script": "Route120_EventScript_Lorenzo",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route120",
+   "id": 553
+  },
+  {
+   "x": 36,
+   "y": 45,
+   "sight": 2,
+   "script": "Route120_EventScript_Jenna",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route120",
+   "id": 560
+  },
+  {
+   "x": 19,
+   "y": 80,
+   "sight": 3,
+   "script": "Route120_EventScript_Jeffrey",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route120",
+   "id": 226
+  },
+  {
+   "x": 31,
+   "y": 37,
+   "sight": 4,
+   "script": "Route120_EventScript_Jennifer",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route120",
+   "id": 95
+  },
+  {
+   "x": 9,
+   "y": 60,
+   "sight": 4,
+   "script": "Route120_EventScript_Chip",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route120",
+   "id": 45
+  },
+  {
+   "x": 16,
+   "y": 6,
+   "sight": 4,
+   "script": "Route120_EventScript_Clarissa",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route120",
+   "id": 435
+  },
+  {
+   "x": 18,
+   "y": 34,
+   "sight": 3,
+   "script": "Route120_EventScript_Angelica",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route120",
+   "id": 436
+  },
+  {
+   "x": 10,
+   "y": 72,
+   "sight": 3,
+   "script": "Route120_EventScript_Keigo",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route120",
+   "id": 652
+  },
+  {
+   "x": 19,
+   "y": 28,
+   "sight": 3,
+   "script": "Route120_EventScript_Riley",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route120",
+   "id": 653
+  },
+  {
+   "x": 19,
+   "y": 32,
+   "sight": 3,
+   "script": "Route120_EventScript_Callie",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route120",
+   "id": 763
+  },
+  {
+   "x": 14,
+   "y": 34,
+   "sight": 3,
+   "script": "Route120_EventScript_Leonel",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route120",
+   "id": 762
+  }
+ ],
+ "0.36": [
+  {
+   "x": 39,
+   "y": 9,
+   "sight": 1,
+   "script": "Route121_EventScript_Kate",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route121",
+   "id": 286
+  },
+  {
+   "x": 40,
+   "y": 9,
+   "sight": 1,
+   "script": "Route121_EventScript_Joy",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route121",
+   "id": 286
+  },
+  {
+   "x": 63,
+   "y": 5,
+   "sight": 4,
+   "script": "Route121_EventScript_Vanessa",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route121",
+   "id": 300
+  },
+  {
+   "x": 55,
+   "y": 8,
+   "sight": 3,
+   "script": "Route121_EventScript_Walter",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route121",
+   "id": 254
+  },
+  {
+   "x": 11,
+   "y": 11,
+   "sight": 4,
+   "script": "Route121_EventScript_Tammy",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route121",
+   "id": 107
+  },
+  {
+   "x": 22,
+   "y": 5,
+   "sight": 4,
+   "script": "Route121_EventScript_Jessica",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route121",
+   "id": 127
+  },
+  {
+   "x": 11,
+   "y": 6,
+   "sight": 3,
+   "script": "Route121_EventScript_Cale",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route121",
+   "id": 764
+  },
+  {
+   "x": 59,
+   "y": 8,
+   "sight": 4,
+   "script": "Route121_EventScript_Myles",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route121",
+   "id": 765
+  },
+  {
+   "x": 59,
+   "y": 13,
+   "sight": 4,
+   "script": "Route121_EventScript_Pat",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route121",
+   "id": 766
+  },
+  {
+   "x": 65,
+   "y": 9,
+   "sight": 6,
+   "script": "Route121_EventScript_Marcel",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route121",
+   "id": 11
+  },
+  {
+   "x": 72,
+   "y": 9,
+   "sight": 6,
+   "script": "Route121_EventScript_Cristin",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route121",
+   "id": 767
+  }
+ ],
+ "0.38": [
+  {
+   "x": 70,
+   "y": 12,
+   "sight": 1,
+   "script": "Route123_EventScript_Wendy",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route123",
+   "id": 92
+  },
+  {
+   "x": 58,
+   "y": 7,
+   "sight": 2,
+   "script": "Route123_EventScript_Braxton",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route123",
+   "id": 75
+  },
+  {
+   "x": 18,
+   "y": 9,
+   "sight": 2,
+   "script": "Route123_EventScript_Violet",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route123",
+   "id": 39
+  },
+  {
+   "x": 38,
+   "y": 13,
+   "sight": 1,
+   "script": "Route123_EventScript_Yuki",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route123",
+   "id": 484
+  },
+  {
+   "x": 37,
+   "y": 13,
+   "sight": 1,
+   "script": "Route123_EventScript_Miu",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route123",
+   "id": 484
+  },
+  {
+   "x": 138,
+   "y": 12,
+   "sight": 7,
+   "script": "Route123_EventScript_Cameron",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route123",
+   "id": 238
+  },
+  {
+   "x": 49,
+   "y": 16,
+   "sight": 1,
+   "script": "Route123_EventScript_Jacki",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route123",
+   "id": 249
+  },
+  {
+   "x": 87,
+   "y": 12,
+   "sight": 4,
+   "script": "Route123_EventScript_Kindra",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route123",
+   "id": 106
+  },
+  {
+   "x": 138,
+   "y": 14,
+   "sight": 1,
+   "script": "Route123_EventScript_Jonas",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route123",
+   "id": 504
+  },
+  {
+   "x": 138,
+   "y": 16,
+   "sight": 1,
+   "script": "Route123_EventScript_Kayley",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route123",
+   "id": 505
+  },
+  {
+   "x": 87,
+   "y": 17,
+   "sight": 4,
+   "script": "Route123_EventScript_Ed",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route123",
+   "id": 13
+  },
+  {
+   "x": 66,
+   "y": 16,
+   "sight": 2,
+   "script": "Route123_EventScript_Fernando",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route123",
+   "id": 195
+  },
+  {
+   "x": 66,
+   "y": 19,
+   "sight": 2,
+   "script": "Route123_EventScript_Alberto",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route123",
+   "id": 12
+  },
+  {
+   "x": 49,
+   "y": 19,
+   "sight": 2,
+   "script": "Route123_EventScript_Frederick",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route123",
+   "id": 29
+  },
+  {
+   "x": 14,
+   "y": 16,
+   "sight": 3,
+   "script": "Route123_EventScript_Jazmyn",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route123",
+   "id": 503
+  },
+  {
+   "x": 14,
+   "y": 12,
+   "sight": 3,
+   "script": "Route123_EventScript_Davis",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route123",
+   "id": 539
+  }
+ ],
+ "0.39": [
+  {
+   "x": 34,
+   "y": 25,
+   "sight": 3,
+   "script": "Route124_EventScript_Spencer",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route124",
+   "id": 159
+  },
+  {
+   "x": 61,
+   "y": 74,
+   "sight": 7,
+   "script": "Route124_EventScript_Roland",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route124",
+   "id": 160
+  },
+  {
+   "x": 49,
+   "y": 45,
+   "sight": 3,
+   "script": "Route124_EventScript_Jenny",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route124",
+   "id": 449
+  },
+  {
+   "x": 7,
+   "y": 23,
+   "sight": 5,
+   "script": "Route124_EventScript_Grace",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route124",
+   "id": 450
+  },
+  {
+   "x": 58,
+   "y": 58,
+   "sight": 2,
+   "script": "Route124_EventScript_Chad",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route124",
+   "id": 174
+  },
+  {
+   "x": 18,
+   "y": 44,
+   "sight": 1,
+   "script": "Route124_EventScript_Lila",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route124",
+   "id": 687
+  },
+  {
+   "x": 17,
+   "y": 44,
+   "sight": 1,
+   "script": "Route124_EventScript_Roy",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route124",
+   "id": 687
+  },
+  {
+   "x": 7,
+   "y": 29,
+   "sight": 5,
+   "script": "Route124_EventScript_Declan",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route124",
+   "id": 15
+  },
+  {
+   "x": 69,
+   "y": 74,
+   "sight": 7,
+   "script": "Route124_EventScript_Isabella",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route124",
+   "id": 595
+  }
+ ],
+ "0.40": [
+  {
+   "x": 7,
+   "y": 31,
+   "sight": 2,
+   "script": "Route125_EventScript_Nolen",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route125",
+   "id": 161
+  },
+  {
+   "x": 45,
+   "y": 9,
+   "sight": 2,
+   "script": "Route125_EventScript_Stan",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route125",
+   "id": 162
+  },
+  {
+   "x": 38,
+   "y": 24,
+   "sight": 3,
+   "script": "Route125_EventScript_Tanya",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route125",
+   "id": 451
+  },
+  {
+   "x": 30,
+   "y": 28,
+   "sight": 3,
+   "script": "Route125_EventScript_Sharon",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route125",
+   "id": 452
+  },
+  {
+   "x": 21,
+   "y": 30,
+   "sight": 2,
+   "script": "Route125_EventScript_Ernest",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route125",
+   "id": 492
+  },
+  {
+   "x": 17,
+   "y": 19,
+   "sight": 1,
+   "script": "Route125_EventScript_Kim",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route125",
+   "id": 678
+  },
+  {
+   "x": 18,
+   "y": 19,
+   "sight": 1,
+   "script": "Route125_EventScript_Iris",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route125",
+   "id": 678
+  },
+  {
+   "x": 43,
+   "y": 19,
+   "sight": 3,
+   "script": "Route125_EventScript_Presley",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route125",
+   "id": 403
+  },
+  {
+   "x": 48,
+   "y": 19,
+   "sight": 3,
+   "script": "Route125_EventScript_Auron",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route125",
+   "id": 506
+  }
+ ],
+ "0.41": [
+  {
+   "x": 51,
+   "y": 65,
+   "sight": 3,
+   "script": "Route126_EventScript_Barry",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route126",
+   "id": 163
+  },
+  {
+   "x": 56,
+   "y": 22,
+   "sight": 3,
+   "script": "Route126_EventScript_Dean",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route126",
+   "id": 164
+  },
+  {
+   "x": 63,
+   "y": 43,
+   "sight": 3,
+   "script": "Route126_EventScript_Nikki",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route126",
+   "id": 453
+  },
+  {
+   "x": 9,
+   "y": 48,
+   "sight": 3,
+   "script": "Route126_EventScript_Brenda",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route126",
+   "id": 454
+  },
+  {
+   "x": 15,
+   "y": 66,
+   "sight": 7,
+   "script": "Route126_EventScript_Sienna",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route126",
+   "id": 459
+  },
+  {
+   "x": 7,
+   "y": 66,
+   "sight": 7,
+   "script": "Route126_EventScript_Pablo",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route126",
+   "id": 377
+  },
+  {
+   "x": 64,
+   "y": 5,
+   "sight": 7,
+   "script": "Route126_EventScript_Isobel",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route126",
+   "id": 383
+  },
+  {
+   "x": 56,
+   "y": 5,
+   "sight": 7,
+   "script": "Route126_EventScript_Leonardo",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route126",
+   "id": 576
+  }
+ ],
+ "0.42": [
+  {
+   "x": 45,
+   "y": 42,
+   "sight": 2,
+   "script": "Route127_EventScript_Camden",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route127",
+   "id": 374
+  },
+  {
+   "x": 18,
+   "y": 68,
+   "sight": 4,
+   "script": "Route127_EventScript_Donny",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route127",
+   "id": 384
+  },
+  {
+   "x": 42,
+   "y": 21,
+   "sight": 0,
+   "script": "Route127_EventScript_Jonah",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route127",
+   "id": 667
+  },
+  {
+   "x": 64,
+   "y": 19,
+   "sight": 0,
+   "script": "Route127_EventScript_Roger",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route127",
+   "id": 669
+  },
+  {
+   "x": 54,
+   "y": 14,
+   "sight": 0,
+   "script": "Route127_EventScript_Henry",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route127",
+   "id": 668
+  },
+  {
+   "x": 15,
+   "y": 23,
+   "sight": 2,
+   "script": "Route127_EventScript_Aidan",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route127",
+   "id": 674
+  },
+  {
+   "x": 63,
+   "y": 63,
+   "sight": 3,
+   "script": "Route127_EventScript_Koji",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route127",
+   "id": 672
+  },
+  {
+   "x": 12,
+   "y": 23,
+   "sight": 2,
+   "script": "Route127_EventScript_Athena",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route127",
+   "id": 577
+  }
+ ],
+ "0.43": [
+  {
+   "x": 35,
+   "y": 33,
+   "sight": 3,
+   "script": "Route128_EventScript_Isaiah",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route128",
+   "id": 376
+  },
+  {
+   "x": 78,
+   "y": 24,
+   "sight": 7,
+   "script": "Route128_EventScript_Katelyn",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route128",
+   "id": 386
+  },
+  {
+   "x": 63,
+   "y": 28,
+   "sight": 0,
+   "script": "Route128_EventScript_Wayne",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route128",
+   "id": 673
+  },
+  {
+   "x": 47,
+   "y": 9,
+   "sight": 3,
+   "script": "Route128_EventScript_Ruben",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route128",
+   "id": 671
+  },
+  {
+   "x": 24,
+   "y": 8,
+   "sight": 3,
+   "script": "Route128_EventScript_Alexa",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route128",
+   "id": 670
+  },
+  {
+   "x": 101,
+   "y": 29,
+   "sight": 4,
+   "script": "Route128_EventScript_Carlee",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route128",
+   "id": 464
+  },
+  {
+   "x": 101,
+   "y": 22,
+   "sight": 4,
+   "script": "Route128_EventScript_Harrison",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route128",
+   "id": 578
+  }
+ ],
+ "0.44": [
+  {
+   "x": 28,
+   "y": 16,
+   "sight": 3,
+   "script": "Route129_EventScript_Chase",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route129",
+   "id": 378
+  },
+  {
+   "x": 10,
+   "y": 14,
+   "sight": 2,
+   "script": "Route129_EventScript_Allison",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route129",
+   "id": 387
+  },
+  {
+   "x": 13,
+   "y": 22,
+   "sight": 5,
+   "script": "Route129_EventScript_Tisha",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route129",
+   "id": 676
+  },
+  {
+   "x": 35,
+   "y": 9,
+   "sight": 2,
+   "script": "Route129_EventScript_Reed",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route129",
+   "id": 675
+  },
+  {
+   "x": 13,
+   "y": 27,
+   "sight": 5,
+   "script": "Route129_EventScript_Clarence",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route129",
+   "id": 580
+  }
+ ],
+ "0.45": [
+  {
+   "x": 70,
+   "y": 21,
+   "sight": 3,
+   "script": "Route130_EventScript_Rodney",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route130",
+   "id": 165
+  },
+  {
+   "x": 7,
+   "y": 21,
+   "sight": 5,
+   "script": "Route130_EventScript_Katie",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route130",
+   "id": 455
+  },
+  {
+   "x": 7,
+   "y": 30,
+   "sight": 5,
+   "script": "Route130_EventScript_Santiago",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route130",
+   "id": 168
+  }
+ ],
+ "0.46": [
+  {
+   "x": 41,
+   "y": 32,
+   "sight": 3,
+   "script": "Route131_EventScript_Richard",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route131",
+   "id": 166
+  },
+  {
+   "x": 18,
+   "y": 19,
+   "sight": 4,
+   "script": "Route131_EventScript_Herman",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route131",
+   "id": 167
+  },
+  {
+   "x": 10,
+   "y": 22,
+   "sight": 4,
+   "script": "Route131_EventScript_Susie",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route131",
+   "id": 456
+  },
+  {
+   "x": 31,
+   "y": 25,
+   "sight": 3,
+   "script": "Route131_EventScript_Kara",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route131",
+   "id": 457
+  },
+  {
+   "x": 9,
+   "y": 16,
+   "sight": 1,
+   "script": "Route131_EventScript_Reli",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route131",
+   "id": 686
+  },
+  {
+   "x": 8,
+   "y": 16,
+   "sight": 1,
+   "script": "Route131_EventScript_Ian",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route131",
+   "id": 686
+  },
+  {
+   "x": 52,
+   "y": 20,
+   "sight": 5,
+   "script": "Route131_EventScript_Kevin",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route131",
+   "id": 171
+  },
+  {
+   "x": 52,
+   "y": 27,
+   "sight": 5,
+   "script": "Route131_EventScript_Talia",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route131",
+   "id": 385
+  }
+ ],
+ "0.47": [
+  {
+   "x": 40,
+   "y": 13,
+   "sight": 2,
+   "script": "Route132_EventScript_Gilbert",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route132",
+   "id": 169
+  },
+  {
+   "x": 10,
+   "y": 6,
+   "sight": 2,
+   "script": "Route132_EventScript_Dana",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route132",
+   "id": 458
+  },
+  {
+   "x": 9,
+   "y": 15,
+   "sight": 4,
+   "script": "Route132_EventScript_Kiyo",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route132",
+   "id": 181
+  },
+  {
+   "x": 49,
+   "y": 28,
+   "sight": 1,
+   "script": "Route132_EventScript_Ronald",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route132",
+   "id": 350
+  },
+  {
+   "x": 33,
+   "y": 26,
+   "sight": 4,
+   "script": "Route132_EventScript_Paxton",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route132",
+   "id": 594
+  },
+  {
+   "x": 33,
+   "y": 31,
+   "sight": 4,
+   "script": "Route132_EventScript_Darcy",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route132",
+   "id": 733
+  },
+  {
+   "x": 21,
+   "y": 30,
+   "sight": 4,
+   "script": "Route132_EventScript_Makayla",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route132",
+   "id": 758
+  },
+  {
+   "x": 21,
+   "y": 25,
+   "sight": 4,
+   "script": "Route132_EventScript_Jonathan",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route132",
+   "id": 598
+  }
+ ],
+ "0.48": [
+  {
+   "x": 68,
+   "y": 27,
+   "sight": 3,
+   "script": "Route133_EventScript_Franklin",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route133",
+   "id": 170
+  },
+  {
+   "x": 13,
+   "y": 3,
+   "sight": 3,
+   "script": "Route133_EventScript_Linda",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route133",
+   "id": 461
+  },
+  {
+   "x": 68,
+   "y": 28,
+   "sight": 3,
+   "script": "Route133_EventScript_Debra",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route133",
+   "id": 460
+  },
+  {
+   "x": 7,
+   "y": 14,
+   "sight": 2,
+   "script": "Route133_EventScript_Beck",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route133",
+   "id": 414
+  },
+  {
+   "x": 37,
+   "y": 15,
+   "sight": 4,
+   "script": "Route133_EventScript_Warren",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route133",
+   "id": 88
+  },
+  {
+   "x": 56,
+   "y": 11,
+   "sight": 3,
+   "script": "Route133_EventScript_Mollie",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route133",
+   "id": 137
+  },
+  {
+   "x": 56,
+   "y": 15,
+   "sight": 3,
+   "script": "Route133_EventScript_Conor",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route133",
+   "id": 511
+  }
+ ],
+ "0.49": [
+  {
+   "x": 49,
+   "y": 9,
+   "sight": 2,
+   "script": "Route134_EventScript_Jack",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route134",
+   "id": 172
+  },
+  {
+   "x": 58,
+   "y": 7,
+   "sight": 3,
+   "script": "Route134_EventScript_Laurel",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route134",
+   "id": 463
+  },
+  {
+   "x": 41,
+   "y": 23,
+   "sight": 2,
+   "script": "Route134_EventScript_Aaron",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route134",
+   "id": 397
+  },
+  {
+   "x": 24,
+   "y": 23,
+   "sight": 6,
+   "script": "Route134_EventScript_Alex",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route134",
+   "id": 413
+  },
+  {
+   "x": 49,
+   "y": 16,
+   "sight": 5,
+   "script": "Route134_EventScript_Hitoshi",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route134",
+   "id": 180
+  },
+  {
+   "x": 43,
+   "y": 23,
+   "sight": 2,
+   "script": "Route134_EventScript_Marley",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route134",
+   "id": 508
+  },
+  {
+   "x": 24,
+   "y": 30,
+   "sight": 6,
+   "script": "Route134_EventScript_Kelvin",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route134",
+   "id": 507
+  },
+  {
+   "x": 50,
+   "y": 16,
+   "sight": 5,
+   "script": "Route134_EventScript_Reyna",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route134",
+   "id": 509
+  },
+  {
+   "x": 63,
+   "y": 14,
+   "sight": 3,
+   "script": "Route134_EventScript_Hudson",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route134",
+   "id": 510
+  }
+ ],
+ "3.3": [
+  {
+   "x": 2,
+   "y": 18,
+   "sight": 3,
+   "script": "DewfordTown_Gym_EventScript_Takao",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "DewfordTown_Gym",
+   "id": 179
+  },
+  {
+   "x": 15,
+   "y": 3,
+   "sight": 3,
+   "script": "DewfordTown_Gym_EventScript_Jocelyn",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "DewfordTown_Gym",
+   "id": 425
+  },
+  {
+   "x": 12,
+   "y": 25,
+   "sight": 2,
+   "script": "DewfordTown_Gym_EventScript_Laura",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "DewfordTown_Gym",
+   "id": 426
+  },
+  {
+   "x": 7,
+   "y": 8,
+   "sight": 3,
+   "script": "DewfordTown_Gym_EventScript_Cristian",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "DewfordTown_Gym",
+   "id": 574
+  },
+  {
+   "x": 16,
+   "y": 9,
+   "sight": 3,
+   "script": "DewfordTown_Gym_EventScript_Lilith",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "DewfordTown_Gym",
+   "id": 573
+  },
+  {
+   "x": 14,
+   "y": 12,
+   "sight": 2,
+   "script": "DewfordTown_Gym_EventScript_Brenden",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "DewfordTown_Gym",
+   "id": 572
+  }
+ ],
+ "4.1": [
+  {
+   "x": 3,
+   "y": 14,
+   "sight": 1,
+   "script": "LavaridgeTown_Gym_1F_EventScript_Cole",
+   "type": "TRAINER_TYPE_BURIED",
+   "flag": "0",
+   "map": "LavaridgeTown_Gym_1F",
+   "id": 201
+  },
+  {
+   "x": 2,
+   "y": 15,
+   "sight": 1,
+   "script": "LavaridgeTown_Gym_1F_EventScript_Gerald",
+   "type": "TRAINER_TYPE_BURIED",
+   "flag": "0",
+   "map": "LavaridgeTown_Gym_1F",
+   "id": 648
+  },
+  {
+   "x": 3,
+   "y": 10,
+   "sight": 1,
+   "script": "LavaridgeTown_Gym_1F_EventScript_Axle",
+   "type": "TRAINER_TYPE_BURIED",
+   "flag": "0",
+   "map": "LavaridgeTown_Gym_1F",
+   "id": 203
+  },
+  {
+   "x": 5,
+   "y": 2,
+   "sight": 1,
+   "script": "LavaridgeTown_Gym_1F_EventScript_Danielle",
+   "type": "TRAINER_TYPE_BURIED",
+   "flag": "0",
+   "map": "LavaridgeTown_Gym_1F",
+   "id": 650
+  }
+ ],
+ "4.2": [
+  {
+   "const": null,
+   "x": 4,
+   "y": 18,
+   "sight": 1,
+   "script": "LavaridgeTown_Gym_B1F_EventScript_Jace",
+   "type": "TRAINER_TYPE_BURIED",
+   "flag": "0",
+   "map": "LavaridgeTown_Gym_B1F",
+   "id": null
+  },
+  {
+   "const": null,
+   "x": 3,
+   "y": 6,
+   "sight": 1,
+   "script": "LavaridgeTown_Gym_B1F_EventScript_Keegan",
+   "type": "TRAINER_TYPE_BURIED",
+   "flag": "0",
+   "map": "LavaridgeTown_Gym_B1F",
+   "id": null
+  },
+  {
+   "const": null,
+   "x": 13,
+   "y": 17,
+   "sight": 1,
+   "script": "LavaridgeTown_Gym_B1F_EventScript_Jeff",
+   "type": "TRAINER_TYPE_BURIED",
+   "flag": "0",
+   "map": "LavaridgeTown_Gym_B1F",
+   "id": null
+  },
+  {
+   "const": null,
+   "x": 4,
+   "y": 16,
+   "sight": 1,
+   "script": "LavaridgeTown_Gym_B1F_EventScript_Eli",
+   "type": "TRAINER_TYPE_BURIED",
+   "flag": "0",
+   "map": "LavaridgeTown_Gym_B1F",
+   "id": null
+  }
+ ],
+ "8.1": [
+  {
+   "x": 4,
+   "y": 94,
+   "sight": 0,
+   "script": "PetalburgCity_Gym_EventScript_Mary",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "PetalburgCity_Gym",
+   "id": 89
+  },
+  {
+   "x": 4,
+   "y": 81,
+   "sight": 0,
+   "script": "PetalburgCity_Gym_EventScript_Randall",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "PetalburgCity_Gym",
+   "id": 71
+  },
+  {
+   "x": 4,
+   "y": 42,
+   "sight": 0,
+   "script": "PetalburgCity_Gym_EventScript_Parker",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "PetalburgCity_Gym",
+   "id": 72
+  },
+  {
+   "x": 4,
+   "y": 55,
+   "sight": 0,
+   "script": "PetalburgCity_Gym_EventScript_Alexia",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "PetalburgCity_Gym",
+   "id": 90
+  },
+  {
+   "x": 4,
+   "y": 68,
+   "sight": 0,
+   "script": "PetalburgCity_Gym_EventScript_George",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "PetalburgCity_Gym",
+   "id": 73
+  },
+  {
+   "x": 4,
+   "y": 16,
+   "sight": 0,
+   "script": "PetalburgCity_Gym_EventScript_Jody",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "PetalburgCity_Gym",
+   "id": 91
+  },
+  {
+   "x": 4,
+   "y": 29,
+   "sight": 0,
+   "script": "PetalburgCity_Gym_EventScript_Berke",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "PetalburgCity_Gym",
+   "id": 74
+  }
+ ],
+ "10.0": [
+  {
+   "x": 7,
+   "y": 8,
+   "sight": 1,
+   "script": "MauvilleCity_Gym_EventScript_Shawn",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "MauvilleCity_Gym",
+   "id": 194
+  },
+  {
+   "x": 1,
+   "y": 16,
+   "sight": 2,
+   "script": "MauvilleCity_Gym_EventScript_Vivian",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "MauvilleCity_Gym",
+   "id": 649
+  },
+  {
+   "x": 5,
+   "y": 10,
+   "sight": 2,
+   "script": "MauvilleCity_Gym_EventScript_Ben",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "MauvilleCity_Gym",
+   "id": 323
+  },
+  {
+   "x": 1,
+   "y": 13,
+   "sight": 2,
+   "script": "MauvilleCity_Gym_EventScript_Kirk",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "MauvilleCity_Gym",
+   "id": 191
+  },
+  {
+   "x": 7,
+   "y": 10,
+   "sight": 1,
+   "script": "MauvilleCity_Gym_EventScript_Angelo",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "MauvilleCity_Gym",
+   "id": 802
+  }
+ ],
+ "11.3": [
+  {
+   "x": 5,
+   "y": 13,
+   "sight": 2,
+   "script": "RustboroCity_Gym_EventScript_Josh",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "RustboroCity_Gym",
+   "id": 320
+  },
+  {
+   "x": 3,
+   "y": 9,
+   "sight": 3,
+   "script": "RustboroCity_Gym_EventScript_Tommy",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "RustboroCity_Gym",
+   "id": 321
+  },
+  {
+   "x": 1,
+   "y": 6,
+   "sight": 3,
+   "script": "RustboroCity_Gym_EventScript_Marc",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "RustboroCity_Gym",
+   "id": 571
+  }
+ ],
+ "12.1": [
+  {
+   "x": 4,
+   "y": 14,
+   "sight": 3,
+   "script": "FortreeCity_Gym_EventScript_Jared",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "FortreeCity_Gym",
+   "id": 401
+  },
+  {
+   "x": 10,
+   "y": 10,
+   "sight": 2,
+   "script": "FortreeCity_Gym_EventScript_Flint",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "FortreeCity_Gym",
+   "id": 654
+  },
+  {
+   "x": 5,
+   "y": 17,
+   "sight": 1,
+   "script": "FortreeCity_Gym_EventScript_Ashley",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "FortreeCity_Gym",
+   "id": 655
+  },
+  {
+   "x": 9,
+   "y": 8,
+   "sight": 2,
+   "script": "FortreeCity_Gym_EventScript_Edwardo",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "FortreeCity_Gym",
+   "id": 404
+  },
+  {
+   "x": 4,
+   "y": 23,
+   "sight": 1,
+   "script": "FortreeCity_Gym_EventScript_Humberto",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "FortreeCity_Gym",
+   "id": 402
+  },
+  {
+   "x": 1,
+   "y": 10,
+   "sight": 3,
+   "script": "FortreeCity_Gym_EventScript_Darius",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "FortreeCity_Gym",
+   "id": 803
+  }
+ ],
+ "14.0": [
+  {
+   "x": 1,
+   "y": 30,
+   "sight": 1,
+   "script": "MossdeepCity_Gym_EventScript_Preston",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "MossdeepCity_Gym",
+   "id": 233
+  },
+  {
+   "x": 5,
+   "y": 20,
+   "sight": 1,
+   "script": "MossdeepCity_Gym_EventScript_Blake",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "MossdeepCity_Gym",
+   "id": 235
+  },
+  {
+   "x": 4,
+   "y": 29,
+   "sight": 1,
+   "script": "MossdeepCity_Gym_EventScript_Maura",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "MossdeepCity_Gym",
+   "id": 246
+  },
+  {
+   "x": 4,
+   "y": 23,
+   "sight": 1,
+   "script": "MossdeepCity_Gym_EventScript_Samantha",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "MossdeepCity_Gym",
+   "id": 245
+  },
+  {
+   "x": 6,
+   "y": 9,
+   "sight": 1,
+   "script": "MossdeepCity_Gym_EventScript_Virgil",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "MossdeepCity_Gym",
+   "id": 234
+  },
+  {
+   "x": 6,
+   "y": 3,
+   "sight": 1,
+   "script": "MossdeepCity_Gym_EventScript_Hannah",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "MossdeepCity_Gym",
+   "id": 244
+  },
+  {
+   "x": 9,
+   "y": 8,
+   "sight": 1,
+   "script": "MossdeepCity_Gym_EventScript_Nate",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "MossdeepCity_Gym",
+   "id": 582
+  },
+  {
+   "x": 7,
+   "y": 5,
+   "sight": 1,
+   "script": "MossdeepCity_Gym_EventScript_Sylvia",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "MossdeepCity_Gym",
+   "id": 575
+  },
+  {
+   "x": 22,
+   "y": 25,
+   "sight": 1,
+   "script": "MossdeepCity_Gym_EventScript_Clifford",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "MossdeepCity_Gym",
+   "id": 584
+  },
+  {
+   "x": 25,
+   "y": 25,
+   "sight": 1,
+   "script": "MossdeepCity_Gym_EventScript_Macey",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "MossdeepCity_Gym",
+   "id": 591
+  },
+  {
+   "x": 22,
+   "y": 23,
+   "sight": 1,
+   "script": "MossdeepCity_Gym_EventScript_Kathleen",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "MossdeepCity_Gym",
+   "id": 583
+  },
+  {
+   "x": 25,
+   "y": 22,
+   "sight": 1,
+   "script": "MossdeepCity_Gym_EventScript_Nicholas",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "MossdeepCity_Gym",
+   "id": 585
+  }
+ ],
+ "14.9": [
+  {
+   "x": 12,
+   "y": 9,
+   "sight": 2,
+   "script": "MossdeepCity_SpaceCenter_1F_EventScript_Grunt3",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "FLAG_HIDE_MOSSDEEP_CITY_SPACE_CENTER_1F_TEAM_MAGMA",
+   "map": "MossdeepCity_SpaceCenter_1F",
+   "id": 586
+  },
+  {
+   "x": 11,
+   "y": 6,
+   "sight": 2,
+   "script": "MossdeepCity_SpaceCenter_1F_EventScript_Grunt1",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "FLAG_HIDE_MOSSDEEP_CITY_SPACE_CENTER_1F_TEAM_MAGMA",
+   "map": "MossdeepCity_SpaceCenter_1F",
+   "id": 22
+  },
+  {
+   "x": 10,
+   "y": 2,
+   "sight": 2,
+   "script": "MossdeepCity_SpaceCenter_1F_EventScript_Grunt4",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "FLAG_HIDE_MOSSDEEP_CITY_SPACE_CENTER_1F_TEAM_MAGMA",
+   "map": "MossdeepCity_SpaceCenter_1F",
+   "id": 587
+  },
+  {
+   "x": 13,
+   "y": 2,
+   "sight": 0,
+   "script": "MossdeepCity_SpaceCenter_1F_EventScript_Grunt2",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "FLAG_HIDE_MOSSDEEP_CITY_SPACE_CENTER_1F_TEAM_MAGMA",
+   "map": "MossdeepCity_SpaceCenter_1F",
+   "id": 116
+  }
+ ],
+ "15.1": [
+  {
+   "x": 7,
+   "y": 17,
+   "sight": 1,
+   "script": "SootopolisCity_Gym_B1F_EventScript_Andrea",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "SootopolisCity_Gym_B1F",
+   "id": 613
+  },
+  {
+   "x": 9,
+   "y": 19,
+   "sight": 1,
+   "script": "SootopolisCity_Gym_B1F_EventScript_Connie",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "SootopolisCity_Gym_B1F",
+   "id": 128
+  },
+  {
+   "x": 12,
+   "y": 7,
+   "sight": 1,
+   "script": "SootopolisCity_Gym_B1F_EventScript_Brianna",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "SootopolisCity_Gym_B1F",
+   "id": 118
+  },
+  {
+   "x": 11,
+   "y": 9,
+   "sight": 5,
+   "script": "SootopolisCity_Gym_B1F_EventScript_Bridget",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "SootopolisCity_Gym_B1F",
+   "id": 129
+  },
+  {
+   "x": 5,
+   "y": 6,
+   "sight": 4,
+   "script": "SootopolisCity_Gym_B1F_EventScript_Tiffany",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "SootopolisCity_Gym_B1F",
+   "id": 131
+  },
+  {
+   "x": 7,
+   "y": 8,
+   "sight": 2,
+   "script": "SootopolisCity_Gym_B1F_EventScript_Bethany",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "SootopolisCity_Gym_B1F",
+   "id": 301
+  },
+  {
+   "x": 4,
+   "y": 8,
+   "sight": 2,
+   "script": "SootopolisCity_Gym_B1F_EventScript_Crissy",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "SootopolisCity_Gym_B1F",
+   "id": 614
+  },
+  {
+   "x": 9,
+   "y": 7,
+   "sight": 3,
+   "script": "SootopolisCity_Gym_B1F_EventScript_Olivia",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "SootopolisCity_Gym_B1F",
+   "id": 130
+  },
+  {
+   "x": 6,
+   "y": 13,
+   "sight": 3,
+   "script": "SootopolisCity_Gym_B1F_EventScript_Daphne",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "SootopolisCity_Gym_B1F",
+   "id": 115
+  },
+  {
+   "x": 10,
+   "y": 13,
+   "sight": 3,
+   "script": "SootopolisCity_Gym_B1F_EventScript_Annika",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "SootopolisCity_Gym_B1F",
+   "id": 502
+  }
+ ],
+ "24.1": [
+  {
+   "x": 13,
+   "y": 2,
+   "sight": 1,
+   "script": "MeteorFalls_1F_2R_EventScript_Nicolas",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "MeteorFalls_1F_2R",
+   "id": 392
+  },
+  {
+   "x": 6,
+   "y": 12,
+   "sight": 1,
+   "script": "MeteorFalls_1F_2R_EventScript_John",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "MeteorFalls_1F_2R",
+   "id": 681
+  },
+  {
+   "x": 7,
+   "y": 12,
+   "sight": 1,
+   "script": "MeteorFalls_1F_2R_EventScript_Jay",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "MeteorFalls_1F_2R",
+   "id": 681
+  }
+ ],
+ "24.4": [
+  {
+   "x": 32,
+   "y": 13,
+   "sight": 3,
+   "script": "RusturfTunnel_EventScript_Mike",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "RusturfTunnel",
+   "id": 635
+  }
+ ],
+ "24.11": [
+  {
+   "x": 7,
+   "y": 32,
+   "sight": 3,
+   "script": "PetalburgWoods_EventScript_Lyle",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "PetalburgWoods",
+   "id": 616
+  },
+  {
+   "x": 4,
+   "y": 14,
+   "sight": 3,
+   "script": "PetalburgWoods_EventScript_James",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "PetalburgWoods",
+   "id": 621
+  }
+ ],
+ "24.12": [
+  {
+   "x": 12,
+   "y": 11,
+   "sight": 2,
+   "script": "MtChimney_EventScript_Tabitha",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "FLAG_HIDE_MT_CHIMNEY_TEAM_MAGMA",
+   "map": "MtChimney",
+   "id": 597
+  },
+  {
+   "x": 9,
+   "y": 16,
+   "sight": 3,
+   "script": "MtChimney_EventScript_Grunt2",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "FLAG_HIDE_MT_CHIMNEY_TEAM_MAGMA",
+   "map": "MtChimney",
+   "id": 579
+  },
+  {
+   "x": 16,
+   "y": 18,
+   "sight": 3,
+   "script": "MtChimney_EventScript_Shelby",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "FLAG_HIDE_MT_CHIMNEY_TRAINERS",
+   "map": "MtChimney",
+   "id": 313
+  },
+  {
+   "x": 14,
+   "y": 7,
+   "sight": 6,
+   "script": "MtChimney_EventScript_Melissa",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "FLAG_HIDE_MT_CHIMNEY_TRAINERS",
+   "map": "MtChimney",
+   "id": 124
+  },
+  {
+   "x": 29,
+   "y": 7,
+   "sight": 3,
+   "script": "MtChimney_EventScript_Sheila",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "FLAG_HIDE_MT_CHIMNEY_TRAINERS",
+   "map": "MtChimney",
+   "id": 125
+  },
+  {
+   "x": 27,
+   "y": 17,
+   "sight": 3,
+   "script": "MtChimney_EventScript_Shirley",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "FLAG_HIDE_MT_CHIMNEY_TRAINERS",
+   "map": "MtChimney",
+   "id": 126
+  },
+  {
+   "x": 13,
+   "y": 16,
+   "sight": 3,
+   "script": "MtChimney_EventScript_Grunt1",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "FLAG_HIDE_MT_CHIMNEY_TEAM_MAGMA",
+   "map": "MtChimney",
+   "id": 146
+  },
+  {
+   "x": 7,
+   "y": 7,
+   "sight": 6,
+   "script": "MtChimney_EventScript_Sawyer",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "FLAG_HIDE_MT_CHIMNEY_TRAINERS",
+   "map": "MtChimney",
+   "id": 1
+  }
+ ],
+ "24.13": [
+  {
+   "x": 10,
+   "y": 8,
+   "sight": 3,
+   "script": "JaggedPass_EventScript_Eric",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "JaggedPass",
+   "id": 632
+  },
+  {
+   "x": 16,
+   "y": 35,
+   "sight": 4,
+   "script": "JaggedPass_EventScript_Ethan",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "JaggedPass",
+   "id": 216
+  },
+  {
+   "x": 9,
+   "y": 21,
+   "sight": 3,
+   "script": "JaggedPass_EventScript_Diana",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "JaggedPass",
+   "id": 474
+  },
+  {
+   "x": 14,
+   "y": 25,
+   "sight": 3,
+   "script": "JaggedPass_EventScript_Autumn",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "JaggedPass",
+   "id": 217
+  },
+  {
+   "x": 18,
+   "y": 25,
+   "sight": 3,
+   "script": "JaggedPass_EventScript_Julio",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "JaggedPass",
+   "id": 566
+  }
+ ],
+ "24.16": [
+  {
+   "x": 3,
+   "y": 6,
+   "sight": 2,
+   "script": "MtPyre_2F_EventScript_Mark",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "MtPyre_2F",
+   "id": 145
+  },
+  {
+   "x": 2,
+   "y": 9,
+   "sight": 1,
+   "script": "MtPyre_2F_EventScript_Dez",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "MtPyre_2F",
+   "id": 640
+  },
+  {
+   "x": 3,
+   "y": 9,
+   "sight": 1,
+   "script": "MtPyre_2F_EventScript_Luke",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "MtPyre_2F",
+   "id": 640
+  },
+  {
+   "x": 6,
+   "y": 9,
+   "sight": 2,
+   "script": "MtPyre_2F_EventScript_Zander",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "MtPyre_2F",
+   "id": 31
+  },
+  {
+   "x": 6,
+   "y": 6,
+   "sight": 2,
+   "script": "MtPyre_2F_EventScript_Leah",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "MtPyre_2F",
+   "id": 35
+  }
+ ],
+ "24.17": [
+  {
+   "x": 1,
+   "y": 4,
+   "sight": 4,
+   "script": "MtPyre_3F_EventScript_William",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "MtPyre_3F",
+   "id": 236
+  },
+  {
+   "x": 11,
+   "y": 4,
+   "sight": 4,
+   "script": "MtPyre_3F_EventScript_Kayla",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "MtPyre_3F",
+   "id": 247
+  },
+  {
+   "x": 6,
+   "y": 4,
+   "sight": 4,
+   "script": "MtPyre_3F_EventScript_Gabrielle",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "MtPyre_3F",
+   "id": 9
+  }
+ ],
+ "24.18": [
+  {
+   "const": null,
+   "x": 11,
+   "y": 7,
+   "sight": 2,
+   "script": "MtPyre_4F_EventScript_Tasha",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "MtPyre_4F",
+   "id": null
+  }
+ ],
+ "24.19": [
+  {
+   "const": null,
+   "x": 3,
+   "y": 7,
+   "sight": 2,
+   "script": "MtPyre_5F_EventScript_Atsushi",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "MtPyre_5F",
+   "id": null
+  }
+ ],
+ "24.20": [
+  {
+   "x": 6,
+   "y": 3,
+   "sight": 3,
+   "script": "MtPyre_6F_EventScript_Valerie",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "MtPyre_6F",
+   "id": 108
+  },
+  {
+   "x": 10,
+   "y": 3,
+   "sight": 3,
+   "script": "MtPyre_6F_EventScript_Cedric",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "MtPyre_6F",
+   "id": 475
+  }
+ ],
+ "24.22": [
+  {
+   "x": 21,
+   "y": 15,
+   "sight": 3,
+   "script": "MtPyre_Summit_EventScript_Grunt1",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "FLAG_HIDE_MT_PYRE_SUMMIT_TEAM_AQUA",
+   "map": "MtPyre_Summit",
+   "id": 23
+  },
+  {
+   "x": 25,
+   "y": 18,
+   "sight": 3,
+   "script": "MtPyre_Summit_EventScript_Grunt2",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "FLAG_HIDE_MT_PYRE_SUMMIT_TEAM_AQUA",
+   "map": "MtPyre_Summit",
+   "id": 24
+  },
+  {
+   "x": 21,
+   "y": 11,
+   "sight": 3,
+   "script": "MtPyre_Summit_EventScript_Grunt3",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "FLAG_HIDE_MT_PYRE_SUMMIT_TEAM_AQUA",
+   "map": "MtPyre_Summit",
+   "id": 25
+  },
+  {
+   "x": 25,
+   "y": 11,
+   "sight": 3,
+   "script": "MtPyre_Summit_EventScript_Grunt4",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "FLAG_HIDE_MT_PYRE_SUMMIT_TEAM_AQUA",
+   "map": "MtPyre_Summit",
+   "id": 569
+  }
+ ],
+ "24.23": [
+  {
+   "x": 20,
+   "y": 4,
+   "sight": 3,
+   "script": "AquaHideout_1F_EventScript_Grunt1",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "FLAG_HIDE_AQUA_HIDEOUT_GRUNTS",
+   "map": "AquaHideout_1F",
+   "id": 2
+  }
+ ],
+ "24.24": [
+  {
+   "x": 28,
+   "y": 16,
+   "sight": 4,
+   "script": "AquaHideout_B1F_EventScript_Grunt2",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "FLAG_HIDE_AQUA_HIDEOUT_GRUNTS",
+   "map": "AquaHideout_B1F",
+   "id": 3
+  },
+  {
+   "x": 6,
+   "y": 6,
+   "sight": 5,
+   "script": "AquaHideout_B1F_EventScript_Grunt3",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "FLAG_HIDE_AQUA_HIDEOUT_GRUNTS",
+   "map": "AquaHideout_B1F",
+   "id": 4
+  },
+  {
+   "x": 20,
+   "y": 18,
+   "sight": 4,
+   "script": "AquaHideout_B1F_EventScript_Grunt5",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "FLAG_HIDE_AQUA_HIDEOUT_GRUNTS",
+   "map": "AquaHideout_B1F",
+   "id": 27
+  },
+  {
+   "x": 28,
+   "y": 21,
+   "sight": 4,
+   "script": "AquaHideout_B1F_EventScript_Grunt7",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "FLAG_HIDE_AQUA_HIDEOUT_GRUNTS",
+   "map": "AquaHideout_B1F",
+   "id": 192
+  }
+ ],
+ "24.25": [
+  {
+   "x": 23,
+   "y": 10,
+   "sight": 3,
+   "script": "AquaHideout_B2F_EventScript_Grunt4",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "FLAG_HIDE_AQUA_HIDEOUT_GRUNTS",
+   "map": "AquaHideout_B2F",
+   "id": 5
+  },
+  {
+   "x": 7,
+   "y": 5,
+   "sight": 5,
+   "script": "AquaHideout_B2F_EventScript_Grunt6",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "FLAG_HIDE_AQUA_HIDEOUT_GRUNTS",
+   "map": "AquaHideout_B2F",
+   "id": 28
+  },
+  {
+   "x": 13,
+   "y": 5,
+   "sight": 5,
+   "script": "AquaHideout_B2F_EventScript_Grunt8",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "FLAG_HIDE_AQUA_HIDEOUT_GRUNTS",
+   "map": "AquaHideout_B2F",
+   "id": 193
+  }
+ ],
+ "24.28": [
+  {
+   "x": 8,
+   "y": 6,
+   "sight": 2,
+   "script": "SeafloorCavern_Room1_EventScript_Grunt1",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "FLAG_HIDE_SEAFLOOR_CAVERN_AQUA_GRUNTS",
+   "map": "SeafloorCavern_Room1",
+   "id": 6
+  },
+  {
+   "x": 15,
+   "y": 10,
+   "sight": 3,
+   "script": "SeafloorCavern_Room1_EventScript_Grunt2",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "FLAG_HIDE_SEAFLOOR_CAVERN_AQUA_GRUNTS",
+   "map": "SeafloorCavern_Room1",
+   "id": 7
+  }
+ ],
+ "24.30": [
+  {
+   "x": 9,
+   "y": 5,
+   "sight": 6,
+   "script": "SeafloorCavern_Room3_EventScript_Shelly",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "FLAG_HIDE_SEAFLOOR_CAVERN_AQUA_GRUNTS",
+   "map": "SeafloorCavern_Room3",
+   "id": 33
+  },
+  {
+   "x": 5,
+   "y": 5,
+   "sight": 4,
+   "script": "SeafloorCavern_Room3_EventScript_Grunt5",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "FLAG_HIDE_SEAFLOOR_CAVERN_AQUA_GRUNTS",
+   "map": "SeafloorCavern_Room3",
+   "id": 567
+  }
+ ],
+ "24.31": [
+  {
+   "x": 5,
+   "y": 8,
+   "sight": 3,
+   "script": "SeafloorCavern_Room4_EventScript_Grunt3",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "FLAG_HIDE_SEAFLOOR_CAVERN_AQUA_GRUNTS",
+   "map": "SeafloorCavern_Room4",
+   "id": 8
+  },
+  {
+   "x": 5,
+   "y": 12,
+   "sight": 3,
+   "script": "SeafloorCavern_Room4_EventScript_Grunt4",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "FLAG_HIDE_SEAFLOOR_CAVERN_AQUA_GRUNTS",
+   "map": "SeafloorCavern_Room4",
+   "id": 14
+  }
+ ],
+ "24.43": [
+  {
+   "x": 33,
+   "y": 22,
+   "sight": 3,
+   "script": "VictoryRoad_1F_EventScript_Edgar",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "VictoryRoad_1F",
+   "id": 79
+  },
+  {
+   "x": 6,
+   "y": 15,
+   "sight": 4,
+   "script": "VictoryRoad_1F_EventScript_Hope",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "VictoryRoad_1F",
+   "id": 96
+  },
+  {
+   "x": 27,
+   "y": 34,
+   "sight": 3,
+   "script": "VictoryRoad_1F_EventScript_Albert",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "VictoryRoad_1F",
+   "id": 80
+  },
+  {
+   "x": 29,
+   "y": 17,
+   "sight": 2,
+   "script": "VictoryRoad_1F_EventScript_Katelynn",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "VictoryRoad_1F",
+   "id": 325
+  },
+  {
+   "x": 32,
+   "y": 17,
+   "sight": 2,
+   "script": "VictoryRoad_1F_EventScript_Quincy",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "VictoryRoad_1F",
+   "id": 324
+  }
+ ],
+ "24.44": [
+  {
+   "x": 37,
+   "y": 12,
+   "sight": 3,
+   "script": "VictoryRoad_B1F_EventScript_Samuel",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "VictoryRoad_B1F",
+   "id": 81
+  },
+  {
+   "x": 26,
+   "y": 16,
+   "sight": 4,
+   "script": "VictoryRoad_B1F_EventScript_Shannon",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "VictoryRoad_B1F",
+   "id": 97
+  },
+  {
+   "x": 5,
+   "y": 21,
+   "sight": 2,
+   "script": "VictoryRoad_B1F_EventScript_Michelle",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "VictoryRoad_B1F",
+   "id": 98
+  },
+  {
+   "x": 14,
+   "y": 16,
+   "sight": 4,
+   "script": "VictoryRoad_B1F_EventScript_Mitchell",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "VictoryRoad_B1F",
+   "id": 540
+  },
+  {
+   "x": 14,
+   "y": 20,
+   "sight": 3,
+   "script": "VictoryRoad_B1F_EventScript_Halle",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "VictoryRoad_B1F",
+   "id": 546
+  }
+ ],
+ "24.45": [
+  {
+   "x": 15,
+   "y": 6,
+   "sight": 2,
+   "script": "VictoryRoad_B2F_EventScript_Vito",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "VictoryRoad_B2F",
+   "id": 82
+  },
+  {
+   "x": 43,
+   "y": 14,
+   "sight": 4,
+   "script": "VictoryRoad_B2F_EventScript_Owen",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "VictoryRoad_B2F",
+   "id": 83
+  },
+  {
+   "x": 2,
+   "y": 17,
+   "sight": 2,
+   "script": "VictoryRoad_B2F_EventScript_Caroline",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "VictoryRoad_B2F",
+   "id": 99
+  },
+  {
+   "x": 35,
+   "y": 22,
+   "sight": 2,
+   "script": "VictoryRoad_B2F_EventScript_Julie",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "VictoryRoad_B2F",
+   "id": 100
+  },
+  {
+   "x": 25,
+   "y": 18,
+   "sight": 2,
+   "script": "VictoryRoad_B2F_EventScript_Dianne",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "VictoryRoad_B2F",
+   "id": 417
+  },
+  {
+   "x": 25,
+   "y": 21,
+   "sight": 2,
+   "script": "VictoryRoad_B2F_EventScript_Felix",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "VictoryRoad_B2F",
+   "id": 38
+  }
+ ],
+ "24.55": [
+  {
+   "x": 5,
+   "y": 10,
+   "sight": 3,
+   "script": "AbandonedShip_Corridors_1F_EventScript_Charlie",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "AbandonedShip_Corridors_1F",
+   "id": 66
+  }
+ ],
+ "24.56": [
+  {
+   "x": 10,
+   "y": 11,
+   "sight": 4,
+   "script": "AbandonedShip_Rooms_1F_EventScript_Thalia",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "AbandonedShip_Rooms_1F",
+   "id": 144
+  },
+  {
+   "x": 10,
+   "y": 16,
+   "sight": 4,
+   "script": "AbandonedShip_Rooms_1F_EventScript_Demetrius",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "AbandonedShip_Rooms_1F",
+   "id": 375
+  }
+ ],
+ "24.57": [
+  {
+   "x": 9,
+   "y": 6,
+   "sight": 4,
+   "script": "AbandonedShip_Corridors_B1F_EventScript_Duncan",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "AbandonedShip_Corridors_B1F",
+   "id": 496
+  }
+ ],
+ "24.62": [
+  {
+   "x": 7,
+   "y": 13,
+   "sight": 1,
+   "script": "AbandonedShip_Rooms2_1F_EventScript_Dan",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "AbandonedShip_Rooms2_1F",
+   "id": 642
+  },
+  {
+   "x": 6,
+   "y": 13,
+   "sight": 1,
+   "script": "AbandonedShip_Rooms2_1F_EventScript_Kira",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "AbandonedShip_Rooms2_1F",
+   "id": 642
+  },
+  {
+   "x": 3,
+   "y": 2,
+   "sight": 3,
+   "script": "AbandonedShip_Rooms2_1F_EventScript_Garrison",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "AbandonedShip_Rooms2_1F",
+   "id": 547
+  },
+  {
+   "x": 7,
+   "y": 2,
+   "sight": 3,
+   "script": "AbandonedShip_Rooms2_1F_EventScript_Jani",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "AbandonedShip_Rooms2_1F",
+   "id": 418
+  }
+ ],
+ "24.86": [
+  {
+   "x": 4,
+   "y": 5,
+   "sight": 2,
+   "script": "MagmaHideout_1F_EventScript_Grunt1",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "FLAG_HIDE_MAGMA_HIDEOUT_GRUNTS",
+   "map": "MagmaHideout_1F",
+   "id": 716
+  },
+  {
+   "x": 30,
+   "y": 20,
+   "sight": 4,
+   "script": "MagmaHideout_1F_EventScript_Grunt2",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "FLAG_HIDE_MAGMA_HIDEOUT_GRUNTS",
+   "map": "MagmaHideout_1F",
+   "id": 717
+  }
+ ],
+ "24.87": [
+  {
+   "x": 18,
+   "y": 19,
+   "sight": 1,
+   "script": "MagmaHideout_2F_1R_EventScript_Grunt4",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "FLAG_HIDE_MAGMA_HIDEOUT_GRUNTS",
+   "map": "MagmaHideout_2F_1R",
+   "id": 719
+  },
+  {
+   "x": 12,
+   "y": 14,
+   "sight": 3,
+   "script": "MagmaHideout_2F_1R_EventScript_Grunt5",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "FLAG_HIDE_MAGMA_HIDEOUT_GRUNTS",
+   "map": "MagmaHideout_2F_1R",
+   "id": 720
+  },
+  {
+   "x": 8,
+   "y": 8,
+   "sight": 7,
+   "script": "MagmaHideout_2F_1R_EventScript_Grunt14",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "FLAG_HIDE_MAGMA_HIDEOUT_GRUNTS",
+   "map": "MagmaHideout_2F_1R",
+   "id": 729
+  },
+  {
+   "x": 21,
+   "y": 11,
+   "sight": 3,
+   "script": "MagmaHideout_2F_1R_EventScript_Grunt3",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "FLAG_HIDE_MAGMA_HIDEOUT_GRUNTS",
+   "map": "MagmaHideout_2F_1R",
+   "id": 718
+  }
+ ],
+ "24.88": [
+  {
+   "x": 29,
+   "y": 8,
+   "sight": 7,
+   "script": "MagmaHideout_2F_2R_EventScript_Grunt8",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "FLAG_HIDE_MAGMA_HIDEOUT_GRUNTS",
+   "map": "MagmaHideout_2F_2R",
+   "id": 723
+  },
+  {
+   "x": 25,
+   "y": 11,
+   "sight": 2,
+   "script": "MagmaHideout_2F_2R_EventScript_Grunt7",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "FLAG_HIDE_MAGMA_HIDEOUT_GRUNTS",
+   "map": "MagmaHideout_2F_2R",
+   "id": 722
+  },
+  {
+   "x": 8,
+   "y": 9,
+   "sight": 4,
+   "script": "MagmaHideout_2F_2R_EventScript_Grunt6",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "FLAG_HIDE_MAGMA_HIDEOUT_GRUNTS",
+   "map": "MagmaHideout_2F_2R",
+   "id": 721
+  },
+  {
+   "x": 7,
+   "y": 13,
+   "sight": 1,
+   "script": "MagmaHideout_2F_2R_EventScript_Grunt15",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "FLAG_HIDE_MAGMA_HIDEOUT_GRUNTS",
+   "map": "MagmaHideout_2F_2R",
+   "id": 730
+  }
+ ],
+ "24.89": [
+  {
+   "x": 2,
+   "y": 7,
+   "sight": 5,
+   "script": "MagmaHideout_3F_1R_EventScript_Grunt9",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "FLAG_HIDE_MAGMA_HIDEOUT_GRUNTS",
+   "map": "MagmaHideout_3F_1R",
+   "id": 724
+  },
+  {
+   "x": 21,
+   "y": 21,
+   "sight": 4,
+   "script": "MagmaHideout_3F_1R_EventScript_Grunt16",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "FLAG_HIDE_MAGMA_HIDEOUT_GRUNTS",
+   "map": "MagmaHideout_3F_1R",
+   "id": 731
+  }
+ ],
+ "24.90": [
+  {
+   "x": 16,
+   "y": 3,
+   "sight": 3,
+   "script": "MagmaHideout_3F_2R_EventScript_Grunt10",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "FLAG_HIDE_MAGMA_HIDEOUT_GRUNTS",
+   "map": "MagmaHideout_3F_2R",
+   "id": 725
+  }
+ ],
+ "24.91": [
+  {
+   "x": 31,
+   "y": 22,
+   "sight": 3,
+   "script": "MagmaHideout_4F_EventScript_Grunt11",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "FLAG_HIDE_MAGMA_HIDEOUT_GRUNTS",
+   "map": "MagmaHideout_4F",
+   "id": 726
+  },
+  {
+   "x": 30,
+   "y": 13,
+   "sight": 3,
+   "script": "MagmaHideout_4F_EventScript_Grunt12",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "FLAG_HIDE_MAGMA_HIDEOUT_GRUNTS",
+   "map": "MagmaHideout_4F",
+   "id": 727
+  },
+  {
+   "x": 26,
+   "y": 13,
+   "sight": 3,
+   "script": "MagmaHideout_4F_EventScript_Grunt13",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "FLAG_HIDE_MAGMA_HIDEOUT_GRUNTS",
+   "map": "MagmaHideout_4F",
+   "id": 728
+  },
+  {
+   "x": 22,
+   "y": 4,
+   "sight": 4,
+   "script": "MagmaHideout_4F_EventScript_Tabitha",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "FLAG_HIDE_MAGMA_HIDEOUT_GRUNTS",
+   "map": "MagmaHideout_4F",
+   "id": 732
+  }
+ ],
+ "25.42": [
+  {
+   "x": 10,
+   "y": 4,
+   "sight": 3,
+   "script": "SSTidalLowerDeck_EventScript_Phillip",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "SSTidalLowerDeck",
+   "id": 494
+  },
+  {
+   "x": 7,
+   "y": 4,
+   "sight": 3,
+   "script": "SSTidalLowerDeck_EventScript_Leonard",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "SSTidalLowerDeck",
+   "id": 495
+  }
+ ],
+ "25.43": [
+  {
+   "x": 4,
+   "y": 7,
+   "sight": 0,
+   "script": "SSTidalRooms_EventScript_Colton",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "SSTidalRooms",
+   "id": 294
+  },
+  {
+   "x": 34,
+   "y": 11,
+   "sight": 3,
+   "script": "SSTidalRooms_EventScript_Micah",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "SSTidalRooms",
+   "id": 255
+  },
+  {
+   "x": 21,
+   "y": 5,
+   "sight": 0,
+   "script": "SSTidalRooms_EventScript_Thomas",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "SSTidalRooms",
+   "id": 256
+  },
+  {
+   "x": 5,
+   "y": 14,
+   "sight": 1,
+   "script": "SSTidalRooms_EventScript_Jed",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "SSTidalRooms",
+   "id": 641
+  },
+  {
+   "x": 4,
+   "y": 14,
+   "sight": 1,
+   "script": "SSTidalRooms_EventScript_Lea",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "SSTidalRooms",
+   "id": 641
+  },
+  {
+   "x": 22,
+   "y": 11,
+   "sight": 3,
+   "script": "SSTidalRooms_EventScript_Garret",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "SSTidalRooms",
+   "id": 138
+  },
+  {
+   "x": 15,
+   "y": 6,
+   "sight": 0,
+   "script": "SSTidalRooms_EventScript_Naomi",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "SSTidalRooms",
+   "id": 119
+  }
+ ],
+ "25.44": [
+  {
+   "const": null,
+   "x": 2,
+   "y": 3,
+   "sight": 3,
+   "script": "BattlePyramid_TrainerBattle",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "BattlePyramidSquare01",
+   "id": null
+  },
+  {
+   "const": null,
+   "x": 5,
+   "y": 3,
+   "sight": 3,
+   "script": "BattlePyramid_TrainerBattle",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "BattlePyramidSquare01",
+   "id": null
+  },
+  {
+   "const": null,
+   "x": 2,
+   "y": 6,
+   "sight": 5,
+   "script": "BattlePyramid_TrainerBattle",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "BattlePyramidSquare01",
+   "id": null
+  },
+  {
+   "const": null,
+   "x": 6,
+   "y": 6,
+   "sight": 4,
+   "script": "BattlePyramid_TrainerBattle",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "BattlePyramidSquare01",
+   "id": null
+  }
+ ],
+ "25.45": [
+  {
+   "const": null,
+   "x": 2,
+   "y": 1,
+   "sight": 5,
+   "script": "BattlePyramid_TrainerBattle",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "BattlePyramidSquare02",
+   "id": null
+  },
+  {
+   "const": null,
+   "x": 5,
+   "y": 6,
+   "sight": 5,
+   "script": "BattlePyramid_TrainerBattle",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "BattlePyramidSquare02",
+   "id": null
+  },
+  {
+   "const": null,
+   "x": 2,
+   "y": 6,
+   "sight": 5,
+   "script": "BattlePyramid_TrainerBattle",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "BattlePyramidSquare02",
+   "id": null
+  },
+  {
+   "const": null,
+   "x": 5,
+   "y": 1,
+   "sight": 5,
+   "script": "BattlePyramid_TrainerBattle",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "BattlePyramidSquare02",
+   "id": null
+  }
+ ],
+ "25.46": [
+  {
+   "const": null,
+   "x": 2,
+   "y": 1,
+   "sight": 5,
+   "script": "BattlePyramid_TrainerBattle",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "BattlePyramidSquare03",
+   "id": null
+  },
+  {
+   "const": null,
+   "x": 6,
+   "y": 1,
+   "sight": 4,
+   "script": "BattlePyramid_TrainerBattle",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "BattlePyramidSquare03",
+   "id": null
+  },
+  {
+   "const": null,
+   "x": 6,
+   "y": 4,
+   "sight": 3,
+   "script": "BattlePyramid_TrainerBattle",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "BattlePyramidSquare03",
+   "id": null
+  },
+  {
+   "const": null,
+   "x": 3,
+   "y": 4,
+   "sight": 4,
+   "script": "BattlePyramid_TrainerBattle",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "BattlePyramidSquare03",
+   "id": null
+  }
+ ],
+ "25.47": [
+  {
+   "const": null,
+   "x": 7,
+   "y": 2,
+   "sight": 5,
+   "script": "BattlePyramid_TrainerBattle",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "BattlePyramidSquare04",
+   "id": null
+  },
+  {
+   "const": null,
+   "x": 7,
+   "y": 7,
+   "sight": 5,
+   "script": "BattlePyramid_TrainerBattle",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "BattlePyramidSquare04",
+   "id": null
+  },
+  {
+   "const": null,
+   "x": 1,
+   "y": 4,
+   "sight": 6,
+   "script": "BattlePyramid_TrainerBattle",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "BattlePyramidSquare04",
+   "id": null
+  },
+  {
+   "const": null,
+   "x": 6,
+   "y": 4,
+   "sight": 6,
+   "script": "BattlePyramid_TrainerBattle",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "BattlePyramidSquare04",
+   "id": null
+  }
+ ],
+ "25.48": [
+  {
+   "const": null,
+   "x": 6,
+   "y": 4,
+   "sight": 3,
+   "script": "BattlePyramid_TrainerBattle",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "BattlePyramidSquare05",
+   "id": null
+  },
+  {
+   "const": null,
+   "x": 3,
+   "y": 7,
+   "sight": 5,
+   "script": "BattlePyramid_TrainerBattle",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "BattlePyramidSquare05",
+   "id": null
+  },
+  {
+   "const": null,
+   "x": 3,
+   "y": 1,
+   "sight": 5,
+   "script": "BattlePyramid_TrainerBattle",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "BattlePyramidSquare05",
+   "id": null
+  },
+  {
+   "const": null,
+   "x": 6,
+   "y": 0,
+   "sight": 3,
+   "script": "BattlePyramid_TrainerBattle",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "BattlePyramidSquare05",
+   "id": null
+  }
+ ],
+ "25.49": [
+  {
+   "const": null,
+   "x": 5,
+   "y": 2,
+   "sight": 3,
+   "script": "BattlePyramid_TrainerBattle",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "BattlePyramidSquare06",
+   "id": null
+  },
+  {
+   "const": null,
+   "x": 2,
+   "y": 5,
+   "sight": 3,
+   "script": "BattlePyramid_TrainerBattle",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "BattlePyramidSquare06",
+   "id": null
+  },
+  {
+   "const": null,
+   "x": 5,
+   "y": 5,
+   "sight": 3,
+   "script": "BattlePyramid_TrainerBattle",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "BattlePyramidSquare06",
+   "id": null
+  },
+  {
+   "const": null,
+   "x": 2,
+   "y": 2,
+   "sight": 3,
+   "script": "BattlePyramid_TrainerBattle",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "BattlePyramidSquare06",
+   "id": null
+  }
+ ],
+ "25.50": [
+  {
+   "const": null,
+   "x": 0,
+   "y": 6,
+   "sight": 6,
+   "script": "BattlePyramid_TrainerBattle",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "BattlePyramidSquare07",
+   "id": null
+  },
+  {
+   "const": null,
+   "x": 4,
+   "y": 0,
+   "sight": 4,
+   "script": "BattlePyramid_TrainerBattle",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "BattlePyramidSquare07",
+   "id": null
+  },
+  {
+   "const": null,
+   "x": 6,
+   "y": 0,
+   "sight": 3,
+   "script": "BattlePyramid_TrainerBattle",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "BattlePyramidSquare07",
+   "id": null
+  },
+  {
+   "const": null,
+   "x": 4,
+   "y": 4,
+   "sight": 4,
+   "script": "BattlePyramid_TrainerBattle",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "BattlePyramidSquare07",
+   "id": null
+  }
+ ],
+ "25.51": [
+  {
+   "const": null,
+   "x": 1,
+   "y": 2,
+   "sight": 5,
+   "script": "BattlePyramid_TrainerBattle",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "BattlePyramidSquare08",
+   "id": null
+  },
+  {
+   "const": null,
+   "x": 6,
+   "y": 5,
+   "sight": 5,
+   "script": "BattlePyramid_TrainerBattle",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "BattlePyramidSquare08",
+   "id": null
+  },
+  {
+   "const": null,
+   "x": 1,
+   "y": 5,
+   "sight": 5,
+   "script": "BattlePyramid_TrainerBattle",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "BattlePyramidSquare08",
+   "id": null
+  },
+  {
+   "const": null,
+   "x": 6,
+   "y": 2,
+   "sight": 5,
+   "script": "BattlePyramid_TrainerBattle",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "BattlePyramidSquare08",
+   "id": null
+  }
+ ],
+ "25.52": [
+  {
+   "const": null,
+   "x": 3,
+   "y": 0,
+   "sight": 5,
+   "script": "BattlePyramid_TrainerBattle",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "BattlePyramidSquare09",
+   "id": null
+  },
+  {
+   "const": null,
+   "x": 6,
+   "y": 4,
+   "sight": 4,
+   "script": "BattlePyramid_TrainerBattle",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "BattlePyramidSquare09",
+   "id": null
+  },
+  {
+   "const": null,
+   "x": 6,
+   "y": 0,
+   "sight": 4,
+   "script": "BattlePyramid_TrainerBattle",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "BattlePyramidSquare09",
+   "id": null
+  },
+  {
+   "const": null,
+   "x": 3,
+   "y": 5,
+   "sight": 5,
+   "script": "BattlePyramid_TrainerBattle",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "BattlePyramidSquare09",
+   "id": null
+  }
+ ],
+ "25.53": [
+  {
+   "const": null,
+   "x": 3,
+   "y": 0,
+   "sight": 3,
+   "script": "BattlePyramid_TrainerBattle",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "BattlePyramidSquare10",
+   "id": null
+  },
+  {
+   "const": null,
+   "x": 0,
+   "y": 3,
+   "sight": 3,
+   "script": "BattlePyramid_TrainerBattle",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "BattlePyramidSquare10",
+   "id": null
+  },
+  {
+   "const": null,
+   "x": 6,
+   "y": 5,
+   "sight": 6,
+   "script": "BattlePyramid_TrainerBattle",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "BattlePyramidSquare10",
+   "id": null
+  },
+  {
+   "const": null,
+   "x": 0,
+   "y": 5,
+   "sight": 7,
+   "script": "BattlePyramid_TrainerBattle",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "BattlePyramidSquare10",
+   "id": null
+  }
+ ],
+ "25.54": [
+  {
+   "const": null,
+   "x": 3,
+   "y": 2,
+   "sight": 5,
+   "script": "BattlePyramid_TrainerBattle",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "BattlePyramidSquare11",
+   "id": null
+  },
+  {
+   "const": null,
+   "x": 3,
+   "y": 6,
+   "sight": 4,
+   "script": "BattlePyramid_TrainerBattle",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "BattlePyramidSquare11",
+   "id": null
+  },
+  {
+   "const": null,
+   "x": 6,
+   "y": 4,
+   "sight": 3,
+   "script": "BattlePyramid_TrainerBattle",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "BattlePyramidSquare11",
+   "id": null
+  },
+  {
+   "const": null,
+   "x": 6,
+   "y": 7,
+   "sight": 3,
+   "script": "BattlePyramid_TrainerBattle",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "BattlePyramidSquare11",
+   "id": null
+  }
+ ],
+ "25.55": [
+  {
+   "const": null,
+   "x": 7,
+   "y": 5,
+   "sight": 7,
+   "script": "BattlePyramid_TrainerBattle",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "BattlePyramidSquare12",
+   "id": null
+  },
+  {
+   "const": null,
+   "x": 0,
+   "y": 5,
+   "sight": 7,
+   "script": "BattlePyramid_TrainerBattle",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "BattlePyramidSquare12",
+   "id": null
+  },
+  {
+   "const": null,
+   "x": 3,
+   "y": 0,
+   "sight": 6,
+   "script": "BattlePyramid_TrainerBattle",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "BattlePyramidSquare12",
+   "id": null
+  },
+  {
+   "const": null,
+   "x": 3,
+   "y": 3,
+   "sight": 3,
+   "script": "BattlePyramid_TrainerBattle",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "BattlePyramidSquare12",
+   "id": null
+  }
+ ],
+ "25.56": [
+  {
+   "const": null,
+   "x": 5,
+   "y": 1,
+   "sight": 6,
+   "script": "BattlePyramid_TrainerBattle",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "BattlePyramidSquare13",
+   "id": null
+  },
+  {
+   "const": null,
+   "x": 5,
+   "y": 6,
+   "sight": 6,
+   "script": "BattlePyramid_TrainerBattle",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "BattlePyramidSquare13",
+   "id": null
+  },
+  {
+   "const": null,
+   "x": 1,
+   "y": 1,
+   "sight": 6,
+   "script": "BattlePyramid_TrainerBattle",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "BattlePyramidSquare13",
+   "id": null
+  },
+  {
+   "const": null,
+   "x": 1,
+   "y": 6,
+   "sight": 6,
+   "script": "BattlePyramid_TrainerBattle",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "BattlePyramidSquare13",
+   "id": null
+  }
+ ],
+ "25.57": [
+  {
+   "const": null,
+   "x": 7,
+   "y": 1,
+   "sight": 7,
+   "script": "BattlePyramid_TrainerBattle",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "BattlePyramidSquare14",
+   "id": null
+  },
+  {
+   "const": null,
+   "x": 1,
+   "y": 1,
+   "sight": 6,
+   "script": "BattlePyramid_TrainerBattle",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "BattlePyramidSquare14",
+   "id": null
+  },
+  {
+   "const": null,
+   "x": 6,
+   "y": 5,
+   "sight": 6,
+   "script": "BattlePyramid_TrainerBattle",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "BattlePyramidSquare14",
+   "id": null
+  },
+  {
+   "const": null,
+   "x": 0,
+   "y": 5,
+   "sight": 7,
+   "script": "BattlePyramid_TrainerBattle",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "BattlePyramidSquare14",
+   "id": null
+  }
+ ],
+ "25.58": [
+  {
+   "const": null,
+   "x": 2,
+   "y": 5,
+   "sight": 5,
+   "script": "BattlePyramid_TrainerBattle",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "BattlePyramidSquare15",
+   "id": null
+  },
+  {
+   "const": null,
+   "x": 2,
+   "y": 1,
+   "sight": 6,
+   "script": "BattlePyramid_TrainerBattle",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "BattlePyramidSquare15",
+   "id": null
+  },
+  {
+   "const": null,
+   "x": 6,
+   "y": 4,
+   "sight": 4,
+   "script": "BattlePyramid_TrainerBattle",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "BattlePyramidSquare15",
+   "id": null
+  },
+  {
+   "const": null,
+   "x": 6,
+   "y": 0,
+   "sight": 4,
+   "script": "BattlePyramid_TrainerBattle",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "BattlePyramidSquare15",
+   "id": null
+  }
+ ],
+ "25.59": [
+  {
+   "const": null,
+   "x": 0,
+   "y": 6,
+   "sight": 6,
+   "script": "BattlePyramid_TrainerBattle",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "BattlePyramidSquare16",
+   "id": null
+  },
+  {
+   "const": null,
+   "x": 1,
+   "y": 0,
+   "sight": 6,
+   "script": "BattlePyramid_TrainerBattle",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "BattlePyramidSquare16",
+   "id": null
+  },
+  {
+   "const": null,
+   "x": 6,
+   "y": 7,
+   "sight": 6,
+   "script": "BattlePyramid_TrainerBattle",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "BattlePyramidSquare16",
+   "id": null
+  },
+  {
+   "const": null,
+   "x": 6,
+   "y": 0,
+   "sight": 6,
+   "script": "BattlePyramid_TrainerBattle",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "BattlePyramidSquare16",
+   "id": null
+  }
+ ],
+ "28.0": [
+  {
+   "x": 2,
+   "y": 3,
+   "sight": 2,
+   "script": "Route109_SeashoreHouse_EventScript_Dwayne",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route109_SeashoreHouse",
+   "id": 493
+  },
+  {
+   "x": 14,
+   "y": 9,
+   "sight": 2,
+   "script": "Route109_SeashoreHouse_EventScript_Simon",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route109_SeashoreHouse",
+   "id": 65
+  },
+  {
+   "x": 10,
+   "y": 5,
+   "sight": 2,
+   "script": "Route109_SeashoreHouse_EventScript_Johanna",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route109_SeashoreHouse",
+   "id": 647
+  }
+ ],
+ "29.3": [
+  {
+   "x": 14,
+   "y": 20,
+   "sight": 6,
+   "script": "Route110_TrickHousePuzzle1_EventScript_Sally",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route110_TrickHousePuzzle1",
+   "id": 611
+  },
+  {
+   "x": 14,
+   "y": 8,
+   "sight": 2,
+   "script": "Route110_TrickHousePuzzle1_EventScript_Eddie",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route110_TrickHousePuzzle1",
+   "id": 332
+  },
+  {
+   "x": 2,
+   "y": 15,
+   "sight": 2,
+   "script": "Route110_TrickHousePuzzle1_EventScript_Robin",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route110_TrickHousePuzzle1",
+   "id": 612
+  }
+ ],
+ "29.4": [
+  {
+   "x": 13,
+   "y": 10,
+   "sight": 1,
+   "script": "Route110_TrickHousePuzzle2_EventScript_Ted",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route110_TrickHousePuzzle2",
+   "id": 274
+  },
+  {
+   "x": 10,
+   "y": 17,
+   "sight": 4,
+   "script": "Route110_TrickHousePuzzle2_EventScript_Paul",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route110_TrickHousePuzzle2",
+   "id": 275
+  },
+  {
+   "x": 11,
+   "y": 9,
+   "sight": 2,
+   "script": "Route110_TrickHousePuzzle2_EventScript_Georgia",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route110_TrickHousePuzzle2",
+   "id": 281
+  }
+ ],
+ "29.5": [
+  {
+   "x": 7,
+   "y": 19,
+   "sight": 2,
+   "script": "Route110_TrickHousePuzzle3_EventScript_Justin",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route110_TrickHousePuzzle3",
+   "id": 215
+  },
+  {
+   "x": 4,
+   "y": 4,
+   "sight": 1,
+   "script": "Route110_TrickHousePuzzle3_EventScript_Martha",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route110_TrickHousePuzzle3",
+   "id": 473
+  },
+  {
+   "x": 10,
+   "y": 10,
+   "sight": 1,
+   "script": "Route110_TrickHousePuzzle3_EventScript_Alan",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route110_TrickHousePuzzle3",
+   "id": 630
+  }
+ ],
+ "29.6": [
+  {
+   "x": 2,
+   "y": 2,
+   "sight": 1,
+   "script": "Route110_TrickHousePuzzle4_EventScript_Cora",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route110_TrickHousePuzzle4",
+   "id": 428
+  },
+  {
+   "x": 14,
+   "y": 7,
+   "sight": 2,
+   "script": "Route110_TrickHousePuzzle4_EventScript_Paula",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route110_TrickHousePuzzle4",
+   "id": 429
+  },
+  {
+   "x": 2,
+   "y": 14,
+   "sight": 2,
+   "script": "Route110_TrickHousePuzzle4_EventScript_Yuji",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route110_TrickHousePuzzle4",
+   "id": 188
+  }
+ ],
+ "29.8": [
+  {
+   "x": 7,
+   "y": 9,
+   "sight": 1,
+   "script": "Route110_TrickHousePuzzle6_EventScript_Sophia",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route110_TrickHousePuzzle6",
+   "id": 561
+  },
+  {
+   "x": 11,
+   "y": 10,
+   "sight": 3,
+   "script": "Route110_TrickHousePuzzle6_EventScript_Benny",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route110_TrickHousePuzzle6",
+   "id": 407
+  },
+  {
+   "x": 4,
+   "y": 5,
+   "sight": 1,
+   "script": "Route110_TrickHousePuzzle6_EventScript_Sebastian",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route110_TrickHousePuzzle6",
+   "id": 554
+  }
+ ],
+ "29.9": [
+  {
+   "x": 9,
+   "y": 20,
+   "sight": 1,
+   "script": "Route110_TrickHousePuzzle7_EventScript_Joshua",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route110_TrickHousePuzzle7",
+   "id": 237
+  },
+  {
+   "x": 10,
+   "y": 2,
+   "sight": 1,
+   "script": "Route110_TrickHousePuzzle7_EventScript_Alexis",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route110_TrickHousePuzzle7",
+   "id": 248
+  },
+  {
+   "x": 8,
+   "y": 17,
+   "sight": 1,
+   "script": "Route110_TrickHousePuzzle7_EventScript_Patricia",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route110_TrickHousePuzzle7",
+   "id": 105
+  },
+  {
+   "x": 9,
+   "y": 2,
+   "sight": 1,
+   "script": "Route110_TrickHousePuzzle7_EventScript_Alvaro",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route110_TrickHousePuzzle7",
+   "id": 849
+  },
+  {
+   "x": 8,
+   "y": 13,
+   "sight": 1,
+   "script": "Route110_TrickHousePuzzle7_EventScript_Mariela",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route110_TrickHousePuzzle7",
+   "id": 848
+  },
+  {
+   "x": 9,
+   "y": 12,
+   "sight": 1,
+   "script": "Route110_TrickHousePuzzle7_EventScript_Everett",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route110_TrickHousePuzzle7",
+   "id": 850
+  }
+ ],
+ "29.10": [
+  {
+   "x": 1,
+   "y": 10,
+   "sight": 1,
+   "script": "Route110_TrickHousePuzzle8_EventScript_Vincent",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route110_TrickHousePuzzle8",
+   "id": 76
+  },
+  {
+   "x": 4,
+   "y": 2,
+   "sight": 1,
+   "script": "Route110_TrickHousePuzzle8_EventScript_Leroy",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route110_TrickHousePuzzle8",
+   "id": 77
+  },
+  {
+   "x": 8,
+   "y": 17,
+   "sight": 1,
+   "script": "Route110_TrickHousePuzzle8_EventScript_Keira",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "0",
+   "map": "Route110_TrickHousePuzzle8",
+   "id": 93
+  }
+ ],
+ "32.0": [
+  {
+   "x": 15,
+   "y": 3,
+   "sight": 3,
+   "script": "Route119_WeatherInstitute_1F_EventScript_Grunt1",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "FLAG_HIDE_ROUTE_119_TEAM_AQUA",
+   "map": "Route119_WeatherInstitute_1F",
+   "id": 17
+  },
+  {
+   "x": 10,
+   "y": 5,
+   "sight": 2,
+   "script": "Route119_WeatherInstitute_1F_EventScript_Grunt4",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "FLAG_HIDE_ROUTE_119_TEAM_AQUA",
+   "map": "Route119_WeatherInstitute_1F",
+   "id": 26
+  }
+ ],
+ "32.1": [
+  {
+   "x": 15,
+   "y": 6,
+   "sight": 4,
+   "script": "Route119_WeatherInstitute_2F_EventScript_Grunt2",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "FLAG_HIDE_ROUTE_119_TEAM_AQUA",
+   "map": "Route119_WeatherInstitute_2F",
+   "id": 18
+  },
+  {
+   "x": 10,
+   "y": 8,
+   "sight": 2,
+   "script": "Route119_WeatherInstitute_2F_EventScript_Grunt3",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "FLAG_HIDE_ROUTE_119_TEAM_AQUA",
+   "map": "Route119_WeatherInstitute_2F",
+   "id": 19
+  },
+  {
+   "x": 4,
+   "y": 6,
+   "sight": 0,
+   "script": "Route119_WeatherInstitute_2F_EventScript_Shelly",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "FLAG_HIDE_ROUTE_119_TEAM_AQUA",
+   "map": "Route119_WeatherInstitute_2F",
+   "id": 32
+  },
+  {
+   "x": 19,
+   "y": 6,
+   "sight": 3,
+   "script": "Route119_WeatherInstitute_2F_EventScript_Grunt5",
+   "type": "TRAINER_TYPE_NORMAL",
+   "flag": "FLAG_HIDE_ROUTE_119_TEAM_AQUA",
+   "map": "Route119_WeatherInstitute_2F",
+   "id": 596
+  }
+ ]
+}
