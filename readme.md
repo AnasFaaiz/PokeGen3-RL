@@ -26,7 +26,7 @@ sequences, so it never presses buttons the game isn't actually waiting on.
 ```
 
 - **`env.py`** — a Gymnasium environment. Talks to the bridge over a plain
-  TCP socket, builds the 417-value observation vector, computes reward, and
+  TCP socket, builds the observation vector (499 values by default), computes reward, and
   exposes the action mask MaskablePPO needs.
 - **`games/emerald/battle_bridge.lua`** — runs inside mGBA. Reads RAM
   directly, drives menu navigation by reading the actual cursor position
@@ -34,12 +34,14 @@ sequences, so it never presses buttons the game isn't actually waiting on.
   `WAITING`, `BATTLE_OVER`, `FORCED_SWITCH`, …) that `env.py` waits on.
 - **`games/emerald/emerald_config.lua`** — every RAM address and struct
   offset used, pulled from the `pokeemerald` decompilation source/symbols.
-- **`training/train_dqn.py`** — the MaskablePPO training loop, with a
-  milestone checkpoint every 2048 steps and a crash-safety checkpoint
-  (`backups/latest_safety.zip`) every 256 steps.
-- **`training/expand_model.py`** — expands an older checkpoint's first
-  layer when the observation size grows (used to go from 285 → 417 dims),
-  without needing a live mGBA connection.
+- **`training/train_dqn.py`** — the MaskablePPO training loop (despite the
+  name, no DQN any more). It loads `pokemon_ppo_masked_v8` and saves
+  `pokemon_ppo_masked_v9`, with a crash-safety checkpoint
+  (`backups/latest_safety.zip`) and optional parallel emulators.
+- **`training/expand_model*.py`** — expand an older checkpoint's first layer
+  (and action head) when the observation or action space grows
+  (285 → 417 → 431 → 499 dims), without a live mGBA connection. Old weights
+  keep their meaning; new inputs start at zero.
 - **`tools/mem_finder.py`** — connects to the bridge's probe port and
   automatically finds RAM addresses: it looks for bytes that mirror known
   signals, bytes that discriminate between game states, and prompts the
@@ -69,19 +71,29 @@ Bridge listening on 8888 (env) and 8889 (address finder)
 python training/train_dqn.py
 ```
 
-This loads `checkpoints/current/pokemon_ppo_masked_v7_expanded.zip` if it
-exists (otherwise starts a fresh model), and trains for 500,000 steps.
-TensorBoard logs go to `ppo_tensorboard/`.
+Build the v9 checkpoint from v8 once (no emulator needed), then train:
+
+```bash
+python training/expand_model_v9.py
+python training/train_dqn.py
+```
+
+This trains for 500,000 steps by default (`POKE_TOTAL_STEPS`). TensorBoard
+logs go to `ppo_tensorboard/`. Flags such as `POKE_N_ENVS` (parallel
+emulators), `POKE_MOVE_TEACH`, `POKE_FRAME_STACK` and `POKE_LEGACY_OBS` are
+listed in [PLAN.md](PLAN.md). Older models are on the
+[Releases page](https://github.com/AnasFaaiz/PokeGen3-RL/releases) (DQN v1–v6,
+PPO v7, v7-expanded, v8).
 
 **3. Evaluate / run a trained model**
 
 ```bash
-python training/run_eval.py
+python analysis/run_eval.py --model checkpoints/current/pokemon_ppo_masked_v9 --battles 100
 ```
 
 ## Observation space
 
-417 values, each normalized to `[0, 1]`:
+499 values by default (431 with `POKE_LEGACY_OBS=1`, which is what v8 was trained on), each normalized to `[0, 1]`:
 
 | Group | Contents |
 |---|---|
@@ -89,18 +101,25 @@ python training/run_eval.py
 | Own party (×6, active-first) | species, level, HP ratio, status |
 | Enemy party (×6) | species, level, HP ratio, status |
 | Battle context | weather category, battle-type flags, outcome/forced-switch flags |
+| Training context (v8, +14) | party levels, level gap, balls left, wild flag, species already owned, PC stock |
+| Combat features (v9, +60) | expected damage, KO flags, speed, stats, bench, move tags |
+| Opponent trainer (v9, +8) | trainer team features from the decomp tables |
 
 ## Reward
 
 - **Damage dealt / taken**: scaled by the *fraction of max team HP* changed
   (not raw HP), so a knockout is worth roughly the same regardless of level.
-- **Win / loss**: ±100, read directly from `gBattleOutcome`.
+- **Win / loss**: ±100 (win bonus adjustable via `POKE_WIN_REWARD`), read directly from `gBattleOutcome`.
 - **KO bonus**: +5 per enemy faint, -5 per faint of your own.
-- **Costs**: -0.25 per decision turn and -3 per *voluntary* switch. Forced
-  switches (after a faint) and switches the game refused are free.
-- **Catching** (outcome 7): +10 only for a Pokemon caught by hand mid-fight,
-  and -1 per ball used during the fight. Scripted catches happen before the
-  agent acts and are not rewarded or charged.
+- **Level growth**: a log-scale term on party level gain, so early levels pay more than late ones.
+- **Costs**: -1 per decision turn and -3 per *voluntary* switch, escalating
+  by 50% for each further switch (max 4 per battle). Forced switches (after a
+  faint) and switches the game refused are free. Running from a wild battle
+  costs `POKE_FLEE_PENALTY` (40).
+- **Catching** (outcome 7): the model's own action 17 throws a ball (wild
+  battles only, max 4 per battle). Catches pay a bonus, more for a new Pokedex
+  species or a low-HP catch, minus a per-ball cost.
+- **Scaling**: all rewards are multiplied by 0.01 before PPO sees them.
 - **Rejected actions**: never stored as training steps. The env retries the
   action, then falls back to a legal one, and logs each reject to
   `logs/rejects.csv`.
@@ -109,9 +128,10 @@ python training/run_eval.py
 
 ## Catching
 
-A scripted rule (`training/catch_policy.py`) keeps a pool of low-level Pokemon
-on hand for when the party has outleveled the area it hunts in. It is not
-part of the policy's 17 actions, so the checkpoint is unchanged.
+Catching is now a model action (action 17, `THROW_ACTION`). The scripted rule
+below (`training/catch_policy.py`) is dormant (`SCRIPTED_CATCH = False`) and
+kept for reference; it keeps a pool of low-level Pokemon on hand for when the
+party has outleveled the area it hunts in.
 
 - **Trigger:** every party member is at least 12 levels above the highest
   wild level recently seen on this map (last 20 encounters, at least 10
@@ -129,8 +149,27 @@ result), `logs/battles.csv` (one row per battle: outcome, wild or trainer,
 level gap, switch counts, balls) and `logs/level_gap.csv` (party-vs-PC levels
 every 25 battles). `battle_data.csv` is the per-step log; if its header is
 older than the current columns, the old file is renamed to
-`battle_data_oldschema_<time>.csv` when training starts. Swapping the party for the
-low-level stock from the PC is not built yet.
+`battle_data_oldschema_<time>.csv` when training starts. Every row carries a
+run id (`logs/runs.csv`); `python training/log_report.py` summarises logs per
+run, level gap and species.
+
+## PC-box swap
+
+`training/swap_policy.py` swaps overleveled party members for PC Pokemon near
+the wild area's level, so fights stay informative. It writes party and box
+memory directly in the overworld (`BOXMON` / `PARTYMON` / `SWAP` bridge
+commands), not by driving the PC menu. The whole party is checked, a start-up
+fill brings it into the area's band, picks are weighted so species rotate, box
+eggs are skipped and computed stats are sanity-checked first. Wild areas only
+(needs 10 wild encounters on a map first); turn off with `SCRIPTED_SWAP = False`
+for gym or story battles. Verified live. Swaps are logged in `logs/swaps.csv`.
+
+## Move teaching (optional)
+
+With `POKE_MOVE_TEACH=1`, four extra actions (18–21) let the model choose a
+level-up move to teach a party member, scored by `training/move_policy.py`
+and written between battles by `SETMOVES`. Not yet checked on the real game;
+see [PLAN.md](PLAN.md).
 
 Read-only and manual bridge commands (`python training/bridge_cli.py <CMD>`,
 training stopped):
@@ -142,6 +181,9 @@ training stopped):
 | `DEX` | Pokedex owned flags |
 | `BAG` | bag pocket/cursor and current callback |
 | `THROW[:itemId]` | throw a ball in a wild single battle (default Poke Ball) |
+| `PARTYMON` / `BOXMON` / `SWAP` / `SPECIES` | read party/box Pokemon, swap a party slot with a box slot |
+| `MONMOVES` / `SETMOVES` | read and write a party Pokemon's moves (move teaching) |
+| `TRAINER` / `TRAINERSCAN` / `TRAINERFLAGS` | opponent trainer lookup and defeated flags (address not yet found live) |
 
 ## Memory address finder
 
@@ -181,24 +223,29 @@ python tools/mem_finder.py analyze analysis/mem_sessions/<session> --sym pokeeme
 
 ```
 games/battle_bridge.lua  the mGBA bridge (battle tasks, throw task, socket server)
-games/emerald/          emerald_config.lua, inventory.lua (read-only readers), overworld_nav.lua, game data
-training/                env.py, train_dqn.py, catch_policy.py, exp_tables.py, bridge_cli.py,
-                         expand_model.py, logger.py, mem_finder.py
-checkpoints/current/     the model currently being trained/loaded
+games/bridge_ports.lua   picks a free port pair per emulator window
+games/emerald/           emerald_config.lua, inventory.lua (party/box/move readers and writers),
+                         overworld_nav.lua, game_data/ (decomp-generated tables), data_gen/ (generators)
+training/                env.py, train_dqn.py, swap_policy.py, catch_policy.py, move_policy.py,
+                         damage_calc.py, trainer_info.py, expand_model*.py, logger.py, log_report.py,
+                         prepare_instances.py, check_ports.py, bridge_cli.py, test_*.py (offline tests)
+analysis/                run_eval.py, reinit_value_head.py, distill_policy.py (mem_sessions/ not committed)
+checkpoints/current/     v7-expanded, v8 and v9 models
 backups/                 auto-generated milestone + crash-safety checkpoints (not committed)
-analysis/mem_sessions/   mem_finder.py output (not committed)
+PLAN.md                  current work, env flags, live-test checklist
 ```
 
 ## Status / caveats
 
-- The bridge and `env.py` rewrite (game-state-driven battle detection,
-  cursor-verified navigation, PID-based switching) has only been verified
-  against a simulated battle engine built from the `pokeemerald` source —
-  not yet confirmed stable on a long real-mGBA run.
-- `checkpoints/current/pokemon_ppo_masked_v7.zip` was trained on an earlier,
-  buggy observation/reward setup (swapped level/max_hp offsets, wrong
-  weather address, switch-reward exploit) — expect a relearning period
-  after loading the expanded checkpoint.
+- The battle bridge and `env.py` are driven by game state (battle detection,
+  cursor-verified navigation, PID-based switching). Catching and the PC-box swap
+  have run live. Move teaching, trainer-id lookup and the v9 observation are
+  verified only offline so far; the live checklist is in [PLAN.md](PLAN.md).
+- Training speed on one emulator is about 1,000 steps/hour; parallel emulators
+  (`POKE_N_ENVS`) are the main lever.
+- The v7 checkpoints were trained on an earlier, buggy observation/reward setup
+  (swapped level/max_hp offsets, wrong weather address, switch-reward exploit),
+  so v8 and later are the ones to use.
 
 ## License
 
