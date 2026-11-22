@@ -617,6 +617,8 @@ class PokemonBattleEnv(gym.Env):
             if startup and area_max is not None:
                 self.swap_startup_done = True        # nothing to fill: the party is already in band
             return                                   # cheap gate first: no box read unless it matters
+        if not self._wait_for_overworld():           # the bridge refuses SWAP while gMain.inBattle is still set
+            return                                   # (post-battle screens); no back-off, retry next battle
         box = self._get_box()                        # cached; refreshed after a catch or swap
         if not box or not pol.candidates(area_max, self.box_entries):
             pol.next_check_episode = self.episode + pol.retry
