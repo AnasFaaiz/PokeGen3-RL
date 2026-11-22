@@ -54,15 +54,18 @@ local function boxLine()
 			if pid ~= 0 then
 				local key = pid ~ emu:read32(base + 4)
 				local order = block_orders[(pid % 24) + 1]
-				local g
+				local g, m
 				for i = 1, 4 do
 					if order[i] == 0 then
 						g = base + 0x20 + (i - 1) * 12
+					elseif order[i] == 3 then
+						m = base + 0x20 + (i - 1) * 12
 					end
 				end
 				local species = (emu:read32(g) ~ key) & 0xFFFF
 				local exp = emu:read32(g + 4) ~ key
-				if species ~= 0 then
+				local isEgg = (((emu:read32(m + 4) ~ key) >> 30) & 1) == 1 -- eggs are useless in the party: never offer them
+				if species ~= 0 and not isEgg then
 					out[#out + 1] = string.format("%d.%d:%d:%d", b, s, species, exp)
 				end
 			end

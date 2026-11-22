@@ -82,6 +82,10 @@ def main():
     rom_info.ensure(ask, [int(p[1]) for p in parsed])
     for pos, sp, exp in parsed:
         entries.append(BoxEntry(pos, int(sp), box_level(int(sp), int(exp))))
+    eggs = [e.key for e in SwapPolicy().candidates(a.area, entries)
+            if (parse_boxmon(ask(f"BOXMON:{e.key}")) or {"iv": 0})["iv"] >> 30 & 1]
+    assert not eggs, f"eggs leaked into the box list: {eggs}"
+    print("egg filter: no eggs among in-band box mons")
     if a.box:
         pick = next((e for e in entries if e.key == a.box), None)
     else:

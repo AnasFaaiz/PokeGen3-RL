@@ -636,8 +636,8 @@ class PokemonBattleEnv(gym.Env):
                 if mon:
                     rom_info.ensure(self._request, [mon["species"]])
                 stats = compute_stats(mon) if mon else None
-                if not stats:
-                    print(f"[swap] cannot compute stats for {ent.key}; skipped")
+                if not stats or stats[1] <= 0 or stats[0] != ent.level:   # bad ROM table read or a changed box slot
+                    print(f"[swap] implausible stats for {ent.key} ({stats}); skipped")
                     continue
                 reply = self._request(f"SWAP:{slot}:{ent.key}:" + ":".join(map(str, stats)))
                 name = SPECIES_ID_TO_NAME.get(ent.species, ent.species)
