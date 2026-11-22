@@ -15,15 +15,29 @@ sequences, so it never presses buttons the game isn't actually waiting on.
 ## How it fits together
 
 ```
-┌─────────────┐   TCP :8888   ┌────────────────────┐   Lua/C API   ┌───────┐
-│  env.py      │◄─────────────►│ battle_bridge.lua  │◄─────────────►│ mGBA  │
-│ (Gym env)    │   TCP :8889   │ (game-state driven) │   emu:read*   │ + ROM │
-└──────┬───────┘                └──────────┬─────────┘               └───────┘
-       │                                   │
-       ▼                                   ▼
- train_dqn.py                      tools/mem_finder.py
- (MaskablePPO)                     (automatic RAM address finder)
+                          ┌──────────────────────────────────────────────┐
+                          │ train_dqn.py  (main process)                 │
+                          │  MaskablePPO: ONE policy + value network     │
+                          │  rollout buffer (n_steps x N envs)           │
+                          │  callbacks: win-rate, milestone + safety     │
+                          └───────┬──────────────────────────────▲───────┘
+                  actions (batch) │   obs, reward, done, mask    │  weights saved to
+                                  ▼   (SubprocVecEnv pipes)      │  checkpoints/ + backups/
+        ┌─────────────┬───────────┴─┬─────────────┬──────────────┴┐
+        │ worker 0    │ worker 1    │ worker 2    │ worker 3      │   env.py (Gymnasium env),
+        │ env.py      │ env.py      │ env.py      │ env.py        │   no model inside: it only
+        │ port 8888   │ port 8890   │ port 8892   │ port 8894     │   steps its own game
+        └──────┬──────┴──────┬──────┴──────┬──────┴──────┬────────┘
+          TCP  │        TCP  │        TCP  │        TCP  │   line protocol: GET_STATE, ACTION:n,
+               ▼             ▼             ▼             ▼   THROW, NAV:*, SWAP, ...  (one reply per line)
+        ┌────────────┐┌────────────┐┌────────────┐┌────────────┐
+        │ mGBA #0    ││ mGBA #1    ││ mGBA #2    ││ mGBA #3    │  each: own ROM + .sav copy,
+        │ battle_    ││ battle_    ││ battle_    ││ battle_    │  own battle_bridge.lua
+        │ bridge.lua ││ bridge.lua ││ bridge.lua ││ bridge.lua │  (also probe port main+1 for
+        └────────────┘└────────────┘└────────────┘└────────────┘   tools/mem_finder.py)
 ```
+
+`POKE_N_ENVS=1` is the same picture with a single worker and no `SubprocVecEnv`.
 
 - **`env.py`** — a Gymnasium environment. Talks to the bridge over a plain
   TCP socket, builds the observation vector (499 values by default), computes reward, and
@@ -46,6 +60,73 @@ sequences, so it never presses buttons the game isn't actually waiting on.
   automatically finds RAM addresses: it looks for bytes that mirror known
   signals, bytes that discriminate between game states, and prompts the
   bridge doesn't yet handle. See [Memory address finder](#memory-address-finder).
+
+## How the Lua bridge and the env work
+
+**The bridge (`games/battle_bridge.lua`)** runs inside mGBA and is registered on the emulator's
+`frame` callback, so it runs once per emulated frame. Each frame it:
+
+1. Reads game RAM (addresses from `emerald_config.lua`): the main callback (`callback2`), `gMain.inBattle`,
+   `gBattleOutcome`, the controller function of each battler and the battle-script opcode.
+2. Works out a **phase** from those: `CHOOSE_ACTION`, `FORCED_SWITCH`, `WAITING`, `BUSY`, `BATTLE_OVER`,
+   `NOT_IN_BATTLE`.
+3. Advances the running **task** (one move, switch or ball throw) by at most one button press. Menus are
+   navigated by pressing, then reading the real cursor position back and pressing again until it is right.
+4. When no task is running, `battleAutomation` clears the prompts the agent never decides (evolution,
+   "learn a move?", level-up boxes, post-battle text), with a watchdog that presses B if the game is stuck.
+5. When out of battle, `overworld_nav.lua` walks the player to grass or to a Pokémon Center.
+6. Services the TCP sockets: accepts the env's connection and answers one reply per command line.
+
+The bridge is a plain request/response server. `GET_STATE` returns the whole battle state,
+`STATUS` returns `phase:lastResult`, `ACTION:n` / `THROW` start a task and reply `ACK` or `REJECT:<why>`,
+and `NAV:*`, `INVENTORY`, `BOX`, `SWAP`, `SETMOVES` and the rest are the overworld commands.
+
+**The env (`training/env.py`)** is a standard Gymnasium environment where one episode is one battle:
+
+- `reset()` waits for the previous battle to finish. In the overworld it applies queued move edits, runs the
+  PC-box swap, then calls `NAV:HUNT`/`NAV:HEAL` and polls `STATUS` until the game is asking for an action.
+- `step(action)` waits for a decision phase, snapshots the state, sends `ACTION:n`, polls until the next
+  decision point or the end of the battle, and then builds the new observation, the reward and the mask.
+  If the bridge rejects an action, the env retries it and falls back to a legal action. A rejected action is
+  never stored as a training step.
+- `action_masks()` marks illegal moves, switches and throws, and MaskablePPO only samples from the legal ones.
+- A stuck emulator or a 60-second turn timeout ends the episode as `truncated` with reward 0.
+
+## Four environments, one model
+
+`POKE_N_ENVS=4` starts four **separate mGBA windows**, and the training process drives all of them:
+
+1. `training/prepare_instances.py` gives each window its own copy of the ROM, `.sav` and start state, because
+   two windows writing one save file would corrupt it. Each window loads `battle_bridge.lua`. The first free
+   port pair is taken in order (`bridge_ports.lua`), so the windows get 8888/8889, 8890/8891, 8892/8893 and
+   8894/8895. `python training/check_ports.py 4` checks that all four answer.
+2. `train_dqn.py` wraps each env in a `SubprocVecEnv`, so each worker process owns one `PokemonBattleEnv` and
+   one TCP connection to its own emulator. Workers hold no model.
+3. There is a single `MaskablePPO` in the main process. Each step it takes the 4 observations and 4 masks as
+   one batch, runs one forward pass and sends one action back to each worker. The four games then step in
+   parallel, and each takes its own wall-clock time per turn.
+4. Every env's transitions go into the **same rollout buffer**. `POKE_N_STEPS` is the total samples per update
+   (default 512), so with 4 envs each contributes 128 steps. When the buffer is full, PPO does one update on all of it and
+   the new weights are used by all four games on the next step. So the 4 envs are not 4 models; they are 4
+   sources of experience for one policy, which is why the speed-up is close to linear in the emulator count.
+5. Logging stays separable. Each worker gets its own log id (`<run>_e0` … `_e3`) and episode numbers start at
+   `i * 10,000,000`, so rows from different emulators never collide.
+
+## How the model is saved while training
+
+All saving happens in the main process, in `train_dqn.py` callbacks, and the workers are never involved:
+
+| What | When | Where |
+|---|---|---|
+| `SafetyCheckpointCallback` | every `max(256 // N_ENVS, 8)` vec-steps (~256 samples) | overwrites `backups/latest_safety.zip` **and** the main file `checkpoints/current/pokemon_ppo_masked_v9.zip` |
+| `CheckpointCallback` | once per PPO update (`n_steps`) | numbered milestones `backups/ppo_v9_<steps>_steps.zip`, which accumulate |
+| `finally:` block | finish, Ctrl+C or a crash in `learn()` | one last save of the main file |
+
+The main-file save is atomic (`save_atomic`): the zip is written to `<name>.tmp.zip` and then `os.replace`d onto the
+real name, so a crash during a write can never leave a half-written model. The next run loads that same main
+file (falling back to the v8 baseline only if it doesn't exist), so killing the run at any time loses at most
+a few hundred samples. Saved weights are whatever the policy is at that moment, which can be mid-rollout and
+between updates, and the file always loads and resumes normally.
 
 ## Setup
 
