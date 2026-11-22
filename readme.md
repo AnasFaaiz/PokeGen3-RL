@@ -112,6 +112,38 @@ and `NAV:*`, `INVENTORY`, `BOX`, `SWAP`, `SETMOVES` and the rest are the overwor
 5. Logging stays separable. Each worker gets its own log id (`<run>_e0` … `_e3`) and episode numbers start at
    `i * 10,000,000`, so rows from different emulators never collide.
 
+### Commands for the 4-env run
+
+```bash
+# 1. One ROM + .sav + start-state copy per window (copies files and prints the launch commands; starts nothing)
+python training/prepare_instances.py --rom /path/to/emerald.gba --n 4 --state /path/to/start.ss1 --out instances
+
+# 2. Start the 4 windows with the printed commands, for example:
+flatpak run io.mgba.mGBA -t instances/env0/start.ss1 instances/env0/<rom>
+flatpak run io.mgba.mGBA -t instances/env1/start.ss1 instances/env1/<rom>   # ... env2, env3
+#    If mGBA can't read the folder (Flatpak sandbox), allow it once:
+flatpak override --user --filesystem=$PWD/instances io.mgba.mGBA
+
+# 3. In each window: Tools -> Scripting -> Load script -> games/battle_bridge.lua (first window first).
+#    Windows take ports 8888, 8890, 8892, 8894 in the order they load the script.
+
+# 4. Check that all 4 bridges answer (read-only)
+python training/check_ports.py 4
+
+# 5. Train on all 4 with one shared model
+POKE_N_ENVS=4 python training/train_dqn.py
+
+# Optional: a custom total update size / run length / port list
+POKE_N_ENVS=4 POKE_N_STEPS=512 POKE_TOTAL_STEPS=500000 python training/train_dqn.py
+POKE_N_ENVS=4 POKE_PORTS=8888,8890,8892,8894 python training/train_dqn.py
+
+# Watch training / summarise logs
+tensorboard --logdir ppo_tensorboard
+python training/log_report.py
+
+# Stop safely: Ctrl+C in the training terminal (the model is saved before exit)
+```
+
 ## How the model is saved while training
 
 All saving happens in the main process, in `train_dqn.py` callbacks, and the workers are never involved:
